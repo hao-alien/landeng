@@ -37,6 +37,18 @@ const (
 	FORWARDED_FOR_IP = "192.168.1.1"
 )
 
+var (
+	successfulRequests int
+
+	testClientHeaders = http.Header{
+		"Accept":          {`text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8`},
+		"Accept-Encoding": {`gzip, deflate, sdch`},
+		"Accept-Language": {`en-US,en;q=0.8,es;q=0.6`},
+		"Referer":         {`https://www.example.org/`},
+		"User-Agent":      {`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.34 (KHTML, like Gecko) Chrome/41.0.2311.135 Safari/537.31`},
+	}
+)
+
 // TestCloudFlare tests to make sure that a client and server can communicate
 // with each other to proxy traffic for an HTTP client using the CloudFlare
 // protocol.  This does not test actually running through CloudFlare and just
@@ -140,6 +152,17 @@ func TestCloudFlare(t *testing.T) {
 	testRequest("Plain Text Request", t, mockServer.requests, false, certPool, 200, nil)
 	testRequest("HTTPS Request", t, mockServer.requests, true, certPool, 200, nil)
 	testRequest("HTTPS Request without server Cert", t, mockServer.requests, true, nil, 200, fmt.Errorf("Get https://"+HTTPS_ADDR+": x509: certificate signed by unknown authority"))
+
+	for i := 0; i < successfulRequests; i++ {
+		req := <-mockServer.requests
+		// Inspecting request headers, all our testClientHeaders should be here too.
+		for k := range testClientHeaders {
+			if req.Header.Get(k) != testClientHeaders.Get(k) {
+				t.Fatalf("Wrong header, got %s = %q, expecting %q.", k, req.Header.Get(k), testClientHeaders.Get(k))
+			}
+		}
+	}
+
 }
 
 // testRequest tests an individual request, either HTTP or HTTPS, making sure
@@ -147,15 +170,16 @@ func TestCloudFlare(t *testing.T) {
 // was successful, it also tests to make sure that the outbound request didn't
 // leak any Lantern or CloudFlare headers.
 func testRequest(testCase string, t *testing.T, requests chan *http.Request, https bool, certPool *x509.CertPool, expectedStatus int, expectedErr error) {
-	httpClient := &http.Client{Transport: &http.Transport{
-		Proxy: func(req *http.Request) (*url.URL, error) {
-			return url.Parse("http://" + CLIENT_ADDR)
+	httpClient := &http.Client{
+		Transport: &http.Transport{
+			Proxy: func(req *http.Request) (*url.URL, error) {
+				return url.Parse("http://" + CLIENT_ADDR)
+			},
+			TLSClientConfig: &tls.Config{
+				RootCAs: certPool,
+			},
 		},
-
-		TLSClientConfig: &tls.Config{
-			RootCAs: certPool,
-		},
-	}}
+	}
 
 	var destURL string
 	if https {
@@ -164,9 +188,13 @@ func testRequest(testCase string, t *testing.T, requests chan *http.Request, htt
 		destURL = "http://" + HTTP_ADDR
 	}
 	req, err := http.NewRequest("GET", destURL, nil)
+
 	if err != nil {
 		t.Fatalf("Unable to construct request: %s", err)
 	}
+
+	req.Header = testClientHeaders
+
 	resp, err := httpClient.Do(req)
 
 	requestSuccessful := err == nil
@@ -175,6 +203,7 @@ func testRequest(testCase string, t *testing.T, requests chan *http.Request, htt
 	if !gotCorrectError {
 		t.Errorf("%s: Wrong error.\nExpected: %s\nGot     : %s", testCase, expectedErr, err)
 	} else if requestSuccessful {
+		successfulRequests++
 		defer resp.Body.Close()
 		if resp.StatusCode != expectedStatus {
 			t.Errorf("%s: Wrong response status. Expected %d, got %d", testCase, expectedStatus, resp.StatusCode)
