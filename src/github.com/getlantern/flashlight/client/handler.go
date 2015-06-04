@@ -98,8 +98,17 @@ func (client *Client) intercept(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	serverAddr := func() (ret string) {
+		// to avoid panic of RemoteAddr()
+		defer func() {
+			if v := recover(); v != nil {
+				// do nothing
+			}
+		}()
+		return connOut.RemoteAddr().String()
+	}()
 	muConns.Lock()
-	conns[connOut] = connMeta{addr, connOut.RemoteAddr().String(), time.Now()}
+	conns[connOut] = connMeta{addr, serverAddr, time.Now()}
 	muConns.Unlock()
 	defer func() {
 		connOut.Close()
