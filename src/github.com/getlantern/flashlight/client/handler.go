@@ -8,6 +8,7 @@ import (
 	"runtime"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/getlantern/detour"
 )
@@ -16,6 +17,29 @@ const (
 	httpConnectMethod  = "CONNECT" // HTTP CONNECT method
 	httpXFlashlightQOS = "X-Flashlight-QOS"
 )
+
+type connMeta struct {
+	addr          string
+	establishedAt time.Time
+}
+
+var muConns sync.RWMutex
+var conns = make(map[net.Conn]connMeta)
+
+func init() {
+	go func() {
+		ch := time.Tick(10 * time.Second)
+		for now := range ch {
+			muConns.RLock()
+			for _, meta := range conns {
+				if d := now.Sub(meta.establishedAt); d > 10*time.Minute {
+					log.Debugf("**********Connection to %s lasted for %v", meta.addr, d)
+				}
+			}
+			muConns.RUnlock()
+		}
+	}()
+}
 
 // ServeHTTP implements the method from interface http.Handler using the latest
 // handler available from getHandler() and latest ReverseProxy available from
@@ -69,7 +93,15 @@ func (client *Client) intercept(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	defer connOut.Close()
+	muConns.Lock()
+	conns[connOut] = connMeta{addr, time.Now()}
+	muConns.Unlock()
+	defer func() {
+		connOut.Close()
+		muConns.Lock()
+		delete(conns, connOut)
+		muConns.Unlock()
+	}()
 
 	// Pipe data between the client and the proxy.
 	pipeData(clientConn, connOut, req)
