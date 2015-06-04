@@ -19,7 +19,8 @@ const (
 )
 
 type connMeta struct {
-	addr          string
+	hostAddr      string
+	serverAddr    string
 	establishedAt time.Time
 }
 
@@ -32,8 +33,12 @@ func init() {
 		for now := range ch {
 			muConns.RLock()
 			for _, meta := range conns {
-				if d := now.Sub(meta.establishedAt); d > 10*time.Minute {
-					log.Debugf("**********Connection to %s lasted for %v", meta.addr, d)
+				d := now.Sub(meta.establishedAt)
+				msg := fmt.Sprintf("**********Connection to %s via %s lasted for %v", meta.hostAddr, meta.serverAddr, d)
+				if d > 10*time.Minute {
+					log.Debug(msg)
+				} else {
+					log.Trace(msg)
 				}
 			}
 			muConns.RUnlock()
@@ -94,7 +99,7 @@ func (client *Client) intercept(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	muConns.Lock()
-	conns[connOut] = connMeta{addr, time.Now()}
+	conns[connOut] = connMeta{addr, connOut.RemoteAddr().String(), time.Now()}
 	muConns.Unlock()
 	defer func() {
 		connOut.Close()
