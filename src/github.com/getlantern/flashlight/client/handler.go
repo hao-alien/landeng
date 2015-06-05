@@ -20,12 +20,13 @@ const (
 
 type connMeta struct {
 	hostAddr      string
-	serverAddr    string
+	peerAddr      string
 	establishedAt time.Time
 }
 
 var muConns sync.RWMutex
 var conns = make(map[net.Conn]connMeta)
+var clientConns = make(map[net.Conn]connMeta)
 
 func init() {
 	go func() {
@@ -34,13 +35,24 @@ func init() {
 			muConns.RLock()
 			for _, meta := range conns {
 				d := now.Sub(meta.establishedAt)
-				msg := fmt.Sprintf("**********Connection to %s via %s lasted for %v", meta.hostAddr, meta.serverAddr, d)
+				msg := fmt.Sprintf("**********Connection to %s via %s lasted for %v", meta.hostAddr, meta.peerAddr, d)
 				if d > 10*time.Minute {
 					log.Debug(msg)
 				} else {
 					log.Trace(msg)
 				}
 			}
+			log.Debugf("**********%d connections in total", len(conns))
+			for _, meta := range clientConns {
+				d := now.Sub(meta.establishedAt)
+				msg := fmt.Sprintf("**********Client connection to %s from %s lasted for %v", meta.hostAddr, meta.peerAddr, d)
+				if d > 10*time.Minute {
+					log.Debug(msg)
+				} else {
+					log.Trace(msg)
+				}
+			}
+			log.Debugf("**********%d client connections in total", len(clientConns))
 			muConns.RUnlock()
 		}
 	}()
@@ -78,7 +90,15 @@ func (client *Client) intercept(resp http.ResponseWriter, req *http.Request) {
 		respondBadGateway(resp, fmt.Sprintf("Unable to hijack connection: %s", err))
 		return
 	}
-	defer clientConn.Close()
+	muConns.Lock()
+	clientConns[clientConn] = connMeta{req.Host, clientConn.RemoteAddr().String(), time.Now()}
+	muConns.Unlock()
+	defer func() {
+		clientConn.Close()
+		muConns.Lock()
+		delete(clientConns, clientConn)
+		muConns.Unlock()
+	}()
 
 	addr := hostIncludingPort(req, 443)
 	// Establish outbound connection.
