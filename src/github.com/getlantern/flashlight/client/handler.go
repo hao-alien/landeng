@@ -96,6 +96,8 @@ func (client *Client) intercept(resp http.ResponseWriter, req *http.Request) {
 	defer func() {
 		clientConn.Close()
 		muConns.Lock()
+		meta := clientConns[clientConn]
+		log.Debugf("**********Closing client connection to %s from %s, lasted for %v", meta.hostAddr, meta.peerAddr, time.Now().Sub(meta.establishedAt))
 		delete(clientConns, clientConn)
 		muConns.Unlock()
 	}()
@@ -133,6 +135,8 @@ func (client *Client) intercept(resp http.ResponseWriter, req *http.Request) {
 	defer func() {
 		connOut.Close()
 		muConns.Lock()
+		meta := conns[connOut]
+		log.Debugf("**********Closing connection to %s via %s, lasted for %v", meta.hostAddr, meta.peerAddr, time.Now().Sub(meta.establishedAt))
 		delete(conns, connOut)
 		muConns.Unlock()
 	}()
@@ -171,6 +175,7 @@ func pipeData(clientConn net.Conn, connOut net.Conn, req *http.Request) {
 		// after completed send / receive so that won't cause problem.
 		wg.Wait()
 		clientConn.Close()
+		connOut.Close()
 	}()
 
 	// Respond OK
