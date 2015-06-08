@@ -100,7 +100,7 @@ func DialForTimings(dialer *net.Dialer, network, addr string, sendServerName boo
 		resolvedCh := make(chan *net.TCPAddr, 10)
 		go func() {
 			resolved, err := net.ResolveTCPAddr("tcp", addr)
-			log.Tracef("Resolution resulted in %s : %s", resolved, err)
+			log.Tracef("Resolution resulted in %s : %v", resolved, err)
 			resolvedCh <- resolved
 			errCh <- err
 		}()

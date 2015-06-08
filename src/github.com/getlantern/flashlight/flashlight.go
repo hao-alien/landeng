@@ -254,8 +254,13 @@ func applyClientConfig(client *client.Client, cfg *config.Config) {
 		// An *http.Client that uses the highest QOS dialer.
 		hqfdClient := hqfd.NewDirectDomainFronter()
 		config.Configure(hqfdClient)
-		geolookup.Configure(hqfdClient)
-		statserver.Configure(hqfdClient)
+
+		persistentClient, err := util.PersistentHTTPClient(cfg.CloudConfigCA, cfg.Addr)
+		if err == nil {
+			geolookup.Configure(persistentClient)
+			statserver.Configure(persistentClient)
+		}
+
 		// Note we don't call Configure on analytics here, as that would
 		// result in an extra analytics call and double counting.
 	}
