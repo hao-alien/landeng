@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	reportingInterval = 300 * time.Second
+	reportingInterval = 1 * time.Second
 	retryWaitTime     = 10 * time.Second
 	maxGeolocateTries = 10
 )
