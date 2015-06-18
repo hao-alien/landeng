@@ -52,6 +52,7 @@ func TestFraming(t *testing.T) {
 		readFrame := i%3 == 0
 
 		go func() {
+			defer wg.Done()
 			// Write
 			var n int
 			var err error
@@ -65,10 +66,10 @@ func TestFraming(t *testing.T) {
 			} else {
 				assert.Equal(t, len(testMessage), n, "Bytes written should match length of test message")
 			}
-			wg.Done()
 		}()
 
 		go func() {
+			defer wg.Done()
 			// Read
 			var frame []byte
 			var n int
@@ -91,7 +92,6 @@ func TestFraming(t *testing.T) {
 			}
 
 			assert.Equal(t, testMessage, frame, "Received should match sent")
-			wg.Done()
 		}()
 	}
 
