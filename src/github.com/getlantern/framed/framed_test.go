@@ -40,6 +40,7 @@ func TestFraming(t *testing.T) {
 	// Do a bunch of concurrent reads and writes to make sure we're threadsafe
 	iters := 100
 	var wg sync.WaitGroup
+	var mu sync.Mutex
 	chReadable := make(chan bool, iters)
 	for i := 0; i < iters; i++ {
 		wg.Add(2)
@@ -51,11 +52,13 @@ func TestFraming(t *testing.T) {
 			// Write
 			var n int
 			var err error
+			mu.Lock()
 			if writePieces {
 				n, err = writer.WritePieces(piece1, piece2)
 			} else {
 				n, err = writer.Write(testMessage)
 			}
+			mu.Unlock()
 			chReadable <- true
 			if err != nil {
 				t.Errorf("Unable to write: %s", err)
@@ -73,6 +76,8 @@ func TestFraming(t *testing.T) {
 			buffer := make([]byte, 100)
 
 			<-chReadable
+			mu.Lock()
+			defer mu.Unlock()
 			if readFrame {
 				if frame, err = reader.ReadFrame(); err != nil {
 					t.Errorf("Unable to read frame: %s", err)
