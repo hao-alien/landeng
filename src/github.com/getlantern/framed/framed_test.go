@@ -12,19 +12,24 @@ import (
 
 type CloseableBuffer struct {
 	raw *bytes.Buffer
+	mu  sync.Mutex
 }
 
-func (buffer CloseableBuffer) Read(data []byte) (n int, err error) {
+func (buffer *CloseableBuffer) Read(data []byte) (n int, err error) {
 	defer runtime.Gosched()
+	buffer.mu.Lock()
+	defer buffer.mu.Unlock()
 	return buffer.raw.Read(data)
 }
 
-func (buffer CloseableBuffer) Write(data []byte) (n int, err error) {
+func (buffer *CloseableBuffer) Write(data []byte) (n int, err error) {
 	defer runtime.Gosched()
+	buffer.mu.Lock()
+	defer buffer.mu.Unlock()
 	return buffer.raw.Write(data)
 }
 
-func (buffer CloseableBuffer) Close() (err error) {
+func (buffer *CloseableBuffer) Close() (err error) {
 	return
 }
 
@@ -32,15 +37,14 @@ func TestFraming(t *testing.T) {
 	testMessage := []byte("This is a test message")
 	piece1 := testMessage[:8]
 	piece2 := testMessage[8:]
-	cb := CloseableBuffer{bytes.NewBuffer(make([]byte, 0))}
+	cb := CloseableBuffer{raw: bytes.NewBuffer(make([]byte, 0))}
 	defer cb.Close()
-	writer := NewWriter(cb)
-	reader := NewReader(cb)
+	writer := NewWriter(&cb)
+	reader := NewReader(&cb)
 
 	// Do a bunch of concurrent reads and writes to make sure we're threadsafe
 	iters := 100
 	var wg sync.WaitGroup
-	var mu sync.Mutex
 	chReadable := make(chan bool, iters)
 	for i := 0; i < iters; i++ {
 		wg.Add(2)
@@ -52,13 +56,11 @@ func TestFraming(t *testing.T) {
 			// Write
 			var n int
 			var err error
-			mu.Lock()
 			if writePieces {
 				n, err = writer.WritePieces(piece1, piece2)
 			} else {
 				n, err = writer.Write(testMessage)
 			}
-			mu.Unlock()
 			chReadable <- true
 			if err != nil {
 				t.Errorf("Unable to write: %s", err)
@@ -76,8 +78,6 @@ func TestFraming(t *testing.T) {
 			buffer := make([]byte, 100)
 
 			<-chReadable
-			mu.Lock()
-			defer mu.Unlock()
 			if readFrame {
 				if frame, err = reader.ReadFrame(); err != nil {
 					t.Errorf("Unable to read frame: %s", err)
