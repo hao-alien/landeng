@@ -419,10 +419,18 @@ test-and-cover:
 	if [ -f envvars.bash ]; then \
 		source envvars.bash; \
 	fi && \
+        declare -a failed_tests=() && \
 	for pkg in $$(cat testpackages.txt | grep -v "^#"); do \
-		go test -v -covermode=count -coverprofile=profile_tmp.cov $$pkg; \
+		go test -v -covermode=count -coverprofile=profile_tmp.cov $$pkg || failed_tests=("$${failed_tests[@]}" $$pkg);\
 		tail -n +2 profile_tmp.cov >> profile.cov; \
-	done
+	done && \
+	if [ "$${#failed_tests[@]}" -gt 0 ]; then \
+		echo "******Failed packages******"; \
+		for t in $${failed_tests[@]}; do \
+			echo $$t; \
+		done; \
+		exit 1;\
+	fi
 
 android-lib: docker-golang-android
 	@source setenv.bash && \
