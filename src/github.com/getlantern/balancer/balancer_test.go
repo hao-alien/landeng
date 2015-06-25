@@ -105,14 +105,27 @@ func TestAll(t *testing.T) {
 			return net.Dial(network, addr)
 		},
 	}
-	checkAttempts := int32(0)
 	dialer3 := &Dialer{
 		Label:  "Dialer 3",
 		Weight: 1,
 		QOS:    15,
 		Dial: func(network, addr string) (net.Conn, error) {
 			atomic.StoreInt32(&dialedBy, 3)
-			if atomic.LoadInt32(&checkAttempts) < 6 {
+			return nil, fmt.Errorf("Failing intentionally")
+		},
+		Check: func() bool {
+			return false
+		},
+	}
+	checkAttempts := int32(0)
+	var maxCheckAttempts int32
+	dialer4 := &Dialer{
+		Label:  "Dialer 4",
+		Weight: 1,
+		QOS:    15,
+		Dial: func(network, addr string) (net.Conn, error) {
+			atomic.StoreInt32(&dialedBy, 4)
+			if atomic.LoadInt32(&checkAttempts) <= maxCheckAttempts {
 				// Fail for a while
 				return nil, fmt.Errorf("Failing intentionally")
 			} else {
@@ -123,19 +136,19 @@ func TestAll(t *testing.T) {
 		Check: func() bool {
 			time.Sleep(100 * time.Millisecond)
 			n := atomic.AddInt32(&checkAttempts, 1)
-			return n > 5
+			return n > maxCheckAttempts
 		},
 	}
 
-	d4attempts := int32(0)
-	dialer4 := &Dialer{
-		Label:  "Dialer 4",
+	d5attempts := int32(0)
+	dialer5 := &Dialer{
+		Label:  "Dialer 5",
 		Weight: 1,
 		QOS:    15,
 		Dial: func(network, addr string) (net.Conn, error) {
-			atomic.StoreInt32(&dialedBy, 4)
-			defer atomic.AddInt32(&d4attempts, 1)
-			if atomic.LoadInt32(&d4attempts) < 1 {
+			atomic.StoreInt32(&dialedBy, 5)
+			defer atomic.AddInt32(&d5attempts, 1)
+			if atomic.LoadInt32(&d5attempts) < 1 {
 				// Fail once
 				return nil, fmt.Errorf("Failing intentionally")
 			} else {
@@ -200,8 +213,11 @@ func TestAll(t *testing.T) {
 	}
 
 	// Test failure
-	b = New(dialer3)
-	maxCheckTimeout = 300 * time.Millisecond
+	b = New(dialer4)
+	maxCheckTimeout = 350 * time.Millisecond
+	// 100 (minimum timeout to recheck) + 350 + 350 = 800ms,
+	// so 3 is the largest possible check attempts which < the sleep time (1 sec)
+	maxCheckAttempts = 3
 	// Dial a bunch of times on multiple goroutines to hit different failure branches
 	var wg sync.WaitGroup
 	wg.Add(2)
@@ -217,28 +233,30 @@ func TestAll(t *testing.T) {
 		}()
 	}
 
+	// Sleep enough time for another check
 	time.Sleep(1 * time.Second)
-	assert.Equal(t, 6, atomic.LoadInt32(&checkAttempts), "Wrong number of check attempts on failed dialer")
+	assert.Equal(t, maxCheckAttempts, atomic.LoadInt32(&checkAttempts), "Wrong number of check attempts on failed dialer")
 	wg.Wait()
+	time.Sleep(maxCheckTimeout)
 
 	// Test success after successful recheck using custom check
 	conn, err = b.DialQOS("tcp", addr, 20)
 	assert.NoError(t, err, "Dialing should have succeeded")
-	assert.Equal(t, 3, atomic.LoadInt32(&dialedBy), "Wrong dialedBy")
+	assert.Equal(t, 4, atomic.LoadInt32(&dialedBy), "Wrong dialedBy")
 	if err == nil {
 		doTestConn(t, conn)
 	}
 
 	// Test failure
-	b = New(dialer4, dialer4)
+	b = New(dialer5, dialer5)
 	_, err = b.Dial("tcp", addr)
 	assert.NoError(t, err, "Dialing should have succeeded as we have 2nd try")
-	assert.Equal(t, 2, atomic.LoadInt32(&d4attempts), "Wrong number of dial attempts on failed dialer")
+	assert.Equal(t, 2, atomic.LoadInt32(&d5attempts), "Wrong number of dial attempts on failed dialer")
 
 	// Test success after successful retest using default check
 	conn, err = b.DialQOS("tcp", addr, 20)
 	assert.NoError(t, err, "Dialing should have succeeded")
-	assert.Equal(t, 4, atomic.LoadInt32(&dialedBy), "Wrong dialedBy")
+	assert.Equal(t, 5, atomic.LoadInt32(&dialedBy), "Wrong dialedBy")
 	if err == nil {
 		doTestConn(t, conn)
 	}
