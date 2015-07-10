@@ -126,7 +126,11 @@ div.end-censorship{
 	text-align: center;
 	text-decoration: none;
 
-    color: rgb(82,82,82);
+	text-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15),
+        inset 0 0 0 2px rgba(255, 255, 255, 0.4);
+
+	color: #fff;
 
 	-webkit-user-select: none;
 
