@@ -160,6 +160,7 @@ func (c *conn) doRequest(proxyConn *connInfo, host string, op string, request *r
 	// Check response status
 	responseOK := resp.StatusCode >= 200 && resp.StatusCode < 300
 	if !responseOK {
+		log.Tracef("Got bad response when requesting %s via proxy %s: %+v", c.addr, host, resp)
 		err = fmt.Errorf("Bad response status for read: %s", resp.Status)
 		resp.Body.Close()
 		resp = nil
