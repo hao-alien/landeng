@@ -15,6 +15,7 @@ import (
 const (
 	httpConnectMethod  = "CONNECT" // HTTP CONNECT method
 	httpXFlashlightQOS = "X-Flashlight-QOS"
+	maxReqRetries      = 3
 )
 
 // ServeHTTP implements the method from interface http.Handler using the latest
@@ -47,25 +48,21 @@ func (client *Client) intercept(resp http.ResponseWriter, req *http.Request) {
 
 	// Make sure of closing connections only once
 	var closeOnce sync.Once
-
-	// Force closing if EOF at the request half or error encountered.
-	// A bit arbitrary, but it's rather rare now to use half closing
-	// as a way to notify server. Most application closes both connections
-	// after completed send / receive so that won't cause problem.
-	closeConns := func() {
+	closeBothConns := func() {
+		// TODO: We shouldn't close clientConn too soon, since we are going to retry
+		// if responses fail
 		if clientConn != nil {
 			if err := clientConn.Close(); err != nil {
-				log.Debugf("Error closing the out connection: %s", err)
+				log.Debugf("Error closing the client connection: %s", err)
 			}
 		}
 		if connOut != nil {
 			if err := connOut.Close(); err != nil {
-				log.Debugf("Error closing the client connection: %s", err)
+				log.Debugf("Error closing the server connection: %s", err)
 			}
 		}
 	}
-
-	defer closeOnce.Do(closeConns)
+	defer closeOnce.Do(closeBothConns)
 
 	// Hijack underlying connection.
 	if clientConn, _, err = resp.(http.Hijacker).Hijack(); err != nil {
@@ -75,21 +72,13 @@ func (client *Client) intercept(resp http.ResponseWriter, req *http.Request) {
 
 	// Establish outbound connection.
 	addr := hostIncludingPort(req, 443)
-	d := func(network, addr string) (net.Conn, error) {
-		return client.getBalancer().DialQOS("tcp", addr, client.targetQOS(req))
-	}
-
-	if runtime.GOOS == "android" || client.ProxyAll {
-		connOut, err = d("tcp", addr)
-	} else {
-		connOut, err = detour.Dialer(d)("tcp", addr)
-	}
+	connOut, err = client.dialServer(addr, req)
 	if err != nil {
 		respondBadGateway(clientConn, fmt.Sprintf("Unable to handle CONNECT request: %s", err))
 		return
 	}
 
-	// Respond OK
+	// Respond OK.
 	err = respondOK(clientConn, req)
 	if err != nil {
 		log.Errorf("Unable to respond OK: %s", err)
@@ -97,7 +86,95 @@ func (client *Client) intercept(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	// Pipe data between the client and the proxy.
-	pipeData(clientConn, connOut, func() { closeOnce.Do(closeConns) })
+	received, ok := pipeData(clientConn, connOut)
+
+	retry := maxReqRetries
+	closeOnlyClientConn := func() {
+		// Close the only the remaining connection (proxy server connection is already closed)
+		closeOnce.Do(func() {})
+		if err := clientConn.Close(); err != nil {
+			log.Errorf("Error closing the client connection: %s", err)
+		}
+	}
+	for {
+		// OK means that piping already finished successfully in both directions. Otherwise, we need
+		// to check that no response has been initiated yet
+		if ok {
+			return
+		} else {
+			// If no bytes have been received, we can just retry the request to the proxy server.
+			if received == 0 {
+				// Retry the server connection
+				// TODO: we need to do make sure we don't end up repeating dialers from the balancer
+				connOut, err = client.dialServer(addr, req)
+				// We've responded already with 200 OK or 502 Bad gateway, so we will just retry. If
+				// this is the last retry, then connections will be just closed.
+				if err != nil {
+					continue
+				}
+
+				received, ok = pipeData(clientConn, connOut)
+			} else {
+				// TODO: Handle case where piping failed after some bytes were received
+				log.Errorf("********* Request failed when response had already started")
+				closeOnlyClientConn()
+				return
+			}
+		}
+		retry--
+		if retry == 0 && !ok {
+			closeOnlyClientConn()
+			break
+		}
+	}
+}
+
+// pipeData pipes data between the client and proxy connections. It returns the number
+// of received bytes, and a boolean value for a successful bidirectional piping.
+// This function closes the connOut connection if any direction of the piping failed,
+// so it can eventually be recovered
+func pipeData(clientConn net.Conn, connOut net.Conn) (received int64, ok bool) {
+	pipeErrors := make(chan error, 2)
+
+	var once sync.Once
+	closeOutConn := func() {
+		// Force closing connection with proxy server only, so we can try to
+		// recover and continue data transmission to the client. This will
+		// stop copying in both directions, no matter which one caused the
+		// connOut to close.
+		if err := connOut.Close(); err != nil {
+			log.Errorf("Error closing the server connection: %s", err)
+		}
+	}
+
+	// Start piping from client to proxy
+	go func() {
+		log.Debugf("======================== Piping data from client to proxy")
+		_, err := io.Copy(connOut, clientConn)
+		if err != nil {
+			log.Debugf("======================== Error piping data from client to proxy: %s", err)
+			pipeErrors <- err
+			// Close the proxy server connection only if there was an error
+			once.Do(closeOutConn)
+		}
+	}()
+
+	// Then start copying from proxy to client.
+	log.Debugf("======================== Piping data from proxy to client")
+	n, err := io.Copy(clientConn, connOut)
+	if err != nil {
+		log.Debugf("======================== Error piping data from proxy to client: %s", err)
+		pipeErrors <- err
+		// Close the proxy server connection only if there was an error
+		once.Do(closeOutConn)
+	}
+
+	select {
+	case <-pipeErrors:
+		return n, false
+	default:
+		return n, true
+	}
 }
 
 // targetQOS determines the target quality of service given the X-Flashlight-QOS
@@ -115,23 +192,21 @@ func (client *Client) targetQOS(req *http.Request) int {
 	return client.MinQOS
 }
 
-// pipeData pipes data between the client and proxy connections.  It's also
-// responsible for responding to the initial CONNECT request with a 200 OK.
-func pipeData(clientConn net.Conn, connOut net.Conn, closeFunc func()) {
-	// Start piping from client to proxy
-	go func() {
-		if _, err := io.Copy(connOut, clientConn); err != nil {
-			log.Tracef("Error piping data from client to proxy: %s", err)
-		}
-		closeFunc()
-	}()
-
-	// Then start coyping from proxy to client.
-	if _, err := io.Copy(clientConn, connOut); err != nil {
-		log.Tracef("Error piping data from proxy to client: %s", err)
+// dialServer will open a TCP connection with a server provided by the balancer
+func (client *Client) dialServer(addr string, req *http.Request) (connOut net.Conn, err error) {
+	d := func(network, addr string) (net.Conn, error) {
+		return client.getBalancer().DialQOS("tcp", addr, client.targetQOS(req))
 	}
+
+	if runtime.GOOS == "android" || client.ProxyAll {
+		connOut, err = d("tcp", addr)
+	} else {
+		connOut, err = detour.Dialer(d)("tcp", addr)
+	}
+	return
 }
 
+// respondOK sends a 200 HTTP response to the client
 func respondOK(writer io.Writer, req *http.Request) error {
 	defer func() {
 		if err := req.Body.Close(); err != nil {
@@ -148,6 +223,7 @@ func respondOK(writer io.Writer, req *http.Request) error {
 	return resp.Write(writer)
 }
 
+// respondBadGateway sends a 502 HTTP response to the client
 func respondBadGateway(w io.Writer, msg string) {
 	log.Debugf("Responding BadGateway: %v", msg)
 	resp := &http.Response{
