@@ -202,7 +202,7 @@ func TestVariableTimeouts(t *testing.T) {
 	}
 
 	for i := 0; i < 500; i++ {
-		doTestTimeout(t, time.Duration(rand.Intn(5000)+1)*time.Microsecond)
+		doTestTimeout(t, time.Duration(rand.Intn(2500)+1)*time.Microsecond)
 	}
 
 	// Wait to give the sockets time to close
