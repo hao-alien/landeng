@@ -6,8 +6,17 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"time"
 
+	"github.com/getlantern/idletiming"
 	"github.com/getlantern/proxy"
+)
+
+var (
+	// idleTimeout needs to be large enough to not interrupt normal connections,
+	// but to close those dangling ones.
+	// TODO: make this configurable.
+	idleTimeout = 1 * time.Hour
 )
 
 // Config is a configuration for a Dialer.
@@ -40,6 +49,12 @@ func (d *dialer) Dial(network, addr string) (net.Conn, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Unable to dial server: %s", err)
 	}
+	conn = idletiming.Conn(conn, idleTimeout, func() {
+		log.Debugf("Proxy connection to %s via %s idle for %v, closing", addr, conn.RemoteAddr(), idleTimeout)
+		if err := conn.Close(); err != nil {
+			log.Debugf("Unable to close connection: %v", err)
+		}
+	})
 	if err := d.sendCONNECT(network, addr, conn); err != nil {
 		// We discard this error, since we are only interested in sendCONNECT
 		_ = conn.Close()
@@ -97,7 +112,7 @@ func checkCONNECTResponse(r *bufio.Reader, req *http.Request) error {
 
 func sameStatusCodeClass(statusCode1 int, statusCode2 int) bool {
 	// HTTP response status code "classes" come in ranges of 100.
-	var classRange int = 100
+	classRange := 100
 	// These are all integers, so division truncates.
 	return statusCode1/classRange == statusCode2/classRange
 }
