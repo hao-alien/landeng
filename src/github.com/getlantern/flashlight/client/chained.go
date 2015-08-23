@@ -9,6 +9,7 @@ import (
 	"github.com/getlantern/balancer"
 	"github.com/getlantern/chained"
 	"github.com/getlantern/keyman"
+	"github.com/getlantern/measured"
 	"github.com/getlantern/tlsdialer"
 )
 
@@ -98,8 +99,8 @@ func (s *ChainedServerInfo) Dialer() (*balancer.Dialer, error) {
 		Weight:  s.Weight,
 		QOS:     s.QOS,
 		Trusted: s.Trusted,
-		Dial: func(network, addr string) (net.Conn, error) {
+		Dial: measured.Dialer(func(network, addr string) (net.Conn, error) {
 			return withStats(d.Dial(network, addr))
-		},
+		}),
 	}, nil
 }

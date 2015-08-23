@@ -7,6 +7,7 @@ import (
 
 	"github.com/getlantern/balancer"
 	"github.com/getlantern/fronted"
+	"github.com/getlantern/measured"
 
 	"github.com/getlantern/flashlight/geolookup"
 	"github.com/getlantern/flashlight/globals"
@@ -93,7 +94,7 @@ func (s *FrontedServerInfo) dialer(masqueradeSets map[string][]*fronted.Masquera
 		Label:   fmt.Sprintf("%sfronted proxy at %s:%d%s", trusted, s.Host, s.Port, masqueradeQualifier),
 		Weight:  s.Weight,
 		QOS:     s.QOS,
-		Dial:    fd.Dial,
+		Dial:    measured.Dialer(fd.Dial),
 		Trusted: s.Trusted,
 		OnClose: func() {
 			if err := fd.Close(); err != nil {
