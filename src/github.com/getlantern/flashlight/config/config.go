@@ -24,6 +24,7 @@ import (
 
 	"github.com/getlantern/flashlight/client"
 	"github.com/getlantern/flashlight/globals"
+	"github.com/getlantern/flashlight/measured"
 	"github.com/getlantern/flashlight/server"
 	"github.com/getlantern/flashlight/statreporter"
 )
@@ -54,6 +55,7 @@ type Config struct {
 	UIAddr        string // UI HTTP server address
 	AutoReport    *bool  // Report anonymous usage to GA
 	AutoLaunch    *bool  // Automatically launch Lantern on system startup
+	Measured      *measured.Config
 	Stats         *statreporter.Config
 	Server        *server.ServerConfig
 	Client        *client.ClientConfig
@@ -222,6 +224,23 @@ func (cfg *Config) ApplyDefaults() {
 
 	if cfg.InstanceId == "" {
 		cfg.InstanceId = uuid.New()
+	}
+
+	// Make sure we always have a stats config
+	if cfg.Measured == nil {
+		cfg.Measured = &measured.Config{}
+	}
+
+	if cfg.Measured.InfluxURL == "" {
+		cfg.Measured.InfluxURL = "https://influx.getiantem.org"
+	}
+
+	if cfg.Measured.InfluxUsername == "" {
+		cfg.Measured.InfluxUsername = "test"
+	}
+
+	if cfg.Measured.InfluxPassword == "" {
+		cfg.Measured.InfluxPassword = "test"
 	}
 
 	// Make sure we always have a stats config

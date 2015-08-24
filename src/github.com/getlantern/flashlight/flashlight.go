@@ -18,8 +18,6 @@ import (
 	"github.com/getlantern/fronted"
 	"github.com/getlantern/golog"
 	"github.com/getlantern/i18n"
-	"github.com/getlantern/measured"
-	"github.com/getlantern/measured/reporter"
 	"github.com/getlantern/profiling"
 
 	"github.com/getlantern/flashlight/analytics"
@@ -28,6 +26,7 @@ import (
 	"github.com/getlantern/flashlight/config"
 	"github.com/getlantern/flashlight/geolookup"
 	"github.com/getlantern/flashlight/logging"
+	"github.com/getlantern/flashlight/measured"
 	"github.com/getlantern/flashlight/proxiedsites"
 	"github.com/getlantern/flashlight/server"
 	"github.com/getlantern/flashlight/settings"
@@ -363,9 +362,7 @@ func applyClientConfig(client *client.Client, cfg *config.Config) {
 		config.Configure(hqfd.NewDirectDomainFronter())
 		geolookup.Configure(hqfd.NewDirectDomainFronter())
 		statserver.Configure(hqfd.NewDirectDomainFronter())
-		log.Debug("InfluxDB server at http://influx.getiantem.org:8080")
-		measured.Reset()
-		measured.AddReporter(reporter.NewInfluxDBReporter("http://influx.getiantem.org:8080", "test", "test", "lantern", hqfd.NewDirectDomainFronter()))
+		measured.Configure(cfg.Measured, hqfd.NewDirectDomainFronter())
 		// Note we don't call Configure on analytics here, as that would
 		// result in an extra analytics call and double counting.
 	}
