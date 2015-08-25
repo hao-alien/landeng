@@ -94,7 +94,7 @@ func (s *FrontedServerInfo) dialer(masqueradeSets map[string][]*fronted.Masquera
 		Label:   fmt.Sprintf("%sfronted proxy at %s:%d%s", trusted, s.Host, s.Port, masqueradeQualifier),
 		Weight:  s.Weight,
 		QOS:     s.QOS,
-		Dial:    measured.Dialer(fd.Dial),
+		Dial:    measured.Dialer(fd.Dial, s.Host),
 		Trusted: s.Trusted,
 		OnClose: func() {
 			if err := fd.Close(); err != nil {

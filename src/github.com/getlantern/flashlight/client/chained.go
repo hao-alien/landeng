@@ -101,6 +101,6 @@ func (s *ChainedServerInfo) Dialer() (*balancer.Dialer, error) {
 		Trusted: s.Trusted,
 		Dial: measured.Dialer(func(network, addr string) (net.Conn, error) {
 			return withStats(d.Dial(network, addr))
-		}),
+		}, s.Addr),
 	}, nil
 }

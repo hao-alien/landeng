@@ -23,10 +23,12 @@ type Config struct {
 // Start runs a goroutine that periodically coalesces the collected statistics
 // and reports them to statshub via HTTPS post
 func Configure(cfg *Config, httpClient *http.Client) {
+	measured.Stop()
 	measured.Reset()
 	measured.AddReporter(reporter.NewInfluxDBReporter(cfg.InfluxURL,
 		cfg.InfluxUsername,
 		cfg.InfluxPassword,
 		"lantern",
 		httpClient))
+	measured.Start()
 }
