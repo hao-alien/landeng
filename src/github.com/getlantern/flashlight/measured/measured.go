@@ -32,8 +32,12 @@ func Configure(cfg *Config, httpClient *http.Client) {
 		cfg.InfluxPassword,
 		"lantern",
 		httpClient))
+	country := geolookup.GetCountry()
+	if country == "" {
+		country = "xx"
+	}
 	measured.SetDefaults(map[string]string{
-		"country": geolookup.GetCountry(),
+		"country": country,
 	})
 	measured.Start()
 }
