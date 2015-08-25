@@ -6,6 +6,8 @@ import (
 	"github.com/getlantern/golog"
 	"github.com/getlantern/measured"
 	"github.com/getlantern/measured/reporter"
+
+	"github.com/getlantern/flashlight/geolookup"
 )
 
 const ()
@@ -30,5 +32,8 @@ func Configure(cfg *Config, httpClient *http.Client) {
 		cfg.InfluxPassword,
 		"lantern",
 		httpClient))
+	measured.SetDefaults(map[string]string{
+		"country": geolookup.GetCountry(),
+	})
 	measured.Start()
 }
