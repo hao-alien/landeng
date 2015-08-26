@@ -33,7 +33,6 @@ func Configure(cfg *Config, httpClient *http.Client) {
 		"lantern",
 		httpClient))
 	pubsub.Sub(pubsub.Country, func(country string) {
-		log.Debugf("Got country %s -- starting analytics", country)
 		if country == "" {
 			country = "xx"
 		}
