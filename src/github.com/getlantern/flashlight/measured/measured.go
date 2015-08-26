@@ -7,7 +7,7 @@ import (
 	"github.com/getlantern/measured"
 	"github.com/getlantern/measured/reporter"
 
-	"github.com/getlantern/flashlight/geolookup"
+	"github.com/getlantern/flashlight/pubsub"
 )
 
 const ()
@@ -32,12 +32,14 @@ func Configure(cfg *Config, httpClient *http.Client) {
 		cfg.InfluxPassword,
 		"lantern",
 		httpClient))
-	country := geolookup.GetCountry()
-	if country == "" {
-		country = "xx"
-	}
-	measured.SetDefaults(map[string]string{
-		"country": country,
+	pubsub.Sub(pubsub.Country, func(country string) {
+		log.Debugf("Got country %s -- starting analytics", country)
+		if country == "" {
+			country = "xx"
+		}
+		measured.SetDefaults(map[string]string{
+			"country": country,
+		})
 	})
 	measured.Start()
 }

@@ -153,6 +153,7 @@ func write() {
 			}
 			// Always publish location, even if unchanged
 			pubsub.Pub(pubsub.IP, newIp)
+			pubsub.Pub(pubsub.Country, newCountry)
 			service.Out <- newCountry
 		} else {
 			msg := fmt.Sprintf("Unable to get current location: %s", err)
