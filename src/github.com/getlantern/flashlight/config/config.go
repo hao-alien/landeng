@@ -300,6 +300,10 @@ func (cfg *Config) applyClientDefaults() {
 		*cfg.AutoLaunch = true
 		launcher.CreateLaunchFile(*cfg.AutoLaunch)
 	}
+	if cfg.Client.AutoSetPAC == nil {
+		cfg.Client.AutoSetPAC = new(bool)
+		*cfg.Client.AutoSetPAC = true
+	}
 
 	// Make sure all servers have a QOS and Weight configured
 	for _, server := range cfg.Client.FrontedServers {

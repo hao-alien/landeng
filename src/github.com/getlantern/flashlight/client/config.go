@@ -14,8 +14,9 @@ var (
 // ClientConfig captures configuration information for a Client
 type ClientConfig struct {
 	MinQOS         int
-	DumpHeaders    bool // whether or not to dump headers of requests and responses
-	ProxyAll       bool // Proxy all sites regardless of being blocked or not
+	DumpHeaders    bool  // whether or not to dump headers of requests and responses
+	AutoSetPAC     *bool // Set system proxy automatic configuration when launch
+	ProxyAll       bool  // Proxy all sites regardless of being blocked or not
 	FrontedServers []*FrontedServerInfo
 	ChainedServers map[string]*ChainedServerInfo
 	MasqueradeSets map[string][]*fronted.Masquerade

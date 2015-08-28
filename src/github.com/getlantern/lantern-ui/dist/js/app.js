@@ -1015,14 +1015,21 @@ app.controller('SettingsCtrl', ['$scope', 'MODAL', 'DataStream', 'gaMgr', functi
         autoLaunch: autoLaunch
       };
       DataStream.send('Settings', obj);
-  }
+  };
+
+  $scope.changeAutoSetPAC = function(autoSetPAC) {
+      var obj = {
+        autoSetPAC: autoSetPAC
+      };
+      DataStream.send('Settings', obj);
+  };
 
   $scope.changeProxyAll = function(proxyAll) {
       var obj = {
         proxyAll: proxyAll
       };
       DataStream.send('Settings', obj);
-  }
+  };
 
   $scope.$watch('model.settings.systemProxy', function (systemProxy) {
     $scope.systemProxy = systemProxy;

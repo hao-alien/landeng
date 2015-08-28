@@ -223,6 +223,11 @@
       </label>
 
         <label class="checkbox">
+          <input type="checkbox" ng-model="model.settings.autoSetPAC" focus-on="show" ng-change="changeAutoSetPAC(model.settings.autoSetPAC)">
+          {{ 'AUTO_SET_PAC' | translate }}
+      </label>
+
+        <label class="checkbox">
           <input type="checkbox" ng-model="model.settings.proxyAll" focus-on="show"
           ng-click="changeProxyAll(model.settings.proxyAll)">
           {{ 'PROXY_ALL_TRAFFIC' | translate }}

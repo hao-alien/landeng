@@ -151,6 +151,7 @@
   "PROXY_ALL_TRAFFIC": "Proxy all traffic",
   "APP": "App",
   "AUTO_START": "Run Lantern automatically on system start",
+  "AUTO_SET_PAC": "Set Lantern as system proxy automatic configuration (PAC)",
   "SHOW_FRIEND_PROMPTS": "Prompt to friend contacts running Lantern",
   "SET_AS_SYSTEM_PROXY": "Set as system proxy",
   "PAC_FILE_LOC": "Lantern PAC file url:",

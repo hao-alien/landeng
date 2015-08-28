@@ -31,6 +31,7 @@ type Settings struct {
 	RevisionDate string
 	AutoReport   bool
 	AutoLaunch   bool
+	AutoSetPAC   bool
 	ProxyAll     bool
 }
 
@@ -47,6 +48,7 @@ func Configure(cfg *config.Config, version, revisionDate string, buildDate strin
 			RevisionDate: revisionDate,
 			AutoReport:   *cfg.AutoReport,
 			AutoLaunch:   *cfg.AutoLaunch,
+			AutoSetPAC:   *cfg.Client.AutoSetPAC,
 			ProxyAll:     cfg.Client.ProxyAll,
 		}
 
@@ -63,6 +65,8 @@ func Configure(cfg *config.Config, version, revisionDate string, buildDate strin
 		}
 		baseSettings.AutoReport = *cfg.AutoReport
 		baseSettings.AutoLaunch = *cfg.AutoLaunch
+		baseSettings.AutoSetPAC = *cfg.Client.AutoSetPAC
+		log.Debugf("**********AutoSetPAC: %v", baseSettings.AutoSetPAC)
 		baseSettings.ProxyAll = cfg.Client.ProxyAll
 	}
 }
@@ -100,6 +104,9 @@ func read() {
 				launcher.CreateLaunchFile(autoLaunch)
 				baseSettings.AutoLaunch = autoLaunch
 				*updated.AutoLaunch = autoLaunch
+			} else if autoSetPAC, ok := settings["autoSetPAC"].(bool); ok {
+				baseSettings.AutoSetPAC = autoSetPAC
+				*updated.Client.AutoSetPAC = autoSetPAC
 			}
 			return nil
 		})
