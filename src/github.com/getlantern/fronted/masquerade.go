@@ -138,7 +138,7 @@ func (vms *verifiedMasqueradeSet) doVerify(masquerade *Masquerade) bool {
 	go func() {
 		start := time.Now()
 		httpClient := vms.dialer.HttpClientUsing(masquerade)
-		req, err := http.NewRequest("GET", "http://geo.getiantem.org/lookup", nil)
+		req, err := http.NewRequest("HEAD", "http://geo.getiantem.org/lookup", nil)
 		if err != nil {
 			errCh <- fmt.Errorf("http.NewRequest Error: %s", err)
 		}
