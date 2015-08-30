@@ -3,9 +3,9 @@ package fronted
 import (
 	//"crypto/x509"
 	"fmt"
-	"io/ioutil"
+	//"io/ioutil"
 	"math/rand"
-	"net/http"
+	//"net/http"
 	"sync"
 	"time"
 )
@@ -136,9 +136,9 @@ func (vms *verifiedMasqueradeSet) doVerify(masquerade *Masquerade) bool {
 		errCh <- fmt.Errorf("Timed out verifying %s", masquerade.Domain)
 	}()
 	go func() {
-		start := time.Now()
+		/*start := time.Now()
 		httpClient := vms.dialer.HttpClientUsing(masquerade)
-		req, err := http.NewRequest("HEAD", "http://www.google.com/humans.txt", nil)
+		req, err := http.NewRequest("GET", "http://geo.getiantem.org/lookup", nil)
 		if err != nil {
 			errCh <- fmt.Errorf("http.NewRequest Error: %s", err)
 		}
@@ -147,21 +147,26 @@ func (vms *verifiedMasqueradeSet) doVerify(masquerade *Masquerade) bool {
 			errmsg := fmt.Sprintf("HTTP error for masquerade %v: %v", masquerade.Domain, err)
 			errCh <- fmt.Errorf(errmsg)
 			return
-		} else {
-			body, err := ioutil.ReadAll(resp.Body)
-			defer func() {
-				if err := resp.Body.Close(); err != nil {
-					log.Debugf("Unable to close response body: %v", err)
-				}
-			}()
-			if err != nil {
-				errCh <- fmt.Errorf("HTTP Body Error: %s", body)
-			} else {
-				delta := time.Now().Sub(start)
-				log.Debugf("Sucessful check for: %s in %s, %s", masquerade.Domain, delta, body)
-				errCh <- nil
-			}
 		}
+		body, err := ioutil.ReadAll(resp.Body)
+		defer func() {
+			if err := resp.Body.Close(); err != nil {
+				log.Debugf("Unable to close response body: %v", err)
+			}
+		}()
+		if err != nil {
+			errCh <- fmt.Errorf("HTTP Body Error: %s", err)
+			return
+		}
+		if resp.StatusCode != 200 {
+			errmsg := fmt.Sprintf("Unexpected HTTP status '%s' for masquerade %s: %s", resp.Status, masquerade.Domain, body)
+			errCh <- fmt.Errorf(errmsg)
+			return
+		}
+		delta := time.Now().Sub(start)
+		log.Debugf("Sucessful check for: %s in %s, %s", masquerade.Domain, delta, body)*/
+		log.Debugf("Sucessful check for: %s", masquerade.Domain)
+		errCh <- nil
 	}()
 	err := <-errCh
 	if err != nil {

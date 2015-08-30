@@ -41,7 +41,7 @@ var (
 type Dialer interface {
 	proxy.Dialer
 
-	// HttpClientUsing creates a simple domain-fronted HTTP client using the
+	// HttpClientUsing creates a simple direct domain-fronted HTTP client using the
 	// specified Masquerade.
 	HttpClientUsing(masquerade *Masquerade) *http.Client
 
@@ -183,14 +183,15 @@ func (d *dialer) Close() error {
 }
 
 func (d *dialer) HttpClientUsing(masquerade *Masquerade) *http.Client {
-	enproxyConfig := d.enproxyConfigWith(func(addr string) (net.Conn, error) {
-		return d.dialServerWith(masquerade)
-	})
-
 	return &http.Client{
-		Transport: &http.Transport{
-			Dial: func(network, addr string) (net.Conn, error) {
-				return enproxy.Dial(addr, enproxyConfig)
+		Transport: &DirectDomainTransport{
+			Transport: http.Transport{
+				Dial: func(network, addr string) (net.Conn, error) {
+					log.Debugf("Dialing %s with masquerade %s (%s)", addr, masquerade.Domain, masquerade.IpAddress)
+					return d.dialServerWith(masquerade)
+				},
+				TLSHandshakeTimeout: 40 * time.Second,
+				DisableKeepAlives:   true,
 			},
 		},
 	}
@@ -219,19 +220,7 @@ func (ddf *DirectDomainTransport) RoundTrip(req *http.Request) (resp *http.Respo
 
 // Creates a new http.Client that does direct domain fronting.
 func (d *dialer) NewDirectDomainFronter() *http.Client {
-	log.Debugf("Creating new direct domain fronter.")
-	return &http.Client{
-		Transport: &DirectDomainTransport{
-			Transport: http.Transport{
-				Dial: func(network, addr string) (net.Conn, error) {
-					log.Debugf("Dialing %s with direct domain fronter", addr)
-					return d.dialServer()
-				},
-				TLSHandshakeTimeout: 40 * time.Second,
-				DisableKeepAlives:   true,
-			},
-		},
-	}
+	return d.HttpClientUsing(d.masquerades.nextVerified())
 }
 
 func (d *dialer) enproxyConfigWith(dialProxy func(addr string) (net.Conn, error)) *enproxy.Config {
