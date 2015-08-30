@@ -39,7 +39,7 @@ var (
 	log                 = golog.LoggerFor("flashlight.config")
 	m                   *yamlconf.Manager
 	lastCloudConfigETag = map[string]string{}
-	httpClient          atomic.Value
+	dialer              atomic.Value
 )
 
 type Config struct {
@@ -61,8 +61,8 @@ type Config struct {
 	TrustedCAs    []*CA
 }
 
-func Configure(c *http.Client) {
-	httpClient.Store(c)
+func Configure(d fronted.Dialer) {
+	dialer.Store(d)
 	// No-op if already started.
 	m.StartPolling()
 }
@@ -356,8 +356,8 @@ func (cfg Config) fetchCloudConfig() ([]byte, error) {
 	// this prevents the occasional EOFs errors we're seeing with
 	// successive requests
 	req.Close = true
-
-	resp, err := httpClient.Load().(*http.Client).Do(req)
+	d := dialer.Load().(fronted.Dialer)
+	resp, err := d.NewDirectDomainFronter().Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to fetch cloud config at %s: %s", url, err)
 	}

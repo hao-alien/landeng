@@ -2,11 +2,11 @@ package statserver
 
 import (
 	"math"
-	"net/http"
 	"sync"
 	"sync/atomic"
 	"time"
 
+	"github.com/getlantern/fronted"
 	"github.com/getlantern/geolookup"
 )
 
@@ -123,7 +123,8 @@ func (peer *Peer) geolocate() error {
 }
 
 func (peer *Peer) doGeolocate() error {
-	geodata, _, err := geolookup.LookupIPWithClient(peer.IP, geoClient.Load().(*http.Client))
+	d := dialer.Load().(fronted.Dialer)
+	geodata, _, err := geolookup.LookupIPWithClient(peer.IP, d.NewDirectDomainFronter())
 
 	if err != nil {
 		return err

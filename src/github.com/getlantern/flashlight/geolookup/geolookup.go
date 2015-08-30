@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/getlantern/enproxy"
+	"github.com/getlantern/fronted"
 	"github.com/getlantern/golog"
 
 	"github.com/getlantern/flashlight/pubsub"
@@ -29,7 +30,7 @@ var (
 	log = golog.LoggerFor("flashlight.geolookup")
 
 	service  *ui.Service
-	client   atomic.Value
+	dialer   atomic.Value
 	cfgMutex sync.Mutex
 	country  = atomicString()
 	ip       = atomicString()
@@ -49,11 +50,11 @@ func GetCountry() string {
 	return country.Load().(string)
 }
 
-// Configure configures geolookup to use the given http.Client to perform
+// Configure configures geolookup to use the given fronted dialer to perform
 // lookups. geolookup runs in a continuous loop, periodically updating its
 // location and publishing updates to any connected clients. We do this
 // continually in order to detect when the computer's location has changed.
-func Configure(newClient *http.Client) {
+func Configure(d fronted.Dialer) {
 	cfgMutex.Lock()
 	defer cfgMutex.Unlock()
 
@@ -61,7 +62,7 @@ func Configure(newClient *http.Client) {
 	ip.Store("")
 	country.Store("")
 
-	client.Store(newClient)
+	dialer.Store(d)
 
 	if service == nil {
 		err := registerService()
@@ -143,8 +144,8 @@ func write() {
 
 		oldIp := GetIp()
 		oldCountry := GetCountry()
-
-		newCountry, newIp, err := lookupIp(client.Load().(*http.Client))
+		d := dialer.Load().(fronted.Dialer)
+		newCountry, newIp, err := lookupIp(d.NewDirectDomainFronter())
 		if err == nil {
 			consecutiveFailures = 0
 			if newIp != oldIp {

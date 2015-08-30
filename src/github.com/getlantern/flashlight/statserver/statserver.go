@@ -1,10 +1,10 @@
 package statserver
 
 import (
-	"net/http"
 	"sync"
 	"sync/atomic"
 
+	"github.com/getlantern/fronted"
 	"github.com/getlantern/golog"
 
 	"github.com/getlantern/flashlight/ui"
@@ -15,15 +15,15 @@ var (
 
 	service    *ui.Service
 	cfgMutex   sync.RWMutex
-	geoClient  atomic.Value
+	dialer     atomic.Value
 	peers      map[string]*Peer
 	peersMutex sync.RWMutex
 )
 
-func Configure(newClient *http.Client) {
+func Configure(d fronted.Dialer) {
 	cfgMutex.Lock()
 	defer cfgMutex.Unlock()
-	geoClient.Store(newClient)
+	dialer.Store(d)
 	if service == nil {
 		err := registerService()
 		if err != nil {

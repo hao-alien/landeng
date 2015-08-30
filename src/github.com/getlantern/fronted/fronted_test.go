@@ -51,7 +51,7 @@ func TestHttpClientWithBadEnproxyConn(t *testing.T) {
 		Host: "localhost",
 		Port: 3253,
 	})
-	hc := d.HttpClientUsing(nil)
+	hc := d.HttpClientUsing(&Masquerade{})
 	_, err := hc.Get("http://www.google.com/humans.txt")
 	assert.Error(t, err, "HttpClient using a non-existent host should have failed")
 }

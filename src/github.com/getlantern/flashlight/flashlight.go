@@ -32,7 +32,7 @@ import (
 	"github.com/getlantern/flashlight/statreporter"
 	"github.com/getlantern/flashlight/statserver"
 	"github.com/getlantern/flashlight/ui"
-	"github.com/getlantern/flashlight/util"
+	//"github.com/getlantern/flashlight/util"
 
 	"github.com/mitchellh/panicwrap"
 )
@@ -358,9 +358,9 @@ func applyClientConfig(client *client.Client, cfg *config.Config) {
 	} else {
 		// Give everyone their own *http.Client that uses the highest QOS dialer. Separate
 		// clients for everyone avoids data races configuring those clients.
-		config.Configure(hqfd.NewDirectDomainFronter())
-		geolookup.Configure(hqfd.NewDirectDomainFronter())
-		statserver.Configure(hqfd.NewDirectDomainFronter())
+		config.Configure(hqfd)
+		geolookup.Configure(hqfd)
+		statserver.Configure(hqfd)
 		// Note we don't call Configure on analytics here, as that would
 		// result in an extra analytics call and double counting.
 	}
@@ -425,12 +425,13 @@ func runServerProxy(cfg *config.Config) {
 }
 
 func updateServerSideConfigClient(cfg *config.Config) {
-	client, err := util.HTTPClient(cfg.CloudConfigCA, "")
+	// temporarily comment it as we didn't have fronted dialer on server side
+	/*client, err := util.HTTPClient(cfg.CloudConfigCA, "")
 	if err != nil {
 		log.Errorf("Couldn't create http.Client for fetching the config")
 		return
 	}
-	config.Configure(client)
+	config.Configure(client)*/
 }
 
 func useAllCores() {

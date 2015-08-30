@@ -3,9 +3,9 @@ package fronted
 import (
 	//"crypto/x509"
 	"fmt"
-	//"io/ioutil"
+	"io/ioutil"
 	"math/rand"
-	//"net/http"
+	"net/http"
 	"sync"
 	"time"
 )
@@ -136,7 +136,7 @@ func (vms *verifiedMasqueradeSet) doVerify(masquerade *Masquerade) bool {
 		errCh <- fmt.Errorf("Timed out verifying %s", masquerade.Domain)
 	}()
 	go func() {
-		/*start := time.Now()
+		start := time.Now()
 		httpClient := vms.dialer.HttpClientUsing(masquerade)
 		req, err := http.NewRequest("GET", "http://geo.getiantem.org/lookup", nil)
 		if err != nil {
@@ -164,8 +164,7 @@ func (vms *verifiedMasqueradeSet) doVerify(masquerade *Masquerade) bool {
 			return
 		}
 		delta := time.Now().Sub(start)
-		log.Debugf("Sucessful check for: %s in %s, %s", masquerade.Domain, delta, body)*/
-		log.Debugf("Sucessful check for: %s", masquerade.Domain)
+		log.Debugf("Sucessful check for masquerade %s in %s", masquerade.Domain, delta)
 		errCh <- nil
 	}()
 	err := <-errCh
