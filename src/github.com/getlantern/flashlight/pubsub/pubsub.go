@@ -29,3 +29,9 @@ func Pub(topic int, data interface{}) {
 func Sub(topic int, fn interface{}) error {
 	return bus.SubscribeAsync(strconv.Itoa(topic), fn, true)
 }
+
+// SubOnce subscribes to a topic a single time and removes the specified
+// handler after executing once
+func SubOnce(topic int, fn interface{}) error {
+	return bus.SubscribeOnceAsync(strconv.Itoa(topic), fn)
+}

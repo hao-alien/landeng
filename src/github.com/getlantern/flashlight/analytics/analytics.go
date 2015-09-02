@@ -25,7 +25,7 @@ var (
 
 func Configure(cfg *config.Config, version string) {
 	if cfg.AutoReport != nil && *cfg.AutoReport {
-		pubsub.Sub(pubsub.IP, func(ip string) {
+		pubsub.SubOnce(pubsub.IP, func(ip string) {
 			log.Debugf("Got IP %v -- starting analytics", ip)
 			go trackSession(ip, version, cfg.Addr, cfg.InstanceId)
 		})
