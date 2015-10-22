@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"sync"
 	"testing"
 	"time"
 
@@ -48,110 +47,6 @@ func (c *TestCfg) ApplyDefaults() {
 	}
 }
 
-func TestFileAndUpdate(t *testing.T) {
-	file, err := ioutil.TempFile("", "yamlconf_test_")
-	if err != nil {
-		t.Fatalf("Unable to create temp file: %s", err)
-	}
-	defer func() {
-		if err := os.Remove(file.Name()); err != nil {
-			t.Fatalf("Unable to remove file: %v", err)
-		}
-	}()
-
-	m := &Manager{
-		EmptyConfig: func() Config {
-			return &TestCfg{}
-		},
-		FilePath:         file.Name(),
-		FilePollInterval: pollInterval,
-	}
-
-	first, err := m.Init()
-	if err != nil {
-		t.Fatalf("Unable to Init manager: %s", err)
-	}
-	m.StartPolling()
-
-	assertSavedConfigEquals(t, file, &TestCfg{
-		Version: 1,
-		N: &Nested{
-			I: FIXED_I,
-		},
-	})
-
-	assert.Equal(t, &TestCfg{
-		Version: 1,
-		N: &Nested{
-			I: FIXED_I,
-		},
-	}, first, "First config should contain correct data")
-
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		// Push updates
-
-		// Push update with bad version file (this should not get emitted as an
-		// updated config)
-		saveConfig(t, file, &TestCfg{
-			Version: 0,
-			N: &Nested{
-				S: "3",
-				I: 3,
-			},
-		})
-
-		// Wait for file update to get picked up
-		time.Sleep(pollInterval * 2)
-
-		// Push update to file
-		saveConfig(t, file, &TestCfg{
-			Version: 1,
-			N: &Nested{
-				S: "3",
-				I: 3,
-			},
-		})
-
-		// Wait for file update to get picked up
-		time.Sleep(pollInterval * 2)
-
-		// Perform update programmatically
-		err := m.Update(func(cfg Config) error {
-			tc := cfg.(*TestCfg)
-			tc.N.S = "4"
-			tc.N.I = 4
-			return nil
-		})
-		if err != nil {
-			t.Fatalf("Unable to issue first update: %s", err)
-		}
-
-		wg.Done()
-	}()
-
-	updated := m.Next()
-	assert.Equal(t, &TestCfg{
-		Version: 1,
-		N: &Nested{
-			S: "3",
-			I: 3,
-		},
-	}, updated, "Config from updated file should contain correct data")
-
-	updated = m.Next()
-	assert.Equal(t, &TestCfg{
-		Version: 2,
-		N: &Nested{
-			S: "4",
-			I: 4,
-		},
-	}, updated, "Config from programmatic update should contain correct data, including updated version")
-
-	wg.Wait()
-}
-
 func TestCustomPoll(t *testing.T) {
 	file, err := ioutil.TempFile("", "yamlconf_test_")
 	if err != nil {
@@ -168,8 +63,7 @@ func TestCustomPoll(t *testing.T) {
 		EmptyConfig: func() Config {
 			return &TestCfg{}
 		},
-		FilePath:         file.Name(),
-		FilePollInterval: pollInterval,
+		FilePath: file.Name(),
 		CustomPoll: func(currentCfg Config) (func(cfg Config) error, time.Duration, error) {
 			defer func() {
 				poll = poll + 1
