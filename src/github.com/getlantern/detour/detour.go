@@ -47,7 +47,7 @@ var DelayBeforeDetour = 0 * time.Millisecond
 
 // If DirectAddrCh is set, when a direct connection is closed without any error,
 // the connection's remote address (in host:port format) will be send to it
-var DirectAddrCh chan string = make(chan string)
+var DirectAddrCh = make(chan string)
 
 var (
 	log = golog.LoggerFor("detour")
@@ -56,6 +56,11 @@ var (
 // Conn implements an net.Conn interface by utilizing underlie direct and
 // detour connections.
 type Conn struct {
+	// Keeps track of the total bytes read from this connection, atomic
+	// Due to https://golang.org/pkg/sync/atomic/#pkg-note-BUG it requires
+	// manual alignment. For this, it is best to keep it as the first field
+	readBytes uint64
+
 	// The underlie connections, uses buffered channel as ring queue to avoid
 	// locking. We have at most 2 connetions so a length of 2 is enough.
 	conns chan conn
@@ -69,9 +74,6 @@ type Conn struct {
 	chRead chan ioResult
 	// The chan to receive result of any write operation
 	chWrite chan ioResult
-
-	// Keeps track of the total bytes read from this connection, atomic
-	readBytes uint64
 
 	addr string
 
@@ -106,6 +108,8 @@ type conn interface {
 	Write(b []byte, ch chan ioResult)
 	Close() error
 	Closed() bool
+	LocalAddr() net.Addr
+	RemoteAddr() net.Addr
 }
 
 func typeOf(c conn) string {
@@ -328,15 +332,19 @@ func (dc *Conn) Close() error {
 }
 
 // LocalAddr implements the function from net.Conn
-func (dc *Conn) LocalAddr() net.Addr {
-	log.Trace("LocalAddr not implemented")
-	return nil
+func (dc *Conn) LocalAddr() (addr net.Addr) {
+	if !dc.withValidConn(func(c conn) { addr = c.LocalAddr() }) {
+		panic("no valid connection to call LocalAddr()")
+	}
+	return
 }
 
 // RemoteAddr implements the function from net.Conn
-func (dc *Conn) RemoteAddr() net.Addr {
-	log.Trace("RemoteAddr not implemented")
-	return nil
+func (dc *Conn) RemoteAddr() (addr net.Addr) {
+	if !dc.withValidConn(func(c conn) { addr = c.RemoteAddr() }) {
+		panic("no valid connection to call RemoteAddr()")
+	}
+	return
 }
 
 // SetDeadline implements the function from net.Conn

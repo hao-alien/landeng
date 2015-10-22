@@ -145,6 +145,10 @@ func (ir *influxDBReporter) submit(dl []*submitData) error {
 				buf.WriteString(fmt.Sprintf("%s=%s", k, s))
 			case int:
 				buf.WriteString(fmt.Sprintf("%s=%di", k, v))
+			case int64:
+				buf.WriteString(fmt.Sprintf("%s=%di", k, v))
+			case uint64:
+				buf.WriteString(fmt.Sprintf("%s=%di", k, v))
 			case float64:
 				buf.WriteString(fmt.Sprintf("%s=%f", k, v))
 			default:

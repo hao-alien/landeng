@@ -6,7 +6,7 @@
 FROM fedora:21
 MAINTAINER "José Carlos Nieto" <xiam@getlantern.org>
 
-ENV GO_VERSION go1.4.2
+ENV GO_VERSION go1.4.3
 ENV GOROOT_BOOTSTRAP /go1.4
 ENV GOROOT /go
 ENV GOPATH /
@@ -15,7 +15,7 @@ ENV PATH $PATH:$GOROOT/bin
 ENV WORKDIR /lantern
 
 # Go binary for bootstrapping.
-ENV GO_PACKAGE_URL https://storage.googleapis.com/golang/go1.4.2.linux-amd64.tar.gz
+ENV GO_PACKAGE_URL https://storage.googleapis.com/golang/go1.4.3.linux-amd64.tar.gz
 
 # Updating system.
 RUN yum -y update && yum clean all
@@ -74,6 +74,9 @@ RUN gem install fpm
 
 # Requisites for packing Lantern for Windows.
 RUN yum install -y osslsigncode mingw32-nsis && yum clean all
+
+# Required for compressing update files
+RUN yum install -y bzip2 && yum clean all
 
 # Requisites for genassets.
 RUN yum install -y nodejs npm && yum clean all

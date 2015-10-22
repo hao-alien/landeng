@@ -113,10 +113,11 @@ func (s *ChainedServerInfo) Dialer() (*balancer.Dialer, error) {
 		return withStats(conn, err)
 	}
 	return &balancer.Dialer{
-		Label:   label,
-		Weight:  s.Weight,
-		QOS:     s.QOS,
-		Trusted: s.Trusted,
-		Dial:    measured.Dialer(d, s.Addr),
+		Label:     label,
+		Weight:    s.Weight,
+		QOS:       s.QOS,
+		Trusted:   s.Trusted,
+		Dial:      measured.Dialer(d, 10*time.Second),
+		AuthToken: s.AuthToken,
 	}, nil
 }

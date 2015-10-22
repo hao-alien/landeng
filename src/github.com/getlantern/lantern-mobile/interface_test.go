@@ -74,7 +74,7 @@ func TestStartClientAndTestReverseProxy(t *testing.T) {
 
 	// Let's run a proxy instance.
 	go func() {
-		if RunClientProxy(listenProxyAddr, "TestApp", new(testCb)); err != nil {
+		if err := RunClientProxy(listenProxyAddr, "TestApp", new(testCb)); err != nil {
 			t.Fatalf("RunClientProxy: %q", err)
 		}
 	}()

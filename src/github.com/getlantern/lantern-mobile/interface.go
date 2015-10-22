@@ -22,6 +22,5 @@ func RunClientProxy(listenAddr, appName string, ready GoCallback) error {
 
 // StopClientProxy stops the proxy.
 func StopClientProxy() error {
-	defaultClient.stop()
-	return nil
+	return defaultClient.stop()
 }
