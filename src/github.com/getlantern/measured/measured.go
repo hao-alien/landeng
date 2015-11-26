@@ -21,21 +21,25 @@ import (
 	"github.com/getlantern/golog"
 )
 
-// Stats encapsulates the statistics to report
+// Stat encapsulates the statistics to report
 type Stat interface {
 	Type() string
 }
 
+// Error encapsulates errors before and during the whole connection
 type Error struct {
 	ID    string
 	Error string
 	Phase string
 }
 
+// Latency encapsulates latency to successfully make a connection
 type Latency struct {
 	ID      string
 	Latency time.Duration
 }
+
+// Traffic encapsulates bytes transfered on a connection
 type Traffic struct {
 	ID       string
 	BytesIn  uint64
@@ -43,15 +47,20 @@ type Traffic struct {
 }
 
 type LatencyTracker struct {
-	ID        string
+	ID string
+	// together with Total, to calculate accurate average across reporting period
+	Points    int
 	Min       time.Duration
 	Max       time.Duration
 	Percent95 time.Duration
 	Last      time.Duration
+	Total     time.Duration
 }
 
 type TrafficTracker struct {
-	ID           string
+	ID string
+	// together with TotalIn and TotalOut, to calculate accurate average across reporting period
+	Points       int
 	MinIn        uint64
 	MaxIn        uint64
 	Percent95In  uint64
@@ -95,9 +104,8 @@ var (
 	chReport     = make(chan Reporter)
 	chStop       = make(chan interface{})
 
-	errorList   []*Error
-	latencyList []*Latency
-	trafficList []*Traffic
+	// atomic
+	running uint32
 )
 
 // DialFunc is the type of function measured can wrap
@@ -124,11 +132,13 @@ func Stop() {
 // Dialer wraps a dial function to measure various statistics
 func Dialer(d DialFunc, interval time.Duration) DialFunc {
 	return func(net, addr string) (net.Conn, error) {
+		start := time.Now()
 		c, err := d(net, addr)
 		if err != nil {
 			submitError(addr, err, "dial")
 			return nil, err
 		}
+		submitLatency(addr, time.Now().Sub(start))
 		return newConn(c, interval), nil
 	}
 }
@@ -154,8 +164,36 @@ func (l *MeasuredListener) Accept() (c net.Conn, err error) {
 }
 
 func run(reportInterval time.Duration, reporters ...Reporter) {
+	var errorList []*Error
+	var latencyList []*Latency
+	var trafficList []*Traffic
+
+	var doReport = func() {
+		newErrorList := errorList
+		errorList = []*Error{}
+		newLatencyList := latencyList
+		latencyList = []*Latency{}
+		newTrafficList := trafficList
+		trafficList = []*Traffic{}
+		go func() {
+			if len(newErrorList) > 0 {
+				reportError(newErrorList, reporters)
+			}
+
+			if len(newLatencyList) > 0 {
+				reportLatency(newLatencyList, reporters)
+			}
+
+			if len(newTrafficList) > 0 {
+				reportTraffic(newTrafficList, reporters)
+			}
+		}()
+	}
+
 	log.Debug("Measured loop started")
+	atomic.StoreUint32(&running, 1)
 	t := time.NewTicker(reportInterval)
+	defer t.Stop()
 	for {
 		select {
 		case s := <-chStat:
@@ -168,27 +206,12 @@ func run(reportInterval time.Duration, reporters ...Reporter) {
 				trafficList = append(trafficList, s.(*Traffic))
 			}
 		case <-t.C:
-			newErrorList := errorList
-			errorList = []*Error{}
-			newLatencyList := latencyList
-			latencyList = []*Latency{}
-			newTrafficList := trafficList
-			trafficList = []*Traffic{}
-			go func() {
-				if len(newErrorList) > 0 {
-					reportError(newErrorList, reporters)
-				}
-
-				if len(newLatencyList) > 0 {
-					reportLatency(newLatencyList, reporters)
-				}
-
-				if len(newTrafficList) > 0 {
-					reportTraffic(newTrafficList, reporters)
-				}
-			}()
+			doReport()
 		case <-chStop:
 			log.Debug("Measured loop stopped")
+			atomic.StoreUint32(&running, 0)
+			// flush out what already submitted
+			doReport()
 			return
 		}
 	}
@@ -222,12 +245,18 @@ func reportLatency(ll []*Latency, reporters []Reporter) {
 	trackers := []*LatencyTracker{}
 	for k, l := range lm {
 		t := LatencyTracker{ID: k}
+		t.Points = t.Points + len(l)
 		t.Last = l[len(l)-1].Latency
+		for _, d := range l {
+			t.Total = t.Total + d.Latency
+		}
 		sort.Sort(latencySorter(l))
 		t.Min = l[0].Latency
 		t.Max = l[len(l)-1].Latency
+		// fraction is discarded so p95 is always less than len(l)
 		p95 := int(float64(len(l)) * 0.95)
 		t.Percent95 = l[p95].Latency
+
 		trackers = append(trackers, &t)
 	}
 	for _, r := range reporters {
@@ -258,12 +287,15 @@ func reportTraffic(tl []*Traffic, reporters []Reporter) {
 	trackers := []*TrafficTracker{}
 	for k, l := range tm {
 		t := TrafficTracker{ID: k}
+		t.Points = t.Points + len(l)
 		t.LastIn = l[len(l)-1].BytesIn
 		t.LastOut = l[len(l)-1].BytesOut
 		for _, d := range l {
 			t.TotalIn = t.TotalIn + d.BytesIn
 			t.TotalOut = t.TotalOut + d.BytesOut
 		}
+
+		// fraction is discarded so p95 is always less than len(l)
 		p95 := int(float64(len(l)) * 0.95)
 
 		sort.Sort(trafficByBytesIn(l))
@@ -275,6 +307,7 @@ func reportTraffic(tl []*Traffic, reporters []Reporter) {
 		t.MinOut = l[0].BytesOut
 		t.MaxOut = l[len(l)-1].BytesOut
 		t.Percent95Out = l[p95].BytesOut
+
 		trackers = append(trackers, &t)
 	}
 	for _, r := range reporters {
@@ -360,6 +393,10 @@ func (mc *Conn) submitTraffic() {
 }
 
 func submitError(remoteAddr string, err error, phase string) {
+	if atomic.LoadUint32(&running) == 0 {
+		log.Trace("Measured loop is not running, skip submitting error")
+		return
+	}
 	splitted := strings.Split(err.Error(), ":")
 	lastIndex := len(splitted) - 1
 	if lastIndex < 0 {
@@ -379,7 +416,28 @@ func submitError(remoteAddr string, err error, phase string) {
 	}
 }
 
+func submitLatency(remoteAddr string, latency time.Duration) {
+	if atomic.LoadUint32(&running) == 0 {
+		log.Trace("Measured loop is not running, skip submitting latency")
+		return
+	}
+	t := &Latency{
+		ID:      remoteAddr,
+		Latency: latency,
+	}
+	log.Tracef("Submiting latency %+v", t)
+	select {
+	case chStat <- t:
+	default:
+		log.Error("Failed to submit latency, channel busy")
+	}
+}
+
 func submitTraffic(remoteAddr string, BytesIn uint64, BytesOut uint64) {
+	if atomic.LoadUint32(&running) == 0 {
+		log.Trace("Measured loop is not running, skip submitting traffic")
+		return
+	}
 	t := &Traffic{
 		ID:       remoteAddr,
 		BytesIn:  BytesIn,

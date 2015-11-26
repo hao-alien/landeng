@@ -47,7 +47,41 @@ func TestReportError(t *testing.T) {
 	}
 }
 
-func TestReportStats(t *testing.T) {
+func TestReportLatency(t *testing.T) {
+	// prevent tests from interleaving
+	time.Sleep(100 * time.Millisecond)
+	nr := startWithMockReporter()
+	defer Stop()
+
+	// start server
+	l, err := net.Listen("tcp", "127.0.0.1:0")
+	if assert.NoError(t, err, "Listen should not fail") {
+		// large enough interval so it will only report stats in Close()
+		ml := Listener(l, 10*time.Second)
+		s := http.Server{
+			Handler: http.NotFoundHandler(),
+		}
+		go func() { _ = s.Serve(ml) }()
+	}
+
+	// start client with latency tracking
+	c := http.Client{
+		Transport: &http.Transport{
+			// carefully chosen interval to report another once before Close()
+			Dial: Dialer(net.Dial, 160*time.Millisecond),
+		},
+	}
+	req, _ := http.NewRequest("GET", "http://"+l.Addr().String(), nil)
+	resp, _ := c.Do(req)
+	assert.Equal(t, 404, resp.StatusCode)
+	_ = resp.Body.Close()
+	time.Sleep(100 * time.Millisecond)
+	assert.Equal(t, 1, len(nr.latency), "should track latency")
+}
+
+func TestReportTraffic(t *testing.T) {
+	// prevent tests from interleaving
+	time.Sleep(100 * time.Millisecond)
 	nr := startWithMockReporter()
 	defer Stop()
 	var bytesIn, bytesOut uint64
@@ -90,23 +124,19 @@ func TestReportStats(t *testing.T) {
 
 	time.Sleep(300 * time.Millisecond)
 	// verify both client and server stats
-	if assert.Equal(t, 3, len(nr.traffic)) {
-		e := nr.traffic[1]
-		assert.Equal(t, RemoteAddr, e.ID, "should report server stats with Remote addr")
-		assert.Equal(t, bytesIn, e.TotalIn, "should report server stats with bytes in")
-		assert.Equal(t, bytesOut, e.TotalOut, "should report server stats with bytes out")
-		assert.Equal(t, bytesIn, e.MinIn, "should report server stats with bytes in")
-		assert.Equal(t, bytesOut, e.MinOut, "should report server stats with bytes out")
-
-		e = nr.traffic[0]
+	if assert.Equal(t, 2, len(nr.traffic)) {
+		e := nr.traffic[0]
 		assert.Equal(t, l.Addr().String(), e.ID, "should report server as Remote addr")
+		assert.Equal(t, 1, e.Points, "should report 1 client data points")
 		assert.Equal(t, bytesIn, e.MinOut, "should report same byte count as server")
 		assert.Equal(t, bytesOut, e.MinIn, "should report same byte count as server")
-
-		e = nr.traffic[2]
-		assert.Equal(t, l.Addr().String(), e.ID, "should report server as Remote addr")
-		assert.Equal(t, uint64(0), e.MinOut, "should only report increased byte count")
-		assert.Equal(t, uint64(0), e.MinIn, "should only report increased byte count")
+		e = nr.traffic[1]
+		assert.Equal(t, RemoteAddr, e.ID, "should report server stats with Remote addr")
+		assert.Equal(t, 2, e.Points, "should report 2 server data points")
+		assert.Equal(t, bytesIn, e.TotalIn, "should report server stats with bytes in")
+		assert.Equal(t, bytesOut, e.TotalOut, "should report server stats with bytes out")
+		assert.Equal(t, bytesIn, e.MaxIn, "should report server stats with bytes in")
+		assert.Equal(t, bytesOut, e.MaxOut, "should report server stats with bytes out")
 	}
 }
 
