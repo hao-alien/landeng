@@ -90,11 +90,6 @@ type Reporter interface {
 	ReportTraffic([]*TrafficTracker) error
 }
 
-type tickingReporter struct {
-	t *time.Ticker
-	r Reporter
-}
-
 var (
 	reporters []Reporter
 	log       = golog.LoggerFor("measured")
