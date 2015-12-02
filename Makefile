@@ -132,7 +132,7 @@ define fpm-debian-build =
 endef
 
 all: binaries
-android: android-lib build-android-debug android-install android-run
+android: android-tun-lib build-android-debug android-install android-run
 android-dist: genconfig android
 
 # This is to be called within the docker image.
@@ -520,11 +520,27 @@ genconfig:
 	source setenv.bash && \
 	(cd src/github.com/getlantern/flashlight/genconfig && ./genconfig-android.bash)
 
+android-tun-lib: docker-mobile
+	@source setenv.bash && \
+	cd $(LANTERN_MOBILE_DIR)/lantern
+	@$(call docker-up) && \
+	$(DOCKER) run -v $$PWD/src:/src $(DOCKER_MOBILE_IMAGE_TAG) /bin/bash -c \ "cd /src/github.com/getlantern/lantern-mobile/lantern && gomobile bind -target=android -tags='headless tun' -o=$(LANTERN_MOBILE_LIBRARY) -ldflags='$(LDFLAGS_MOBILE)' ." && \
+	cp -v $(LANTERN_MOBILE_DIR)/lantern/$(LANTERN_MOBILE_LIBRARY) $(LANTERN_MOBILE_DIR)/app/libs; \
+	if [ -d "$(FIRETWEET_MAIN_DIR)" ]; then \
+		cp -v $(LANTERN_MOBILE_DIR)/lantern/$(LANTERN_MOBILE_LIBRARY) $(FIRETWEET_MAIN_DIR)/libs/$(LANTERN_MOBILE_LIBRARY); \
+	else \
+		echo ""; \
+		echo "Either no FIRETWEET_MAIN_DIR variable was passed or the given value is not a";\
+		echo "directory. You'll have to copy the $(LANTERN_MOBILE_LIBRARY) file manually:"; \
+		echo ""; \
+		echo "cp -v $(LANTERN_MOBILE_DIR)/$(LANTERN_MOBILE_LIBRARY) \$$FIRETWEET_MAIN_DIR"; \
+	fi
+
 android-lib: docker-mobile
 	@source setenv.bash && \
 	cd $(LANTERN_MOBILE_DIR)/lantern
 	@$(call docker-up) && \
-$(DOCKER) run -v $$PWD/src:/src $(DOCKER_MOBILE_IMAGE_TAG) /bin/bash -c \ "cd /src/github.com/getlantern/lantern-mobile/lantern && gomobile bind -target=android -tags='headless' -o=$(LANTERN_MOBILE_LIBRARY) -ldflags='$(LDFLAGS_MOBILE)' ." && \
+ 	$(DOCKER) run -v $$PWD/src:/src $(DOCKER_MOBILE_IMAGE_TAG) /bin/bash -c \ "cd /src/github.com/getlantern/lantern-mobile/lantern && gomobile bind -target=android -tags='headless' -o=$(LANTERN_MOBILE_LIBRARY) -ldflags='$(LDFLAGS_MOBILE)' ." && \
 	cp -v $(LANTERN_MOBILE_DIR)/lantern/$(LANTERN_MOBILE_LIBRARY) $(LANTERN_MOBILE_DIR)/app/libs; \
 	if [ -d "$(FIRETWEET_MAIN_DIR)" ]; then \
 		cp -v $(LANTERN_MOBILE_DIR)/lantern/$(LANTERN_MOBILE_LIBRARY) $(FIRETWEET_MAIN_DIR)/libs/$(LANTERN_MOBILE_LIBRARY); \
@@ -545,7 +561,7 @@ build-android-debug:
 build-tun2socks:
 	cd $(LANTERN_MOBILE_DIR)
 	ndk-build
-	mkdir -p app/libs/armeabi-v7a 
+	mkdir -p app/libs/armeabi-v7a
 	cp libs/armeabi-v7a/libtun2socks.so app/libs/armeabi-v7a/
 
 $(APK_FILE): build-android-debug
