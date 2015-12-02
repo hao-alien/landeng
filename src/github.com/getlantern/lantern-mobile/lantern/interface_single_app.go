@@ -35,7 +35,7 @@ func RunClientProxy(listenAddr, appName string, ready GoCallback) error {
 	go func() {
 		var err error
 
-		defaultClient, err = newClient(bootstrapSettings.HttpAddr, appName, androidProps, settingsDir)
+		defaultClient, err = newClient(listenAddr, appName, androidProps, settingsDir)
 		if err != nil {
 			log.Fatalf("Could not start Lantern")
 		}
