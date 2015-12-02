@@ -1,3 +1,5 @@
+// +build tun
+
 package client
 
 import (
