@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Welcome to Lantern’s documentation! &mdash; Lantern 2.1.0 documentation</title>
+    <title>lantern |Travis CI Status| |Coverage Status| [|ProjectTalk|] (http://www.projecttalk.io/boards/getlantern%2Flantern?utm_campaign=gh-badge&amp;utm_medium=badge&amp;utm_source=github) &mdash; Lantern 2.1.0 documentation</title>
     
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -41,21 +41,321 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="welcome-to-lantern-s-documentation">
-<h1>Welcome to Lantern&#8217;s documentation!<a class="headerlink" href="#welcome-to-lantern-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>Contents:</p>
-<div class="toctree-wrapper compound">
+  <div class="section" id="lantern-travis-ci-status-coverage-status-projecttalk-http-www-projecttalk-io-boards-getlantern-2flantern-utm-campaign-gh-badge-utm-medium-badge-utm-source-github">
+<h1>lantern <a href="#id1"><span class="problematic" id="id2">|Travis CI Status|&nbsp;|Coverage Status|&nbsp;[|ProjectTalk|</span></a>] (<a class="reference external" href="http://www.projecttalk.io/boards/getlantern%2Flantern?utm_campaign=gh-badge&amp;utm_medium=badge&amp;utm_source=github">http://www.projecttalk.io/boards/getlantern%2Flantern?utm_campaign=gh-badge&amp;utm_medium=badge&amp;utm_source=github</a>)<a class="headerlink" href="#lantern-travis-ci-status-coverage-status-projecttalk-http-www-projecttalk-io-boards-getlantern-2flantern-utm-campaign-gh-badge-utm-medium-badge-utm-source-github" title="Permalink to this headline">¶</a></h1>
+<p><strong>If you&#8217;re looking for Lantern binaries, you can find all of them at
+the following links:</strong> - <a class="reference external" href="https://raw.githubusercontent.com/getlantern/lantern-binaries/master/lantern-installer-beta.exe">Windows XP SP 3 and
+above</a>
+- <a class="reference external" href="https://raw.githubusercontent.com/getlantern/lantern-binaries/master/lantern-installer-beta.dmg">OSX 10.8 and
+above</a>
+- <a class="reference external" href="https://raw.githubusercontent.com/getlantern/lantern-binaries/master/lantern-installer-beta-32-bit.deb">Ubuntu 14.04 32
+bit</a>
+- <a class="reference external" href="https://raw.githubusercontent.com/getlantern/lantern-binaries/master/lantern-installer-beta-64-bit.deb">Ubuntu 14.04 64
+bit</a></p>
+<p><strong>If you&#8217;re looking for help, please visit below user forums:</strong></p>
+<p><a class="reference external" href="https://groups.google.com/forum/#!forum/lantern-users-en">English</a>
+| <a class="reference external" href="https://groups.google.com/forum/#!forum/lantern-users-zh">中文</a>
+| <a class="reference external" href="https://groups.google.com/forum/#!forum/lantern-users-fa">فارسی</a>
+|
+<a class="reference external" href="https://groups.google.com/forum/#!forum/lantern-users-fr">français</a></p>
+<div class="section" id="building-lantern">
+<h2>Building Lantern<a class="headerlink" href="#building-lantern" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="requisites">
+<h3>Requisites<a class="headerlink" href="#requisites" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li><a class="reference external" href="https://golang.org/dl/">Go 1.4.x</a>.</li>
+<li><a class="reference external" href="https://www.docker.com/">Docker</a>.</li>
+<li><a class="reference external" href="https://www.gnu.org/software/make/">GNU Make</a></li>
+<li>An OSX or Linux host.</li>
 </ul>
+<p>We are going to create a Docker image that will take care of compiling
+Lantern for Windows and Linux, in order to compile Lantern for OSX
+you&#8217;ll need an OSX host, this is a limitation caused by Lantern
+depending on C code and OSX build tools for certain features.</p>
+</div>
+<div class="section" id="building-the-docker-image">
+<h3>Building the docker image<a class="headerlink" href="#building-the-docker-image" title="Permalink to this headline">¶</a></h3>
+<p>In order to build the docker image open a terminal, <code class="docutils literal"><span class="pre">cd</span></code> into the
+<code class="docutils literal"><span class="pre">lantern</span></code> project and execute <code class="docutils literal"><span class="pre">make</span> <span class="pre">docker</span></code>:</p>
+<div class="code sh highlight-python"><div class="highlight"><pre>cd lantern
+make docker
+</pre></div>
+</div>
+<p>This will take a while, be patient, you only need to do this once.</p>
 </div>
 </div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="building-lantern-binaries">
+<h2>Building Lantern binaries<a class="headerlink" href="#building-lantern-binaries" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="building-for-linux">
+<h3>Building for Linux<a class="headerlink" href="#building-for-linux" title="Permalink to this headline">¶</a></h3>
+<p>If you want to build for Linux on all supported architectures, use:</p>
+<div class="code sh highlight-python"><div class="highlight"><pre>make linux
+</pre></div>
+</div>
+<p>You can also build for Linux 386:</p>
+<div class="code sh highlight-python"><div class="highlight"><pre>make linux-386
+file lantern_linux_386
+# lantern_linux_386: ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV), dynamically linked (uses shared libs), not stripped
+</pre></div>
+</div>
+<p>Or only for amd64:</p>
+<div class="code sh highlight-python"><div class="highlight"><pre>make linux-amd64
+file lantern_linux_amd64
+# lantern_linux_amd64: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), not stripped
+</pre></div>
+</div>
+<p>Or ARM:</p>
+<div class="code sh highlight-python"><div class="highlight"><pre>make linux-arm
+file lantern_linux_arm
+# lantern_linux_arm: ELF 32-bit LSB executable, ARM, version 1 (SYSV), dynamically linked (uses shared libs), not stripped
+</pre></div>
+</div>
+</div>
+<div class="section" id="building-for-windows">
+<h3>Building for Windows<a class="headerlink" href="#building-for-windows" title="Permalink to this headline">¶</a></h3>
+<p>Lantern supports the 386 architecture on Windows. In order to build
+Lantern on Windows use:</p>
+<div class="code sh highlight-python"><div class="highlight"><pre>make windows
+file lantern_windows_386.exe
+# lantern_windows_386.exe: PE32 executable for MS Windows (GUI) Intel 80386 32-bit
+</pre></div>
+</div>
+</div>
+<div class="section" id="building-for-osx">
+<h3>Building for OSX<a class="headerlink" href="#building-for-osx" title="Permalink to this headline">¶</a></h3>
+<p>Lantern supports the amd64 architecture on OSX. In order to build
+Lantern on OSX you&#8217;ll need an OSX host. Run the following command:</p>
+<div class="code sh highlight-python"><div class="highlight"><pre>make darwin
+file lantern_darwin_amd64
+# lantern_darwin_amd64: Mach-O 64-bit executable x86_64
+</pre></div>
+</div>
+</div>
+<div class="section" id="building-all-binaries">
+<h3>Building all binaries<a class="headerlink" href="#building-all-binaries" title="Permalink to this headline">¶</a></h3>
+<p>If you want to build all supported binaries of Lantern use the
+<code class="docutils literal"><span class="pre">binaries</span></code> task:</p>
+<div class="code sh highlight-python"><div class="highlight"><pre>make binaries
+</pre></div>
+</div>
+</div>
+<div class="section" id="building-headless-version">
+<h3>Building headless version<a class="headerlink" href="#building-headless-version" title="Permalink to this headline">¶</a></h3>
+<p>If <code class="docutils literal"><span class="pre">HEADLESS</span></code> environment variable is set, the generated binaries will
+be headless, that is, it doesn&#8217;t depend on the systray support
+libraries, and will not show systray or UI.</p>
+</div>
+</div>
+<div class="section" id="packaging">
+<h2>Packaging<a class="headerlink" href="#packaging" title="Permalink to this headline">¶</a></h2>
+<p>Packaging requires some special environment variables.</p>
+<div class="section" id="osx">
+<h3>OSX<a class="headerlink" href="#osx" title="Permalink to this headline">¶</a></h3>
+<p>Lantern on OS X is packaged as the <code class="docutils literal"><span class="pre">Lantern.app</span></code> app bundle,
+distributed inside of a drag-and-drop dmg installer. The app bundle and
+dmg can be created using:</p>
+<div class="code sh highlight-python"><div class="highlight"><pre>VERSION=2.0.0-beta2 make package-darwin
+file Lantern.dmg
+# Lantern.dmg: bzip2 compressed data, block size = 100k
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">make</span> <span class="pre">package-darwin</span></code> signs the Lantern.app using the BNS code signing
+certificate in your KeyChain. The
+<a class="reference external" href="https://github.com/getlantern/too-many-secrets/blob/master/osx-code-signing-certificate.p12">certificate</a>
+and
+<a class="reference external" href="https://github.com/getlantern/too-many-secrets/blob/master/osx-code-signing-certificate.p12.txt">password</a>
+can be obtained from
+<a class="reference external" href="https://github.com/getlantern/too-many-secrets">too-many-secrets</a>
+and must be installed to the system&#8217;s key chain beforehand.</p>
+<p>If signing fails, the script will still build the app bundle and dmg,
+but the app bundle won&#8217;t be signed. Unsigned app bundles can be used for
+testing but should never be distributed to end users.</p>
+<p>The background image for the DMG is
+<code class="docutils literal"><span class="pre">installer-resources/darwin/dmgbackground.svg</span></code>.</p>
+</div>
+<div class="section" id="packaging-for-windows">
+<h3>Packaging for Windows<a class="headerlink" href="#packaging-for-windows" title="Permalink to this headline">¶</a></h3>
+<p>Lantern on Windows is distributed as an installer built with
+<a class="reference external" href="http://nsis.sourceforge.net/">nsis</a>. The installer is built and
+signed with <code class="docutils literal"><span class="pre">make</span> <span class="pre">package-windows</span></code>.</p>
+<p>For <code class="docutils literal"><span class="pre">make</span> <span class="pre">package-windows</span></code> to be able to sign the executable, the
+environment varaibles <code class="docutils literal"><span class="pre">SECRETS_DIR</span></code> and <code class="docutils literal"><span class="pre">BNS_CERT_PASS</span></code> must be set
+to point to the secrets directory and the
+<a class="reference external" href="https://github.com/getlantern/too-many-secrets/blob/master/build-installers/env-vars.txt#L3">password</a>
+of the BNS certificate. You can set the environment variables and run
+the script on one line, like this:</p>
+<div class="code sh highlight-python"><div class="highlight"><pre>SECRETS_DIR=$PATH_TO_TOO_MANY_SECRETS BNS_CERT_PASS=&#39;***&#39; \
+VERSION=2.0.0-beta1 make package-windows
+</pre></div>
+</div>
+</div>
+<div class="section" id="packaging-for-ubuntu">
+<h3>Packaging for Ubuntu<a class="headerlink" href="#packaging-for-ubuntu" title="Permalink to this headline">¶</a></h3>
+<p>Lantern on Ubuntu is distributed as a <code class="docutils literal"><span class="pre">.deb</span></code> package. You can generate
+a Debian package with:</p>
+<div class="code sh highlight-python"><div class="highlight"><pre>VERSION=2.0.0-beta2 make package-linux
+</pre></div>
+</div>
+<p>The version string must match the Debian requirements:</p>
+<p><a class="reference external" href="https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version">https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version</a></p>
+<p>This will build both 386 and amd64 packages.</p>
+</div>
+<div class="section" id="generating-all-packages">
+<h3>Generating all packages<a class="headerlink" href="#generating-all-packages" title="Permalink to this headline">¶</a></h3>
+<p>Use the <code class="docutils literal"><span class="pre">make</span> <span class="pre">packages</span></code> task combining all the arguments that
+<code class="docutils literal"><span class="pre">package-linux</span></code>, <code class="docutils literal"><span class="pre">package-windows</span></code> and <code class="docutils literal"><span class="pre">package-darwin</span></code> require.</p>
+<div class="code sh highlight-python"><div class="highlight"><pre>SECRETS_DIR=$PATH_TO_TOO_MANY_SECRETS BNS_CERT_PASS=&#39;***&#39; \
+VERSION=2.0.0-beta1 make packages
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="creating-releases">
+<h2>Creating releases<a class="headerlink" href="#creating-releases" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="releasing-for-qa">
+<h3>Releasing for QA<a class="headerlink" href="#releasing-for-qa" title="Permalink to this headline">¶</a></h3>
+<p>In order to release for QA, first obtain an <a class="reference external" href="https://help.github.com/articles/creating-an-access-token-for-command-line-use/">application
+token</a>
+from Github (<code class="docutils literal"><span class="pre">GH_TOKEN</span></code>) and then make sure that
+<a class="reference external" href="https://github.com/s3tools/s3cmd">s3cmd</a> is correctly configured:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">s3cmd</span> <span class="o">--</span><span class="n">config</span>
+</pre></div>
+</div>
+<p>Then, create all distribution packages:</p>
+<div class="highlight-python"><div class="highlight"><pre>[...env variables...] make packages
+</pre></div>
+</div>
+<p>Finally, use <code class="docutils literal"><span class="pre">release-qa</span></code> to upload the packages that were just
+generated to both AWS S3 and the Github release page:</p>
+<div class="highlight-python"><div class="highlight"><pre>VERSION=2.0.0-beta5 make release-qa
+</pre></div>
+</div>
+</div>
+<div class="section" id="releasing-beta">
+<h3>Releasing Beta<a class="headerlink" href="#releasing-beta" title="Permalink to this headline">¶</a></h3>
+<p>If you want to release a beta you must have created a package for QA
+first, then use the <code class="docutils literal"><span class="pre">release-beta</span></code> task:</p>
+<div class="highlight-python"><div class="highlight"><pre>make release-beta
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">release-beta</span></code> will promote the QA files that are currently in S3 to
+beta.</p>
+</div>
+<div class="section" id="releasing-for-production">
+<h3>Releasing for production<a class="headerlink" href="#releasing-for-production" title="Permalink to this headline">¶</a></h3>
+<p>After you&#8217;re satisfied with a beta version, it will be time to promote
+beta packages to production and to publish the packages for
+auto-updates:</p>
+<div class="highlight-python"><div class="highlight"><pre>VERSION=2.0.0-beta5 GH_TOKEN=$GITHUB_TOKEN make release
+</pre></div>
+</div>
+<p><code class="docutils literal"><span class="pre">make</span> <span class="pre">release</span></code> expects a <code class="docutils literal"><span class="pre">lantern-binaries</span></code> directory at
+<code class="docutils literal"><span class="pre">../lantern-binaries</span></code>. You can provide a different directory by
+passing the <code class="docutils literal"><span class="pre">LANTERN_BINARIES_PATH</span></code> env variable.</p>
+</div>
+</div>
+<div class="section" id="other-tasks">
+<h2>Other tasks<a class="headerlink" href="#other-tasks" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="creating-the-android-embeddable-library">
+<h3>Creating the Android embeddable library<a class="headerlink" href="#creating-the-android-embeddable-library" title="Permalink to this headline">¶</a></h3>
+<p>In order to build the Android ARM library that can be embedded in
+applications, Lantern is using <code class="docutils literal"><span class="pre">gomobile</span></code>. This simplifies the process
+notably.</p>
+<p>Currently, as Go 1.5 is not stable, a specific git revision is used
+within an isolated Docker image.</p>
+<p>To build a development library (takes shorter time):</p>
+<div class="highlight-python"><div class="highlight"><pre>make android-lib
+</pre></div>
+</div>
+<p>To build the final version for Firetweet:</p>
+<div class="highlight-python"><div class="highlight"><pre>make android-lib-dist
+</pre></div>
+</div>
+<p>If you pass the <code class="docutils literal"><span class="pre">FIRETWEET_MAIN_DIR</span></code> env variable to
+<code class="docutils literal"><span class="pre">make</span> <span class="pre">android-lib</span></code>, the generated bindings and library will be copied
+into it:</p>
+<div class="highlight-python"><div class="highlight"><pre>FIRETWEET_MAIN_DIR=/path/to/firetweet/src/main make android-lib
+</pre></div>
+</div>
+<p>You can also override this environment variable if you want to use the
+<a class="reference external" href="https://github.com/getlantern/lantern-mobile-single-app-example">Flashlight Android
+Tester</a>
+app.</p>
+</div>
+<div class="section" id="generating-assets">
+<h3>Generating assets<a class="headerlink" href="#generating-assets" title="Permalink to this headline">¶</a></h3>
+<div class="code sh highlight-python"><div class="highlight"><pre>make genassets
+</pre></div>
+</div>
+<p>If the environment variable <code class="docutils literal"><span class="pre">UPDATE_DIST=true</span></code> is set,
+<code class="docutils literal"><span class="pre">make</span> <span class="pre">genassets</span></code> also updates the resources in the dist folder.</p>
+<p>An annotated tag can be added like this:</p>
+<div class="code sh highlight-python"><div class="highlight"><pre>git tag -a v1.0.0 -m&quot;Tagged 1.0.0&quot;
+git push --tags
+</pre></div>
+</div>
+<p>Use <code class="docutils literal"><span class="pre">make</span> <span class="pre">create-tag</span></code> as a shortcut for creating and uploading tags:</p>
+<div class="highlight-python"><div class="highlight"><pre>VERSION=&#39;2.0.0-beta5&#39; make create-tag
+</pre></div>
+</div>
+<p>If you want to both create a package and upload a tag, run the
+<code class="docutils literal"><span class="pre">create-tag</span></code> task right after the <code class="docutils literal"><span class="pre">packages</span></code> task:</p>
+<div class="highlight-python"><div class="highlight"><pre>[...env variables...] make packages create-tag
+</pre></div>
+</div>
+</div>
+<div class="section" id="updating-icons">
+<h3>Updating Icons<a class="headerlink" href="#updating-icons" title="Permalink to this headline">¶</a></h3>
+<p>The icons used for the system tray are stored in
+<code class="docutils literal"><span class="pre">src/github/getlantern/lantern/icons</span></code>. To apply changes to the icons,
+make your updates in the icons folder and then run
+<code class="docutils literal"><span class="pre">make</span> <span class="pre">update-icons</span></code>.</p>
+</div>
+<div class="section" id="continuous-integration-with-travis-ci">
+<h3>Continuous Integration with Travis CI<a class="headerlink" href="#continuous-integration-with-travis-ci" title="Permalink to this headline">¶</a></h3>
+<p>Continuous builds are run on Travis CI. These builds use the
+<code class="docutils literal"><span class="pre">.travis.yml</span></code> configuration. The github.com/getlantern/cf unit tests
+require an envvars.bash to be populated with credentials for cloudflare.
+The original <code class="docutils literal"><span class="pre">envvars.bash</span></code> is available
+<a class="reference external" href="https://github.com/getlantern/too-many-secrets/blob/master/envvars.bash">here</a>.
+An encrypted version is checked in as <code class="docutils literal"><span class="pre">envvars.bash.enc</span></code>, which was
+encrypted per the instructions
+<a class="reference external" href="https://docs.travis-ci.com/user/encrypting-files/">here</a>.</p>
+</div>
+</div>
+<div class="section" id="documentation-for-developers">
+<h2>Documentation for developers<a class="headerlink" href="#documentation-for-developers" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="dev-readme">
+<h3>Dev README<a class="headerlink" href="#dev-readme" title="Permalink to this headline">¶</a></h3>
+<p>Please, go to <a class="reference external" href="README-dev.md">README-dev</a> for an in-depth explanation
+of the Lantern internals and cloud services.</p>
+</div>
+<div class="section" id="contributing-changes">
+<h3>Contributing changes<a class="headerlink" href="#contributing-changes" title="Permalink to this headline">¶</a></h3>
+<p>Lantern is a <a class="reference external" href="https://github.com/getlantern/gost">gost</a> project that
+provides repeatable builds and consolidated pull requests for lantern.</p>
+<p>Go code in Lantern must pass several tests:</p>
 <ul class="simple">
-<li><a class="reference internal" href="genindex.html"><span>Index</span></a></li>
-<li><a class="reference internal" href="py-modindex.html"><span>Module Index</span></a></li>
-<li><a class="reference internal" href="search.html"><span>Search Page</span></a></li>
+<li><a class="reference external" href="https://github.com/kisielk/errcheck">errcheck</a></li>
+<li><a class="reference external" href="https://github.com/golang/lint">golint</a></li>
+<li>Go vet</li>
+<li>Go test -race</li>
 </ul>
+<p>You can find a generic
+<a class="reference external" href="https://github.com/getlantern/lantern/blob/valencia/git-hook">git-hook</a>
+file, which can be used as a pre-push (or pre-commit) hook to
+automatically ensure these tests are passed before committing any code.
+Only Go packages in <code class="docutils literal"><span class="pre">src/github.com/getlantern</span></code> will be tested, and
+only those that have changes in them.</p>
+<p>Install by copying it into the local <code class="docutils literal"><span class="pre">.git/hooks/</span></code> directory, with the
+<code class="docutils literal"><span class="pre">pre-push</span></code> file name if you want to run it before pushing.
+Alternatively, you can name it <code class="docutils literal"><span class="pre">pre-commit</span></code> to run it before each
+commit..</p>
+<p><strong>Important notice</strong></p>
+<p>If you <em>must</em> commit without running the hooks, you can run git with the
+<code class="docutils literal"><span class="pre">--no-verify</span></code> flag.</p>
+</div>
+</div>
 </div>
 
 
@@ -66,8 +366,47 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Welcome to Lantern&#8217;s documentation!</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<li><a class="reference internal" href="#">lantern |Travis CI Status|&nbsp;|Coverage Status|&nbsp;[|ProjectTalk|] (http://www.projecttalk.io/boards/getlantern%2Flantern?utm_campaign=gh-badge&amp;utm_medium=badge&amp;utm_source=github)</a><ul>
+<li><a class="reference internal" href="#building-lantern">Building Lantern</a><ul>
+<li><a class="reference internal" href="#requisites">Requisites</a></li>
+<li><a class="reference internal" href="#building-the-docker-image">Building the docker image</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#building-lantern-binaries">Building Lantern binaries</a><ul>
+<li><a class="reference internal" href="#building-for-linux">Building for Linux</a></li>
+<li><a class="reference internal" href="#building-for-windows">Building for Windows</a></li>
+<li><a class="reference internal" href="#building-for-osx">Building for OSX</a></li>
+<li><a class="reference internal" href="#building-all-binaries">Building all binaries</a></li>
+<li><a class="reference internal" href="#building-headless-version">Building headless version</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#packaging">Packaging</a><ul>
+<li><a class="reference internal" href="#osx">OSX</a></li>
+<li><a class="reference internal" href="#packaging-for-windows">Packaging for Windows</a></li>
+<li><a class="reference internal" href="#packaging-for-ubuntu">Packaging for Ubuntu</a></li>
+<li><a class="reference internal" href="#generating-all-packages">Generating all packages</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-releases">Creating releases</a><ul>
+<li><a class="reference internal" href="#releasing-for-qa">Releasing for QA</a></li>
+<li><a class="reference internal" href="#releasing-beta">Releasing Beta</a></li>
+<li><a class="reference internal" href="#releasing-for-production">Releasing for production</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#other-tasks">Other tasks</a><ul>
+<li><a class="reference internal" href="#creating-the-android-embeddable-library">Creating the Android embeddable library</a></li>
+<li><a class="reference internal" href="#generating-assets">Generating assets</a></li>
+<li><a class="reference internal" href="#updating-icons">Updating Icons</a></li>
+<li><a class="reference internal" href="#continuous-integration-with-travis-ci">Continuous Integration with Travis CI</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#documentation-for-developers">Documentation for developers</a><ul>
+<li><a class="reference internal" href="#dev-readme">Dev README</a></li>
+<li><a class="reference internal" href="#contributing-changes">Contributing changes</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
   <div role="note" aria-label="source link">
