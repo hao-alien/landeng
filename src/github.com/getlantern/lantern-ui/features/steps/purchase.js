@@ -1,8 +1,7 @@
 var steps = function() {
 
-  this.When(/^I click the upgrade link$/, function (done) {
-    // Write code here that turns the phrase above into concrete actions
-    done.pending();
+  this.When(/^I click the upgrade link$/, function () {
+    element(by.id('show-pro')).click();
   });
 
   this.When(/^I select a plan$/, function (done) {

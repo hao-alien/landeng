@@ -10,7 +10,7 @@ exports.config = {
   frameworkPath: require.resolve('protractor-cucumber-framework'),
   cucumberOpts: {
     require: '../features/steps/**/*.js',
-    format: "summary"
+    format: "pretty"
   }
 };
 
