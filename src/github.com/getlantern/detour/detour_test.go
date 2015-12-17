@@ -29,6 +29,10 @@ type timestamped struct {
 	io.Writer
 }
 
+func init() {
+	DirectAddrCh = make(chan string)
+}
+
 func (t timestamped) Write(p []byte) (int, error) {
 	logTimestampFormat := "Jan 02 15:04:05.000"
 	// Write in single operation to prevent different log items from interleaving
@@ -137,7 +141,6 @@ func TestRemoveFromWhitelist(t *testing.T) {
 }
 
 func TestClosing(t *testing.T) {
-	DirectAddrCh = make(chan string)
 	defer stopMockServers()
 	proxiedURL, proxy := newMockServer(detourMsg)
 	proxy.Timeout(200*time.Millisecond, detourMsg)
