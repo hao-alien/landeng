@@ -254,7 +254,6 @@ func (r *reader) run() {
 			log.Tracef("Detour connection to %s failed, removing from whitelist", r.addr)
 			RemoveFromWl(r.addr)
 		}
-	} else {
 	}
 	select {
 	case r.chMerge <- innerReadResult{r.c, r.buf[:n], err}:
