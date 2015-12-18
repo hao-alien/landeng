@@ -9,8 +9,6 @@ import (
 type directConn struct {
 	net.Conn
 	addr string
-	// keep track of the total bytes read by this connection, atomic
-	readBytes uint64
 }
 
 var (
@@ -41,7 +39,7 @@ func dialDirect(network string, addr string) (conn, error) {
 			return nil, fmt.Errorf("DNS hijacked")
 		}
 		log.Tracef("Dial directly to %s succeeded", addr)
-		return &directConn{Conn: conn, addr: addr, readBytes: 0}, nil
+		return &directConn{Conn: &readBytesCounted{conn, 0}, addr: addr}, nil
 	} else if detector.TamperingSuspected(err) {
 		log.Debugf("Dial directly to %s, tampering suspected: %s", addr, err)
 		AddToWl(addr, false)
@@ -107,15 +105,13 @@ func (dc *directConn) doRead(b []byte, checker readChecker) (int, error) {
 	if err != nil {
 		b = nil
 		n = 0
-	} else {
-		atomic.AddUint64(&dc.readBytes, uint64(n))
 	}
 	return n, err
 }
 
 func (dc *directConn) Close() (err error) {
 	err = dc.Conn.Close()
-	if atomic.LoadUint64(&dc.readBytes) > 0 && !wlTemporarily(dc.addr) {
+	if dc.Conn.(*readBytesCounted).anyDataReceived() && !wlTemporarily(dc.addr) {
 		log.Tracef("no error found till closing, notify caller that %s can be dialed directly", dc.addr)
 		// just fire it, but not blocking if the chan is nil or no reader
 		select {

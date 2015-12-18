@@ -9,9 +9,6 @@ import (
 type detourConn struct {
 	net.Conn
 	addr string
-	// keep track of the total bytes read in this connection
-	readBytes uint64
-
 	// 1 == true, 0 == false, atomic
 	errorEncountered uint32
 }
@@ -24,7 +21,7 @@ func dialDetour(network string, addr string, dialer dialFunc) (conn, error) {
 		return nil, err
 	}
 	log.Tracef("Dial detour to %s succeeded", addr)
-	return &detourConn{Conn: conn, addr: addr, readBytes: 0}, nil
+	return &detourConn{Conn: &readBytesCounted{conn, 0}, addr: addr}, nil
 }
 
 func (dc *detourConn) Type() connType {
@@ -33,7 +30,6 @@ func (dc *detourConn) Type() connType {
 
 func (dc *detourConn) Read(b []byte, isFirst bool) (int, error) {
 	n, err := dc.Conn.Read(b)
-	atomic.AddUint64(&dc.readBytes, uint64(n))
 	if err != nil && err != io.EOF {
 		atomic.AddUint32(&dc.errorEncountered, 1)
 	}
@@ -42,7 +38,7 @@ func (dc *detourConn) Read(b []byte, isFirst bool) (int, error) {
 
 func (dc *detourConn) Close() (err error) {
 	err = dc.Conn.Close()
-	if atomic.LoadUint64(&dc.readBytes) > 0 && atomic.LoadUint32(&dc.errorEncountered) == 0 {
+	if dc.Conn.(*readBytesCounted).anyDataReceived() && atomic.LoadUint32(&dc.errorEncountered) == 0 {
 		log.Tracef("no error found till closing, add %s to whitelist", dc.addr)
 		AddToWl(dc.addr, false)
 	}

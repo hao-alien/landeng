@@ -42,7 +42,6 @@ package detour
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"net"
 	"sync"
@@ -100,14 +99,10 @@ type Conn struct {
 // Read() implements the function from net.Conn
 func (dc *Conn) Read(b []byte) (n int, err error) {
 	ch := make(chan ioResult)
-	select {
-	case <-dc.chClose:
-		return 0, errors.New("read from closed connection")
-	case dc.chReadRequest <- ioRequest{b, ch}:
-	}
+	dc.chReadRequest <- ioRequest{b, ch}
 	result, ok := <-ch
 	if !ok {
-		return 0, errors.New("read from closed connection")
+		return 0, fmt.Errorf("connection to %s closed during reading", dc.addr)
 	}
 	n, err = result.n, result.err
 	dc.incReadBytes(n)
@@ -117,11 +112,7 @@ func (dc *Conn) Read(b []byte) (n int, err error) {
 // Write() implements the function from net.Conn
 func (dc *Conn) Write(b []byte) (n int, err error) {
 	ch := make(chan ioResult)
-	select {
-	case <-dc.chClose:
-		return 0, errors.New("write to closed connection")
-	case dc.chWriteRequest <- ioRequest{b, ch}:
-	}
+	dc.chWriteRequest <- ioRequest{b, ch}
 	result := <-ch
 	return result.n, result.err
 }
@@ -185,6 +176,7 @@ type getAddrRequest struct {
 	chResult chan net.Addr
 }
 
+// common interface for underlie connections
 type conn interface {
 	Type() connType
 	Read(b []byte, isFirst bool) (int, error)
@@ -204,3 +196,20 @@ const (
 var connTypeDesc = []string{"direct", "detour"}
 
 func (c connType) String() string { return connTypeDesc[c] }
+
+type readBytesCounted struct {
+	net.Conn
+	readBytes uint64
+}
+
+func (c *readBytesCounted) Read(p []byte) (n int, err error) {
+	n, err = c.Conn.Read(p)
+	if n > 0 {
+		atomic.AddUint64(&c.readBytes, uint64(n))
+	}
+	return
+}
+
+func (c *readBytesCounted) anyDataReceived() bool {
+	return atomic.LoadUint64(&c.readBytes) > 0
+}
