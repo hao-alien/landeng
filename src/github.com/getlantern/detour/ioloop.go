@@ -27,7 +27,7 @@ type innerReadRequest struct {
 func (dc *Conn) ioLoop() {
 	// Use buffered channel in same goroutine so we can easily add / remove
 	// connections. Should switch to container/ring if performace matters.
-	chConns := make(chan conn, 2)
+	conns := newConnQueue(2)
 	// Requests ioLoop to remove already closed connections.
 	chRemoveConn := make(chan conn)
 	// Hold the read request so we can re-read after replay.
@@ -59,7 +59,7 @@ func (dc *Conn) ioLoop() {
 				}
 				reRead = true
 			}
-			chConns <- c
+			conns.Add(c)
 			// spawn goroutine after above statement so channel
 			// operations are in determined order.
 			if reRead {
@@ -75,24 +75,15 @@ func (dc *Conn) ioLoop() {
 				}()
 			}
 		case r := <-chRemoveConn:
-			tries := len(chConns)
-			for i := 0; i < tries; i++ {
-				c := <-chConns
-				if c != r {
-					chConns <- c
-				}
-			}
+			conns.Remove(r)
 		case req := <-dc.chReadRequest:
 			chMergeReads := make(chan innerReadResult)
 			first := !dc.anyDataReceived()
 			if first {
 				firstReadReq = &innerReadRequest{req.buf, chMergeReads}
 			}
-			tries := len(chConns)
 			// read from all valid connections, typically only one
-			for i := 0; i < tries; i++ {
-				c := <-chConns
-				chConns <- c
+			conns.Foreach(func(c conn) bool {
 				buf := make([]byte, len(req.buf))
 				r := &reader{
 					c:            c,
@@ -104,7 +95,8 @@ func (dc *Conn) ioLoop() {
 					chClose:      dc.chClose,
 				}
 				go r.run()
-			}
+				return true
+			})
 
 			go func() {
 				// Merge read responses, return first succeeded
@@ -113,7 +105,7 @@ func (dc *Conn) ioLoop() {
 				m := merger{
 					chMerge: chMergeReads,
 					addr:    dc.addr,
-					tries:   tries,
+					tries:   conns.Len(),
 					req:     &req,
 					chClose: dc.chClose,
 				}
@@ -140,40 +132,38 @@ func (dc *Conn) ioLoop() {
 				}
 			}
 			var lastN int
-			tries := len(chConns)
-			for i := 0; i < tries; i++ {
-				c := <-chConns
+			conns.Foreach(func(c conn) bool {
 				if n, err := c.Write(req.buf); err != nil {
 					log.Debugf("Error write to %s connection to %s", c.Type(), dc.addr)
 					closeConn(c)
 					// intentionally not return c to chConns
+					return false
 				} else {
 					log.Tracef("Wrote %v bytes to %s connection to %s", n, c.Type(), dc.addr)
 					lastN = n
-					chConns <- c
+					return true
 				}
-			}
+			})
 			if lastN > 0 {
 				req.chResult <- ioResult{lastN, nil}
 			} else {
 				req.chResult <- ioResult{0, errors.New("fail to write to any connection")}
 			}
 		case req := <-dc.chGetAddr:
-			if len(chConns) == 0 {
+			if conns.Len() == 0 {
 				panic("should have at least one valid connection")
 			}
-			c := <-chConns
-			chConns <- c
+			c := conns.Next()
 			if req.isLocal {
 				req.chResult <- c.LocalAddr()
 			} else {
 				req.chResult <- c.RemoteAddr()
 			}
 		case <-dc.chClose:
-			tries := len(chConns)
-			for i := 0; i < tries; i++ {
-				closeConn(<-chConns)
-			}
+			conns.Foreach(func(c conn) bool {
+				closeConn(c)
+				return false
+			})
 			return
 		}
 	}
