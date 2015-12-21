@@ -27,6 +27,7 @@ type innerReadRequest struct {
 func (dc *Conn) ioLoop() {
 	// Use buffered channel in same goroutine so we can easily add / remove
 	// connections. Should switch to container/ring if performace matters.
+	// It's not safe to access it from multiple goroutines.
 	conns := newConnQueue(2)
 	// Requests ioLoop to remove already closed connections.
 	chRemoveConn := make(chan conn)
@@ -70,7 +71,6 @@ func (dc *Conn) ioLoop() {
 					select {
 					case firstReadReq.chResult <- innerReadResult{c, buf[:n], err}:
 					case <-dc.chClose:
-						close(firstReadReq.chResult)
 					}
 				}()
 			}
@@ -82,14 +82,13 @@ func (dc *Conn) ioLoop() {
 			if first {
 				firstReadReq = &innerReadRequest{req.buf, chMergeReads}
 			}
-			// read from all valid connections, typically only one
+			// read from all current connections, typically only one
 			conns.Foreach(func(c conn) bool {
-				buf := make([]byte, len(req.buf))
 				r := &reader{
 					c:            c,
 					chMerge:      chMergeReads,
 					chDialDetour: dc.chDialDetourNow,
-					buf:          buf,
+					buf:          make([]byte, len(req.buf)),
 					first:        first,
 					addr:         dc.addr,
 					chClose:      dc.chClose,
