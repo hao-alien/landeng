@@ -3,6 +3,7 @@ package detour
 import (
 	"fmt"
 	"net"
+	"sync/atomic"
 	"time"
 )
 
@@ -26,13 +27,13 @@ func Dialer(detourDialer dialFunc) func(network, addr string) (net.Conn, error) 
 			err error
 		}
 		ch := make(chan dialResult)
-		numDial := 1
+		dc.expectedConns = 1
 		if !whitelisted(addr) {
-			numDial = 2
+			dc.expectedConns = 2
 		}
 		// Dialing logic
 		go func() {
-			if numDial == 2 {
+			if dc.expectedConns == 2 {
 				go func() {
 					c, err := dialDirect(network, addr)
 					ch <- dialResult{c, err}
@@ -51,26 +52,29 @@ func Dialer(detourDialer dialFunc) func(network, addr string) (net.Conn, error) 
 			ch <- dialResult{c, err}
 		}()
 
-		chLastError := make(chan error, 2)
+		chLastError := make(chan error, dc.expectedConns)
+		numDial := int(dc.expectedConns)
 		// Merge dialing results. Run until all dialing attempts return
 		// but notify caller as soon as any connection available.
 		go func() {
 			var res dialResult
 			for i := 0; i < numDial; i++ {
 				res = <-ch
-				if res.err == nil {
-					// prevent goroutine from blocking if
-					// I/O loop already exited, or lots of
-					// CLOSE_WAIT connections will be left.
-					select {
-					case dc.chConnToIOLoop <- res.c:
-						chLastError <- nil
-					default:
-						log.Tracef(
-							"%s connection to %s established too late, closing",
-							res.c.Type(), dc.addr)
-						closeConn(res.c)
-					}
+				if res.err != nil {
+					atomic.AddUint32(&dc.expectedConns, ^uint32(0))
+					continue
+				}
+				// prevent goroutine from blocking if
+				// I/O loop already exited, or lots of
+				// CLOSE_WAIT connections will be left.
+				select {
+				case dc.chConnToIOLoop <- res.c:
+					chLastError <- nil
+				default:
+					log.Tracef(
+						"%s connection to %s established too late, closing",
+						res.c.Type(), dc.addr)
+					closeConn(res.c)
 				}
 			}
 			// caller will receive error only if no connection available.

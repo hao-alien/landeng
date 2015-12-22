@@ -2,7 +2,7 @@ package detour
 
 import (
 	"bytes"
-	"errors"
+	"io"
 	"sync/atomic"
 )
 
@@ -41,22 +41,19 @@ func (dc *Conn) ioLoop() {
 	for {
 		select {
 		case c := <-dc.chConnToIOLoop:
+			reRead := false
 			if dc.anyDataReceived() {
 				log.Tracef("%s connection to %s available after data received, closing", c.Type(), dc.addr)
-				closeConn(c)
-				continue
+				goto closeAndContinue
 			}
-			reRead := false
 			if firstReadReq != nil {
 				if nonidempotentHTTPRequest {
 					log.Tracef("Not replay nonidempotent request to %s, only add to whitelist", dc.addr)
 					AddToWl(dc.addr, false)
-					closeConn(c)
-					continue
+					goto closeAndContinue
 				}
 				if !dc.replay(c) {
-					closeConn(c)
-					continue
+					goto closeAndContinue
 				}
 				reRead = true
 			}
@@ -74,8 +71,15 @@ func (dc *Conn) ioLoop() {
 					}
 				}()
 			}
+			continue
+		closeAndContinue:
+			closeConn(c)
+			atomic.AddUint32(&dc.expectedConns, ^uint32(0))
+
 		case r := <-chRemoveConn:
+			atomic.AddUint32(&dc.expectedConns, ^uint32(0))
 			conns.Remove(r)
+
 		case req := <-dc.chReadRequest:
 			chMergeReads := make(chan innerReadResult)
 			first := !dc.anyDataReceived()
@@ -96,23 +100,22 @@ func (dc *Conn) ioLoop() {
 				go r.run()
 				return true
 			})
-
 			go func() {
 				// Merge read responses, return first succeeded
-				// one to caller and ignore later, or return the
+				// one to caller and ignore another, or return the
 				// last error if both failed.
 				m := merger{
-					chMerge: chMergeReads,
-					addr:    dc.addr,
-					tries:   conns.Len(),
-					req:     &req,
-					chClose: dc.chClose,
+					chMerge:       chMergeReads,
+					expectedConns: &dc.expectedConns,
+					addr:          dc.addr,
+					req:           &req,
+					chClose:       dc.chClose,
 				}
 				connsToRemove := m.run()
 				for _, c := range connsToRemove {
-					// select on dc.chClose to avoid
-					// blocking on a channel with no receiver.
-					// same hereafter.
+					// select on dc.chClose to avoid blocking
+					// on a channel with no receiver.  same
+					// hereafter.
 					select {
 					case <-dc.chClose:
 					case chRemoveConn <- c:
@@ -131,10 +134,12 @@ func (dc *Conn) ioLoop() {
 				}
 			}
 			var lastN int
+			var lastError error
 			conns.Foreach(func(c conn) bool {
 				if n, err := c.Write(req.buf); err != nil {
 					log.Debugf("Error write to %s connection to %s", c.Type(), dc.addr)
 					closeConn(c)
+					atomic.AddUint32(&dc.expectedConns, ^uint32(0))
 					// intentionally not return c to chConns
 					return false
 				} else {
@@ -146,8 +151,10 @@ func (dc *Conn) ioLoop() {
 			if lastN > 0 {
 				req.chResult <- ioResult{lastN, nil}
 			} else {
-				req.chResult <- ioResult{0, errors.New("fail to write to any connection")}
+				// simply return last error so caller can have a sense of what happening
+				req.chResult <- ioResult{0, lastError}
 			}
+
 		case req := <-dc.chGetAddr:
 			if conns.Len() == 0 {
 				panic("should have at least one valid connection")
@@ -158,6 +165,7 @@ func (dc *Conn) ioLoop() {
 			} else {
 				req.chResult <- c.RemoteAddr()
 			}
+
 		case <-dc.chClose:
 			conns.Foreach(func(c conn) bool {
 				closeConn(c)
@@ -228,8 +236,8 @@ type reader struct {
 }
 
 func (r *reader) run() {
-	log.Tracef("Read via %s connection to %s, first: %v", r.c.Type(), r.addr, r.first)
 	n, err := r.c.Read(r.buf, r.first)
+	log.Tracef("Read %d bytes via %s connection to %s, first: %v, err: %v", n, r.c.Type(), r.addr, r.first, err)
 	if err != nil {
 		switch r.c.Type() {
 		case connTypeDirect:
@@ -240,8 +248,10 @@ func (r *reader) run() {
 			default:
 			}
 		case connTypeDetour:
-			log.Tracef("Detour connection to %s failed, removing from whitelist", r.addr)
-			RemoveFromWl(r.addr)
+			if err != io.EOF {
+				log.Tracef("Detour connection to %s failed, removing from whitelist", r.addr)
+				RemoveFromWl(r.addr)
+			}
 		}
 	}
 	select {
@@ -251,17 +261,17 @@ func (r *reader) run() {
 }
 
 type merger struct {
-	chMerge chan innerReadResult
-	addr    string
-	tries   int
-	req     *ioRequest
-	chClose chan struct{}
+	chMerge       chan innerReadResult
+	expectedConns *uint32
+	addr          string
+	req           *ioRequest
+	chClose       chan struct{}
 }
 
 func (m *merger) run() (connsToRemove []conn) {
 	var got bool
-	merges := m.tries
-	for i := 0; i < merges; i++ {
+	var i uint32 = 0
+	for ; i < atomic.LoadUint32(m.expectedConns); i++ {
 		var result innerReadResult
 		select {
 		case result = <-m.chMerge:
@@ -270,22 +280,23 @@ func (m *merger) run() (connsToRemove []conn) {
 			return
 		}
 		c, buf, n, err := result.c, result.buf, len(result.buf), result.err
-		if err != nil {
-			log.Tracef("Read from %s connection to %s failed, closing: %s", c.Type(), m.addr, err)
+		if err != nil && err != io.EOF {
+			log.Debugf("Read from %s connection to %s failed, closing: %s", c.Type(), m.addr, err)
 			closeConn(c)
 			connsToRemove = append(connsToRemove, c)
 			if i == 0 && c.Type() == connTypeDirect {
-				log.Debugf("Ignore first error from %s connection to %s: %s", c.Type(), m.addr, result.err)
-				// we know that reads from detour connection will come unless we failed to connect it.
-				// It does few harm if so, as m.chClose will prevent the goroutine from wait infinitely.
-				merges = 2
+				log.Tracef("Ignore first error from %s connection to %s: %s", c.Type(), m.addr, result.err)
+				// we know that reads from detour connection will come soon unless we failed to connect it.
+				// It does no harm in that case, as m.chClose will prevent the goroutine from wait infinitely.
 				continue
 			}
 		} else {
 			log.Tracef("Read %d bytes from %s connection to %s", n, c.Type(), m.addr)
 		}
 		if got {
-			log.Tracef("Ignore late copy of response from %s", m.addr)
+			log.Tracef("Ignore late copy of response from %s connection to %s", c.Type(), m.addr)
+			closeConn(c)
+			connsToRemove = append(connsToRemove, c)
 			continue
 		}
 		if n > 0 {

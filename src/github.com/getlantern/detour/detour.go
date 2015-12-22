@@ -73,6 +73,9 @@ type Conn struct {
 	// manual alignment. For this, it is best to keep it as the first field
 	readBytes uint64
 
+	// number of connections expected to be available now or later.
+	expectedConns uint32
+
 	// chan to pass connections from dialer to I/O loop
 	chConnToIOLoop chan conn
 	// ask I/O loop to read
