@@ -1,6 +1,7 @@
 package detour
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"sync/atomic"
@@ -31,9 +32,12 @@ func Dialer(detourDialer dialFunc) func(network, addr string) (net.Conn, error) 
 		if !whitelisted(addr) {
 			dc.expectedConns = 2
 		}
+
 		// Dialing logic
+		numDial := int(dc.expectedConns)
+		chLastError := make(chan error, numDial)
 		go func() {
-			if dc.expectedConns == 2 {
+			if numDial == 2 {
 				go func() {
 					c, err := dialDirect(network, addr)
 					ch <- dialResult{c, err}
@@ -45,6 +49,7 @@ func Dialer(detourDialer dialFunc) func(network, addr string) (net.Conn, error) 
 				case <-dc.chDialDetourNow:
 				}
 				if dc.anyDataReceived() {
+					ch <- dialResult{nil, errors.New("no need to dial detour")}
 					return
 				}
 			}
@@ -52,8 +57,6 @@ func Dialer(detourDialer dialFunc) func(network, addr string) (net.Conn, error) 
 			ch <- dialResult{c, err}
 		}()
 
-		chLastError := make(chan error, dc.expectedConns)
-		numDial := int(dc.expectedConns)
 		// Merge dialing results. Run until all dialing attempts return
 		// but notify caller as soon as any connection available.
 		go func() {

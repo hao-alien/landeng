@@ -44,16 +44,19 @@ func (dc *Conn) ioLoop() {
 			reRead := false
 			if dc.anyDataReceived() {
 				log.Tracef("%s connection to %s available after data received, closing", c.Type(), dc.addr)
-				goto closeAndContinue
+				dc.closeAndDecrease(c)
+				continue
 			}
 			if firstReadReq != nil {
 				if nonidempotentHTTPRequest {
 					log.Tracef("Not replay nonidempotent request to %s, only add to whitelist", dc.addr)
 					AddToWl(dc.addr, false)
-					goto closeAndContinue
+					dc.closeAndDecrease(c)
+					continue
 				}
 				if !dc.replay(c) {
-					goto closeAndContinue
+					dc.closeAndDecrease(c)
+					continue
 				}
 				reRead = true
 			}
@@ -71,10 +74,6 @@ func (dc *Conn) ioLoop() {
 					}
 				}()
 			}
-			continue
-		closeAndContinue:
-			closeConn(c)
-			atomic.AddUint32(&dc.expectedConns, ^uint32(0))
 
 		case r := <-chRemoveConn:
 			atomic.AddUint32(&dc.expectedConns, ^uint32(0))
@@ -138,8 +137,7 @@ func (dc *Conn) ioLoop() {
 			conns.Foreach(func(c conn) bool {
 				if n, err := c.Write(req.buf); err != nil {
 					log.Debugf("Error write to %s connection to %s", c.Type(), dc.addr)
-					closeConn(c)
-					atomic.AddUint32(&dc.expectedConns, ^uint32(0))
+					dc.closeAndDecrease(c)
 					// intentionally not return c to chConns
 					return false
 				} else {
@@ -197,6 +195,10 @@ func (dc *Conn) anyDataReceived() bool {
 
 func (dc *Conn) incReadBytes(n int) {
 	atomic.AddUint64(&dc.readBytes, uint64(n))
+}
+func (dc *Conn) closeAndDecrease(c conn) {
+	closeConn(c)
+	atomic.AddUint32(&dc.expectedConns, ^uint32(0))
 }
 
 // close with trace
