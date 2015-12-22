@@ -79,8 +79,8 @@ func (dc *Conn) ioLoop() {
 			}
 
 		case r := <-chRemoveConn:
-			atomic.AddUint32(&dc.expectedConns, ^uint32(0))
 			conns.Remove(r)
+			atomic.AddUint32(&dc.expectedConns, ^uint32(0))
 
 		case req := <-dc.chReadRequest:
 			chMergeReads := make(chan innerReadResult)
