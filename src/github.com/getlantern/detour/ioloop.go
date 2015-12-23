@@ -49,8 +49,15 @@ func (dc *Conn) ioLoop() {
 			}
 			if firstReadReq != nil {
 				if nonidempotentHTTPRequest {
-					// TODO: it incorrectly adds directly accessible sites to whitelist
-					// should determine whitelist a site or not at single point.
+					// TODO: It incorrectly adds directly
+					// accessible sites to whitelist. Should
+					// determine whitelist a site or not at a
+					// single point. Skipping it should not
+					// cause any problem, as idempotent
+					// requests to the same site can also
+					// be blocked, hence adds the site to
+					// whitelist.
+					//
 					// log.Tracef("Not replay nonidempotent request to %s, only add to whitelist", dc.addr)
 					// AddToWl(dc.addr, false)
 					log.Tracef("Not replay nonidempotent request to %s", dc.addr)
