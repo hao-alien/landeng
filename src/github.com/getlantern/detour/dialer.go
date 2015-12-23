@@ -81,7 +81,9 @@ func Dialer(detourDialer dialFunc) func(network, addr string) (net.Conn, error) 
 				}
 			}
 			// caller will receive error only if no connection available.
-			chLastError <- res.err
+			if res.err != nil {
+				chLastError <- res.err
+			}
 		}()
 
 		go dc.ioLoop()
