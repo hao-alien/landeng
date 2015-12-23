@@ -83,6 +83,19 @@ func (dc *Conn) ioLoop() {
 			atomic.AddUint32(&dc.expectedConns, ^uint32(0))
 
 		case req := <-dc.chReadRequest:
+			if atomic.LoadUint32(&dc.expectedConns) == 1 {
+				c := conns.Next()
+				go func() {
+					n, err := c.Read(req.buf, false)
+					log.Tracef("Read %d bytes via %s connection to %s, err: %v", n, c.Type(), dc.addr, err)
+					if err != nil && err != io.EOF && c.Type() == connTypeDetour {
+						log.Tracef("Detour connection to %s failed, removing from whitelist", dc.addr)
+						RemoveFromWl(dc.addr)
+					}
+					req.chResult <- ioResult{n, err}
+				}()
+				continue
+			}
 			chMergeReads := make(chan innerReadResult)
 			first := !dc.anyDataReceived()
 			if first {
@@ -126,6 +139,15 @@ func (dc *Conn) ioLoop() {
 			}()
 
 		case req := <-dc.chWriteRequest:
+			if atomic.LoadUint32(&dc.expectedConns) == 1 {
+				c := conns.Next()
+				go func() {
+					n, err := c.Write(req.buf)
+					log.Tracef("Wrote %d bytes via %s connection to %s, err: %v", n, c.Type(), dc.addr, err)
+					req.chResult <- ioResult{n, err}
+				}()
+				continue
+			}
 			if !dc.anyDataReceived() {
 				if isNonidempotentHTTPRequest(req.buf) {
 					nonidempotentHTTPRequest = true
