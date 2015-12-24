@@ -23,10 +23,10 @@
     </div>
   </div>
   
-  <textarea id="model" ui-if="model.dev" ui-toggle="uiState.showModel"
+  <textarea id="model" ng-if="model.dev" ui-show="uiState.showModel"
     class="noHeightWhenHidden" lang="en" dir="ltr" readonly>{{ model | json }}</textarea>
 
-    <ul id="langchooser" ui-if="model.dev" ui-toggle="uiState.showLangChooser" dir="ltr">
+    <ul id="langchooser" ng-if="model.dev" ui-show="uiState.showLangChooser" dir="ltr">
       <li ng-repeat="(langKey, langVal) in LANGS" ng-class="{active: lang == langKey}"><a
           ng-click="lang != langKey && changeLang(langKey); uiState.showLangChooser=!uiState.showLangChooser">{{ langVal.name }}</a></li>
     </ul>

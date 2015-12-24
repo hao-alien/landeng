@@ -7,8 +7,6 @@ var app = angular.module('app', [
   'LocalStorageModule',
   'stripe.checkout',
   'pascalprecht.translate',
-  'ui.utils',
-  'ui.showhide',
   'ui.validate',
   'ui.bootstrap',
   'ui.bootstrap.tpls',
