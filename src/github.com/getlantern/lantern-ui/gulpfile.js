@@ -16,7 +16,7 @@
   var fs = require('fs');
   var raml_mock = require('raml-mocker-server');
   var bs = require('browser-sync').create();
-  var ws = require('ws').Server;
+  var ws = require('./scripts/mock-ws');
 
 
   var scssGlob = 'app/scss/*.scss';
@@ -107,12 +107,7 @@
 
   gulp.task('ws', function() {
     util.log('Starting mock Lantern backend (WebSocket) at ' + lanternBackend + '/data');
-    ws({port: lanternBackendPort, path: '/data'}).on('connection', function(ws) {
-      ws.on('message', function(message) {
-        util.log('Lantern backend received: %s', message);
-      });
-      ws.send(JSON.stringify({Type: "mocked"}));
-    });
+    ws(lanternBackendPort, util);
   });
 
   // Use browser-sync to proxy websocket to mock lantern backend and serve
