@@ -1,16 +1,14 @@
+/*global angular,console,document,navigator,setInterval,applyPatch,_*/
+
 'use strict';
 
 angular.module('app.services', [])
 // Messages service will return a map of callbacks that handle websocket
 // messages sent from the flashlight process.
-.service('Messages', ['$rootScope', 'modelSrvc', function($rootScope, modelSrvc) {
+.service('Messages', ['$rootScope', 'DataStream', 'modelSrvc', function($rootScope, DataStream, modelSrvc) {
 
   var model = modelSrvc.model;
-  model.instanceStats = {
-    allBytes: {
-      rate: 0,
-    },
-  };
+  model.instanceStats = { allBytes: { rate: 0 } };
   model.peers = [];
   var flashlightPeers = {};
   var queuedFlashlightPeers = {};
@@ -102,7 +100,7 @@ angular.module('app.services', [])
           entries = _.union(entries, data.Additions);
         }
         if (data.Deletions) {
-          entries = _.difference(entries, data.Deletions)
+          entries = _.difference(entries, data.Deletions);
         }
         entries = _.compact(entries);
         entries.sort();
@@ -112,7 +110,7 @@ angular.module('app.services', [])
           console.log("Setting entries", entries);
           $rootScope.entries = entries;
           $rootScope.originalList = entries;
-        })
+        });
       }
     },
     'Stats': function(data) {
@@ -121,24 +119,134 @@ angular.module('app.services', [])
       }
 
       if (!model.location) {
-        console.log("No location for self yet, queuing peer")
+        console.log("No location for self yet, queuing peer");
         queuedFlashlightPeers[data.data.peerid] = data.data;
         return;
       }
 
       $rootScope.$apply(function() {
         if (queuedFlashlightPeers) {
-          console.log("Applying queued flashlight peers")
+          console.log("Applying queued flashlight peers");
           _.forEach(queuedFlashlightPeers, applyPeer);
           queuedFlashlightPeers = null;
         }
 
         applyPeer(data.data);
       });
-    },
+    }
   };
 
+  _.forEach(fnList, function(fn, messageType) {
+    DataStream.watch(messageType, fn);
+  });
+  DataStream.start();
+
   return fnList;
+}])
+.factory('DataStream', [
+  '$websocket',
+  '$rootScope',
+  '$interval',
+  '$window',
+  function($websocket, $rootScope, $interval, $window) {
+
+    var WS_RECONNECT_INTERVAL = 5000;
+    var WS_RETRY_COUNT        = 0;
+    var dispatchers = {};
+    var ds;
+
+    var start = function() {
+      ds = $websocket('ws://' + document.location.host + '/data');
+
+      // Register if the user navigated away, so we don't try to connect to the UI.
+      // Also, force closing the websocket
+      var userDidLeave = false;
+      $window.onbeforeunload = function() {
+        ds.close();
+        userDidLeave = true;
+      };
+
+      ds.onMessage(function(raw) {
+        var envelope = JSON.parse(raw.data);
+        if (typeof dispatchers[envelope.Type] != 'undefined') {
+          dispatchers[envelope.Type].call(this, envelope.Message);
+        } else {
+          console.log('Got unknown message type: ' + envelope.Type);
+        }
+      });
+
+      ds.onOpen(function(msg) {
+        $rootScope.wsConnected = true;
+        WS_RETRY_COUNT = 0;
+        $rootScope.backendIsGone = false;
+        $rootScope.wsLastConnectedAt = new Date();
+        console.log("New websocket instance created " + msg);
+      });
+
+      ds.onClose(function(msg) {
+        $rootScope.wsConnected = false;
+
+        console.log("This websocket instance closed " + msg);
+
+        // If the user left, then don't try to reconnect. Causes a known bug lantern-#2721
+        // where some browsers will reconnect when navigating away, returning to Lantern
+        // home page
+        if (userDidLeave) {
+          return;
+        }
+
+        // Temporary workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=1192773
+        if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+          $rootScope.backendIsGone = true;
+          $rootScope.$digest();
+        } else {
+          // Try to reconnect indefinitely when the websocket closes
+          $interval(function() {
+            console.log("Trying to reconnect to disconnected websocket");
+            ds = $websocket('ws://' + document.location.host + '/data');
+            ds.onOpen(function(msg) {
+              $window.location.reload();
+            });
+          }, WS_RECONNECT_INTERVAL);
+        }
+      });
+
+      ds.onError(function(msg) {
+        console.log("Error on this websocket instance " + msg);
+      });
+    };
+
+    var methods = {
+      'start': start,
+      'send': function(messageType, data) {
+        console.log('request to send.');
+        ds.send(JSON.stringify({'Type': messageType, 'Message': data}));
+      },
+
+      'watch': function(messageType, func) {
+        dispatchers[messageType] = func;
+      }
+    };
+
+    return methods;
+  }
+])
+.factory('ProxiedSites', ['$window', '$rootScope', 'DataStream', function($window, $rootScope, DataStream) {
+
+  var methods = {
+    update: function() {
+      console.log('UPDATE');
+      // dataStream.send(JSON.stringify($rootScope.updates));
+      DataStream.send('ProxiedSites', $rootScope.updates);
+    },
+    get: function() {
+      console.log('GET');
+      // dataStream.send(JSON.stringify({ action: 'get' }));
+      DataStream.send('ProxiedSites', {'action': 'get'});
+    }
+  };
+
+  return methods;
 }])
 .service('modelSrvc', ['$rootScope', 'apiSrvc', '$window', 'MODEL_SYNC_CHANNEL', function($rootScope, apiSrvc, $window, MODEL_SYNC_CHANNEL) {
   var model = {},

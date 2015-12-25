@@ -1,3 +1,5 @@
+/*global app,console,document,navigator,setInterval,makeValid,_*/
+
 'use strict';
 
 app.controller('RootCtrl', [
@@ -12,7 +14,7 @@ app.controller('RootCtrl', [
 
     $scope.loadScript = function(src) {
       (function() { 
-        var script  = document.createElement("script")
+        var script  = document.createElement("script");
         script.type = "text/javascript";
         script.src  = src;
         script.async = true;
@@ -81,7 +83,7 @@ app.controller('ConfirmResetCtrl', ['$scope', 'MODAL', function($scope, MODAL) {
   });
 }]);
 
-app.controller('SettingsCtrl', ['$scope', 'MODAL', 'DataStream', 'gaMgr', function($scope, MODAL, DataStream, gaMgr) {
+app.controller('SettingsCtrl', ['$scope', 'MODAL', 'Messages', 'DataStream', 'gaMgr', function($scope, MODAL, Messages, DataStream, gaMgr) {
   $scope.show = false;
 
   $scope.$watch('model.modal', function (modal) {
@@ -142,7 +144,7 @@ app.controller('ProxiedSitesCtrl', [
       } else {
         return [];
       }
-    }
+    };
 
     $scope.setFormScope = function(scope) {
       $scope.formScope = scope;
