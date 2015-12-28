@@ -98,6 +98,28 @@ angular.module('app.services')
       return request('get', '/charges');
     }
 
+    function newConfToken(mailAddr) {
+      return request('post', '/autoconf-create', {
+        email: mailAddr
+      });
+    }
+
+    function confWithToken(token) {
+      return request('get', '/autoconf', {
+        "autoconf-token": token
+      });
+    }
+
+    function newReferralCode() {
+      return request('post', '/create-code');
+    }
+
+    function redeemReferralCode(code) {
+      return request('post', '/redeem-code', {
+        code: code
+      });
+    }
+
     return {'purchase': purchase, 'extend': extend};
   }]);
 
