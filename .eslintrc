@@ -1,0 +1,19 @@
+{
+    "env": {
+        "browser": true,
+        "node": true,
+        "mocha": true
+    },
+    "ecmaFeatures": {
+        "forOf": true,
+        "jsx": true,
+        "es6": true
+    },
+    "plugins": [
+      "react"
+    ],
+    "extends": "airbnb",
+    "rules": {
+      "semi": [2, "always"]
+    }
+}
