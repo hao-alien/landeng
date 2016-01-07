@@ -14,11 +14,11 @@ new WebpackDevServer(webpack(config), { // Start a server
   lazy: true,
   historyApiFallback: true,
   quiet: true // Without logging
-}).listen(3000, '0.0.0.0', function (err, result) {
+}).listen(2000, '0.0.0.0', function (err, result) {
   if (err) {
     console.log(err)
   } else {
     console.log('Server started')
-    console.log('Your app is available at http://' + ip.address() + ':3000 on any device in your local network!')
+    console.log('Your app is available at http://' + ip.address() + ':2000 on any device in your local network!')
   }
 });
