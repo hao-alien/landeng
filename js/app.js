@@ -7,7 +7,7 @@
  * Routes are configured at the end of this file!
  *
  */
-
+/*
 // Load the ServiceWorker, the Cache polyfill, the manifest.json file and the .htaccess file
 import 'file?name=[name].[ext]!../serviceworker.js'
 import 'file?name=[name].[ext]!../manifest.json'
@@ -23,7 +23,7 @@ if ('serviceWorker' in navigator) {
 } else {
   // No ServiceWorker Support
 }
-
+*/
 // Import all the third party stuff
 import React from 'react'
 import ReactDOM from 'react-dom'
