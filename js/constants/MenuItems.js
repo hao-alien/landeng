@@ -1,3 +1,5 @@
+/* Main Menu Labels and actions */
+/* TODO: Manage Languages */
 const MenuItems = [
   {
     title: 'Share',
@@ -5,7 +7,7 @@ const MenuItems = [
   },
   {
     title: 'Sign in to PRO',
-    action: 'default',
+    action: 'signin',
   },
   {
     title: 'Language',

@@ -3,23 +3,21 @@
  * This is the first thing users see of our App
  */
 
-import { asyncChangeProjectName } from '../../actions/AppActions'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Link } from 'react-router'
+import RaisedButton from 'material-ui/lib/raised-button'
+
+import ReferralCode from '../ReferralCode.react'
 
 class HomePage extends Component {
   render() {
-    const dispatch = this.props.dispatch
-    const { projectName } = this.props.data
     return (
       <div>
-        <h1>Hello World!</h1>
-        <h2>This is a test of Redux <span className="home__text--red">{ projectName }</span></h2>
-        <label className="home__label">Change to your project name:
-          <input className="home__input" type="text" onChange={(evt) => { dispatch(asyncChangeProjectName(evt.target.value)) }} defaultValue="GetLantern" value={projectName} />
-        </label>
-        <Link className="btn" to="/readme">ReadMe</Link>
+        <h2>Get Free Months</h2>
+        <h2>Invite friends and you will both get a free month of Lanter PRO when they sign up!</h2>
+        <ReferralCode />
+        <RaisedButton label="Email Invite" />
+        <RaisedButton label="Share On Social" />
       </div>
     )
   }
