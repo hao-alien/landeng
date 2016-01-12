@@ -1,5 +1,6 @@
 /* Main Menu Labels and names */
 /* TODO: Manage Languages */
+
 const MenuItems = [
   {
     title: 'Share',

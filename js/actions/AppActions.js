@@ -27,7 +27,7 @@
 // It makes more sense to have the asnyc actions before the non-async ones
 /* eslint-disable no-use-before-define */
 
-import { CHANGE_PROJECT_NAME, DIALOG, OPEN_MENU } from '../constants/AppConstants'
+import { CHANGE_PROJECT_NAME, DIALOG, OPEN_MENU, LANGUAGE } from '../constants/AppConstants'
 
 export function asyncChangeProjectName(name) {
   return (dispatch) => {
@@ -60,4 +60,14 @@ export function asyncOpenMenu(status) {
 
 export function openMenu(status) {
   return { type: OPEN_MENU, status }
+}
+
+export function asyncSetLanguage(name) {
+  return (dispatch) => {
+    return dispatch(setLanguage(name))
+  }
+}
+
+export function setLanguage(name) {
+  return { type: LANGUAGE, name }
 }
