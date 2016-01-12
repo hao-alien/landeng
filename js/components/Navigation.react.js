@@ -4,8 +4,10 @@
  * This component is the navigation left bar, contain code that link to all the pages.
  */
 
+import { asyncOpenDialog } from '../actions/AppActions'
 
 import React from 'react'
+import { connect } from 'react-redux'
 import LeftNav from 'material-ui/lib/left-nav'
 import MenuItem from 'material-ui/lib/menus/menu-item'
 import FlatButton from 'material-ui/lib/raised-button'
@@ -20,14 +22,10 @@ const iconStyles = {
   marginRight: 24,
 }
 
-export default class LeftNavSimpleExample extends React.Component {
+class MainNav extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state = {
-      open: false,
-      signin: false,
-    }
     this.addMenuItem = this.addMenuItem.bind(this)
     this._handleToggle = this._handleToggle.bind(this)
   }
@@ -39,7 +37,9 @@ export default class LeftNavSimpleExample extends React.Component {
       'default': function defaultAction() {
       },
       'signin': function signIn() {
-        that.setState({ signin: true })
+        console.log('SignIn:')
+        console.log(that.props.data)
+        that.props.dispatch(asyncOpenDialog(true))
       },
       'close': function closeMenu() {
         that.setState({ open: false })
@@ -58,6 +58,8 @@ export default class LeftNavSimpleExample extends React.Component {
   }
 
   render() {
+    const dispatch = this.props.dispatch
+    const { openDialog } = this.props.data
     return (
       <div>
         <FlatButton
@@ -66,13 +68,26 @@ export default class LeftNavSimpleExample extends React.Component {
           onTouchTap={this._handleToggle}>
           <FontIcon style={iconStyles} className="muidocs-icon-navigation-menu" />
         </FlatButton>
-        <LeftNav open={this.state.open}>
+        <LeftNav open={true}>
           {MenuItems.map(this.addMenuItem)}
         </LeftNav>
-        <Display if={this.state.signin}>
+        <Display if={openDialog}>
           <SignIn />
         </Display>
       </div>
     )
   }
 }
+
+
+// REDUX STUFF
+
+// Which props do we want to inject, given the global state?
+function select(state) {
+  return {
+    data: state,
+  }
+}
+
+// Wrap the component to inject dispatch and state into it
+export default connect(select)(MainNav)

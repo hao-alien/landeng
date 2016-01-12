@@ -1,18 +1,18 @@
+import { asyncOpenDialog } from '../../actions/AppActions'
+
 import React from 'react'
+import { connect } from 'react-redux'
 import Dialog from 'material-ui/lib/dialog'
 import FlatButton from 'material-ui/lib/flat-button'
 
-export default class SignIn extends React.Component {
+class SignIn extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {
-      open: true,
-    }
     this._handleClose = this._handleClose.bind(this)
   }
 
   _handleClose() {
-    this.setState({open: false})
+    this.props.dispatch(asyncOpenDialog(false))
   }
 
   render() {
@@ -28,6 +28,7 @@ export default class SignIn extends React.Component {
         keyboardFocused
         onTouchTap={that._handleClose} />,
     ]
+    const { openDialog } = this.props.data
 
     return (
       <div>
@@ -35,7 +36,7 @@ export default class SignIn extends React.Component {
           title="Sign In"
           actions={actions}
           modal={false}
-          open={this.state.open}
+          open={openDialog}
           onRequestClose={this._handleClose}>
           Sign In
         </Dialog>
@@ -46,3 +47,15 @@ export default class SignIn extends React.Component {
 
 SignIn.propTypes = {
 }
+
+// REDUX STUFF
+
+// Which props do we want to inject, given the global state?
+function select(state) {
+  return {
+    data: state,
+  }
+}
+
+// Wrap the component to inject dispatch and state into it
+export default connect(select)(SignIn)
