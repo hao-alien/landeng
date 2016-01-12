@@ -8,3 +8,4 @@
  */
 export const CHANGE_PROJECT_NAME = 'CHANGE_PROJECT_NAME'
 export const OPEN_DIALOG = 'OPEN_DIALOG'
+export const OPEN_MENU = 'OPEN_MENU'

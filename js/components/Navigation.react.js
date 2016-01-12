@@ -4,7 +4,7 @@
  * This component is the navigation left bar, contain code that link to all the pages.
  */
 
-import { asyncOpenDialog } from '../actions/AppActions'
+import { asyncOpenDialog, asyncOpenMenu } from '../actions/AppActions'
 
 import React from 'react'
 import { connect } from 'react-redux'
@@ -37,12 +37,10 @@ class MainNav extends React.Component {
       'default': function defaultAction() {
       },
       'signin': function signIn() {
-        console.log('SignIn:')
-        console.log(that.props.data)
         that.props.dispatch(asyncOpenDialog(true))
       },
       'close': function closeMenu() {
-        that.setState({ open: false })
+        that.props.dispatch(asyncOpenMenu(false))
       },
     }
   }
@@ -54,12 +52,13 @@ class MainNav extends React.Component {
     )
   }
   _handleToggle() {
-    this.setState({ open: !this.state.open })
+    const { openMenu } = this.props.data
+    this.props.dispatch(asyncOpenMenu(!openMenu))
   }
 
   render() {
     const dispatch = this.props.dispatch
-    const { openDialog } = this.props.data
+    const { openDialog, openMenu } = this.props.data
     return (
       <div>
         <FlatButton
@@ -68,7 +67,7 @@ class MainNav extends React.Component {
           onTouchTap={this._handleToggle}>
           <FontIcon style={iconStyles} className="muidocs-icon-navigation-menu" />
         </FlatButton>
-        <LeftNav open={true}>
+        <LeftNav open={openMenu}>
           {MenuItems.map(this.addMenuItem)}
         </LeftNav>
         <Display if={openDialog}>
