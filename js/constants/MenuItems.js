@@ -1,37 +1,37 @@
-/* Main Menu Labels and actions */
+/* Main Menu Labels and names */
 /* TODO: Manage Languages */
 const MenuItems = [
   {
     title: 'Share',
-    action: 'default',
+    name: 'share',
   },
   {
     title: 'Sign in to PRO',
-    action: 'signin',
+    name: 'signin',
   },
   {
     title: 'Language',
-    action: 'default',
+    name: 'language',
   },
   {
     title: 'Get Mobile Version',
-    action: 'default',
+    name: 'mobile',
   },
   {
     title: 'Contact',
-    action: 'default',
+    name: 'contact',
   },
   {
     title: 'About',
-    action: 'default',
+    name: 'about',
   },
   {
     title: 'Settings',
-    action: 'default',
+    name: 'settings',
   },
   {
     title: 'Exit',
-    action: 'close',
+    name: 'exit',
   },
 ]
 

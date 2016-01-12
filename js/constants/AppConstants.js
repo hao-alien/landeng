@@ -7,5 +7,5 @@
  * export const YOUR_ACTION_CONSTANT = 'YOUR_ACTION_CONSTANT';
  */
 export const CHANGE_PROJECT_NAME = 'CHANGE_PROJECT_NAME'
-export const OPEN_DIALOG = 'OPEN_DIALOG'
 export const OPEN_MENU = 'OPEN_MENU'
+export const DIALOG = 'DIALOG'

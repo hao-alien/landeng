@@ -1,18 +1,18 @@
-import { asyncOpenDialog } from '../../actions/AppActions'
+import { asyncDialog } from '../../actions/AppActions'
 
 import React from 'react'
 import { connect } from 'react-redux'
 import Dialog from 'material-ui/lib/dialog'
 import FlatButton from 'material-ui/lib/flat-button'
 
-class SignIn extends React.Component {
+class LanternDialog extends React.Component {
   constructor(props) {
     super(props)
     this._handleClose = this._handleClose.bind(this)
   }
 
   _handleClose() {
-    this.props.dispatch(asyncOpenDialog(false))
+    this.props.dispatch(asyncDialog({ open: false, name: '', title: '' }))
   }
 
   render() {
@@ -28,15 +28,15 @@ class SignIn extends React.Component {
         keyboardFocused
         onTouchTap={that._handleClose} />,
     ]
-    const { openDialog } = this.props.data
+    const { dialog } = this.props.data
 
     return (
       <div>
         <Dialog
-          title="Sign In"
+          title={dialog.title}
           actions={actions}
           modal={false}
-          open={openDialog}
+          open={dialog.open}
           onRequestClose={this._handleClose}>
           Sign In
         </Dialog>
@@ -45,7 +45,9 @@ class SignIn extends React.Component {
   }
 }
 
-SignIn.propTypes = {
+LanternDialog.propTypes = {
+  data: React.PropTypes.object,
+  dispatch: React.PropTypes.func,
 }
 
 // REDUX STUFF
@@ -58,4 +60,4 @@ function select(state) {
 }
 
 // Wrap the component to inject dispatch and state into it
-export default connect(select)(SignIn)
+export default connect(select)(LanternDialog)

@@ -4,7 +4,7 @@
  * This component is the navigation left bar, contain code that link to all the pages.
  */
 
-import { asyncOpenDialog, asyncOpenMenu } from '../actions/AppActions'
+import { asyncDialog, asyncOpenMenu } from '../actions/AppActions'
 
 import React from 'react'
 import { connect } from 'react-redux'
@@ -15,8 +15,7 @@ import FontIcon from 'material-ui/lib/font-icon'
 
 import MenuItems from '../constants/MenuItems'
 
-import Display from './Display.react'
-import SignIn from './popups/SignIn.react'
+import LanternDialog from './dialogs/LanternDialog.react'
 
 const iconStyles = {
   marginRight: 24,
@@ -28,37 +27,31 @@ class MainNav extends React.Component {
     super(props)
     this.addMenuItem = this.addMenuItem.bind(this)
     this._handleToggle = this._handleToggle.bind(this)
+    this._exit = this._exit.bind(this)
   }
 
-  componentWillMount() {
-    /* At the moment of mount elements declares the actions from 'js/constants/MenuItem' */
-    const that = this
-    this.actions = {
-      'default': function defaultAction() {
-      },
-      'signin': function signIn() {
-        that.props.dispatch(asyncOpenDialog(true))
-      },
-      'close': function closeMenu() {
-        that.props.dispatch(asyncOpenMenu(false))
-      },
-    }
+  _exit() {
+    this.props.dispatch(asyncOpenMenu(false))
   }
 
   addMenuItem(item, i) {
     /* Render the MenuItems from 'js/constants/MenuItem' */
-    return (
-      <MenuItem key={i} onTouchTap={this.actions[item.action]}>{item.title}</MenuItem>
-    )
+    let Item = null
+    if (item.name === 'exit') {
+      Item = <MenuItem key={i} onTouchTap={this._exit}>{item.title}</MenuItem>
+    } else {
+      Item = <MenuItem key={i} onTouchTap={() => { this.props.dispatch(asyncDialog({ open: true, name: item.name, title: item.title })) }}>{item.title}</MenuItem>
+    }
+    return Item
   }
+
   _handleToggle() {
     const { openMenu } = this.props.data
     this.props.dispatch(asyncOpenMenu(!openMenu))
   }
 
   render() {
-    const dispatch = this.props.dispatch
-    const { openDialog, openMenu } = this.props.data
+    const { dialog, openMenu } = this.props.data
     return (
       <div>
         <FlatButton
@@ -70,14 +63,16 @@ class MainNav extends React.Component {
         <LeftNav open={openMenu}>
           {MenuItems.map(this.addMenuItem)}
         </LeftNav>
-        <Display if={openDialog}>
-          <SignIn />
-        </Display>
+        <LanternDialog dialog={dialog} />
       </div>
     )
   }
 }
 
+MainNav.propTypes = {
+  data: React.PropTypes.object,
+  dispatch: React.PropTypes.func,
+}
 
 // REDUX STUFF
 
@@ -87,6 +82,7 @@ function select(state) {
     data: state,
   }
 }
+
 
 // Wrap the component to inject dispatch and state into it
 export default connect(select)(MainNav)
