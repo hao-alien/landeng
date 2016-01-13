@@ -10,6 +10,8 @@ import LeftNav from 'material-ui/lib/left-nav'
 import MenuItem from 'material-ui/lib/menus/menu-item'
 import FlatButton from 'material-ui/lib/raised-button'
 import FontIcon from 'material-ui/lib/font-icon'
+import ThemeManager from 'material-ui/lib/styles/theme-manager'
+import darkTheme from 'material-ui/lib/styles/raw-themes/dark-raw-theme'
 
 import MenuItems from '../constants/MenuItems'
 
@@ -21,6 +23,10 @@ const iconStyles = {
 }
 
 export default class LeftNavSimpleExample extends React.Component {
+
+ getChildContext () {
+    return { muiTheme: ThemeManager.getMuiTheme(darkTheme) }
+  }
 
   constructor(props) {
     super(props)
@@ -76,3 +82,5 @@ export default class LeftNavSimpleExample extends React.Component {
     )
   }
 }
+
+LeftNavSimpleExample.childContextTypes = { muiTheme: React.PropTypes.object }
