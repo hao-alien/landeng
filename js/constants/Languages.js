@@ -1,5 +1,5 @@
 /* Array that include the languages of the APP */
-const Languages = [
+const languages = [
   {
     title: 'English',
     name: 'english',
@@ -27,4 +27,4 @@ const Languages = [
   },
 ]
 
-export default Languages
+export default languages

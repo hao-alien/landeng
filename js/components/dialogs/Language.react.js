@@ -9,7 +9,7 @@ import TableFooter from 'material-ui/lib/table/table-footer'
 import TableRow from 'material-ui/lib/table/table-row'
 import TableRowColumn from 'material-ui/lib/table/table-row-column'
 
-import Languages from '../../constants/Languages'
+import languages from '../../constants/languages'
 
 class Language extends React.Component {
   constructor(props) {
@@ -25,8 +25,8 @@ class Language extends React.Component {
 
   _onRowSelection(lang) {
     /* Set the selected Language on the APP */
-    if (Languages[lang] !== undefined) {
-      this.props.dispatch(asyncSetLanguage(Languages[lang].lang))
+    if (languages[lang] !== undefined) {
+      this.props.dispatch(asyncSetLanguage(languages[lang].lang))
     }
   }
 
@@ -58,7 +58,7 @@ class Language extends React.Component {
             deselectOnClickaway
             showRowHover={false}
             stripedRows={false}>
-            {Languages.map(this.addMenuItem)}
+            {languages.map(this.addMenuItem)}
           </TableBody>
           <TableFooter />
         </Table>

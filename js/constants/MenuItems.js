@@ -1,7 +1,7 @@
 /* Main Menu Labels and names */
 /* TODO: Manage Languages */
 
-const MenuItems = [
+const menuItems = [
   {
     title: 'Share',
     name: 'share',
@@ -36,4 +36,4 @@ const MenuItems = [
   },
 ]
 
-export default MenuItems
+export default menuItems

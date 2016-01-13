@@ -13,7 +13,7 @@ import MenuItem from 'material-ui/lib/menus/menu-item'
 import FlatButton from 'material-ui/lib/raised-button'
 import FontIcon from 'material-ui/lib/font-icon'
 
-import MenuItems from '../constants/MenuItems'
+import menuItems from '../constants/menuItems'
 
 import LanternDialog from './dialogs/LanternDialog.react'
 
@@ -61,7 +61,7 @@ class MainNav extends React.Component {
           <FontIcon style={iconStyles} className="muidocs-icon-navigation-menu" />
         </FlatButton>
         <LeftNav open={openMenu}>
-          {MenuItems.map(this.addMenuItem)}
+          {menuItems.map(this.addMenuItem)}
         </LeftNav>
         <LanternDialog dialog={dialog} />
       </div>
