@@ -2,11 +2,17 @@ import { asyncDialog } from '../../actions/AppActions'
 
 import React from 'react'
 import { connect } from 'react-redux'
+import RaisedButton from 'material-ui/lib/raised-button'
 
 class SignIn extends React.Component {
   constructor(props) {
     super(props)
     this._handleClose = this._handleClose.bind(this)
+    this.montlyPlan = this.montlyPlan.bind(this)
+  }
+
+  montlyPlan() {
+    this.props.dispatch(asyncDialog({ open: true, name: 'checkout', title: 'Lantern PRO Checkout' }))
   }
 
   _handleClose() {
@@ -19,8 +25,14 @@ class SignIn extends React.Component {
         Faster Connection Speed
         Smarter Servers
         Stronger Blocking Resistance
-        Montly Plan
-        Anual Plan
+        <div>
+          <h3>Montly Plan</h3>
+          <RaisedButton label="Select" primary onTouchTap={this.montlyPlan} />
+        </div>
+        <div>
+          <h3>Anual Plan</h3>
+          <RaisedButton label="Select" secondary />
+        </div>
       </div>
     )
   }

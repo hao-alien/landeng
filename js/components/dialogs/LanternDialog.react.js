@@ -6,6 +6,7 @@ import Dialog from 'material-ui/lib/dialog'
 import ThemeManager from 'material-ui/lib/styles/theme-manager'
 import LightTheme from 'material-ui/lib/styles/raw-themes/light-raw-theme'
 
+import Checkout from './Checkout.react'
 import Language from './Language.react'
 import Mobile from './Mobile.react'
 import Settings from './Settings.react'
@@ -29,7 +30,8 @@ class LanternDialog extends React.Component {
   render() {
     const { dialog } = this.props.data
     const components = {
-      'signin': <SignIn />,
+      'checkout': <SignIn />,
+      'signin': <Checkout />,
       'language': <Language />,
       'mobile': <Mobile />,
       'settings': <Settings />,
