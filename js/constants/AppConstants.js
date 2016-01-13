@@ -6,8 +6,8 @@
  * Follow this format:
  * export const YOUR_ACTION_CONSTANT = 'YOUR_ACTION_CONSTANT';
  */
-export const OPEN_MENU = 'OPEN_MENU'
-export const DIALOG = 'DIALOG'
-export const LANGUAGE = 'LANGUAGE'
-export const SETTINGS = 'SETTINGS'
-export const USER = 'USER'
+export const OPEN_MENU = Symbol('OPEN_MENU')
+export const DIALOG = Symbol('DIALOG')
+export const LANGUAGE = Symbol('LANGUAGE')
+export const SETTINGS = Symbol('SETTINGS')
+export const USER = Symbol('USER')

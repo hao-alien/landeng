@@ -3,6 +3,7 @@
  * If we were to do this in store.js, reducers wouldn't be hot reloadable.
  */
 
+import pro from 'lantern-pro-js-client'
 import homeReducer from './homeReducer'
 
 // Replace line below once you have several reducers with
