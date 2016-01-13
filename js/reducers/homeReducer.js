@@ -13,30 +13,34 @@
  * add it in the rootReducer.js.
  */
 
-import { CHANGE_PROJECT_NAME, DIALOG, OPEN_MENU, LANGUAGE } from '../constants/AppConstants'
+import { SETTINGS, DIALOG, OPEN_MENU, LANGUAGE } from '../constants/AppConstants'
 import assignToEmpty from '../utils/assign'
 
 const initialState = {
-  projectName: 'GetLantern',
   dialog: {
     open: false,
     name: '',
   },
   openMenu: false,
   language: 'EN',
+  settings: {
+    systemStart: true,
+    proxyTraffic: false,
+    sendStatistics: false,
+  },
 }
 
 function homeReducer(state = initialState, action) {
   Object.freeze(state) // Don't mutate state directly, always use assign()!
   switch (action.type) {
-  case CHANGE_PROJECT_NAME:
-    return assignToEmpty(state, { projectName: action.name })
   case DIALOG:
     return assignToEmpty(state, { dialog: action.status })
   case OPEN_MENU:
     return assignToEmpty(state, { openMenu: action.status })
   case LANGUAGE:
     return assignToEmpty(state, { language: action.name })
+  case SETTINGS:
+    return assignToEmpty(state, { settings: action.obj })
   default:
     return state
   }

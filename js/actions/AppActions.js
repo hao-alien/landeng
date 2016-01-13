@@ -27,31 +27,9 @@
 // It makes more sense to have the asnyc actions before the non-async ones
 /* eslint-disable no-use-before-define */
 
-import { CHANGE_PROJECT_NAME, DIALOG, OPEN_MENU, LANGUAGE } from '../constants/AppConstants'
+import { SETTINGS, DIALOG, OPEN_MENU, LANGUAGE } from '../constants/AppConstants'
 
-export function asyncChangeProjectName(name) {
-  return (dispatch) => {
-    // You can do async stuff here!
-    // API fetching, Animations,...
-    // For more information as to how and why you would do this, check https://github.com/gaearon/redux-thunk
-    return dispatch(changeProjectName(name))
-  }
-}
-
-export function changeProjectName(name) {
-  return { type: CHANGE_PROJECT_NAME, name }
-}
-
-export function asyncDialog(status) {
-  return (dispatch) => {
-    return dispatch(openDialog(status))
-  }
-}
-
-export function openDialog(status) {
-  return { type: DIALOG, status }
-}
-
+/* MainNav functions */
 export function asyncOpenMenu(status) {
   return (dispatch) => {
     return dispatch(openMenu(status))
@@ -62,6 +40,18 @@ export function openMenu(status) {
   return { type: OPEN_MENU, status }
 }
 
+/* Dialog component functions */
+export function asyncDialog(status) {
+  return (dispatch) => {
+    return dispatch(openDialog(status))
+  }
+}
+
+export function openDialog(status) {
+  return { type: DIALOG, status }
+}
+
+/* Language Modal functions */
 export function asyncSetLanguage(name) {
   return (dispatch) => {
     return dispatch(setLanguage(name))
@@ -70,4 +60,15 @@ export function asyncSetLanguage(name) {
 
 export function setLanguage(name) {
   return { type: LANGUAGE, name }
+}
+
+/* Settings Modal functions */
+export function asyncSettings(obj) {
+  return (dispatch) => {
+    return dispatch(setSettings(obj))
+  }
+}
+
+export function setSettings(obj) {
+  return { type: SETTINGS, obj }
 }

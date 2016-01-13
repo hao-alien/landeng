@@ -8,6 +8,7 @@ import LightTheme from 'material-ui/lib/styles/raw-themes/light-raw-theme'
 
 import Language from './Language.react'
 import Mobile from './Mobile.react'
+import Settings from './Settings.react'
 import SignIn from './SignIn.react'
 
 
@@ -31,6 +32,7 @@ class LanternDialog extends React.Component {
       'signin': <SignIn />,
       'language': <Language />,
       'mobile': <Mobile />,
+      'settings': <Settings />,
     }
 
     return (
