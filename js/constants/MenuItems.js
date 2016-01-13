@@ -3,32 +3,32 @@
 
 const menuItems = [
   {
-    title: 'Share',
-    name: 'share',
+    title: 'Lantern PRO Plans',
+    name: 'lanternpro',
   },
   {
-    title: 'Sign in to PRO',
+    title: 'Lantern RPO Sign in',
     name: 'signin',
-  },
-  {
-    title: 'Language',
-    name: 'language',
   },
   {
     title: 'Get Mobile Version',
     name: 'mobile',
   },
   {
-    title: 'Contact',
-    name: 'contact',
+    title: 'Language',
+    name: 'language',
   },
   {
-    title: 'About',
-    name: 'about',
+    title: 'Share',
+    name: 'share',
   },
   {
     title: 'Settings',
     name: 'settings',
+  },
+  {
+    title: 'About',
+    name: 'about',
   },
   {
     title: 'Exit',

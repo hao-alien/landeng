@@ -12,6 +12,8 @@ import LeftNav from 'material-ui/lib/left-nav'
 import MenuItem from 'material-ui/lib/menus/menu-item'
 import FlatButton from 'material-ui/lib/raised-button'
 import FontIcon from 'material-ui/lib/font-icon'
+import ThemeManager from 'material-ui/lib/styles/theme-manager'
+import darkTheme from 'material-ui/lib/styles/raw-themes/dark-raw-theme'
 
 import menuItems from '../constants/menuItems'
 
@@ -28,6 +30,10 @@ class MainNav extends React.Component {
     this.addMenuItem = this.addMenuItem.bind(this)
     this._handleToggle = this._handleToggle.bind(this)
     this._exit = this._exit.bind(this)
+  }
+
+  getChildContext() {
+    return { muiTheme: ThemeManager.getMuiTheme(darkTheme) }
   }
 
   _exit() {
@@ -69,10 +75,13 @@ class MainNav extends React.Component {
   }
 }
 
+
 MainNav.propTypes = {
   data: React.PropTypes.object,
   dispatch: React.PropTypes.func,
 }
+
+MainNav.childContextTypes = { muiTheme: React.PropTypes.object }
 
 // REDUX STUFF
 
