@@ -1,13 +1,14 @@
 /*This file contains all application-wide CSS variables.*/
 
-$text-font-stack: 'Helvetica Neue Light', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
-$code-font-stack: 'Courier New', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Monaco', monospace;
+$font-roboto: 'Roboto', 'Helvetica Neue Light', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
 
-$text-color: #222;
-$brand-color: #087B98;
-$light-brand-color: #3C93A9;
-$light-grey: #EDEDED;
-$mid-grey: #999;
-$dark-grey: #444;
+$white: #fff;
 
-$max-width: 968px;
+$header-line-color: $white;
+$header-line-font-size: 45px;
+
+/*** Middle Sheet */
+$middle-sheet-bg: #00BCD4;
+
+/*** Bottom Sheet */
+$bottom-sheet-bg: #0097A7;

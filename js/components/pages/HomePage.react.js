@@ -5,19 +5,14 @@
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import RaisedButton from 'material-ui/lib/raised-button'
 
-import ReferralCode from '../ReferralCode.react'
+import ScreenFree from './ScreenFree.react'
 
 class HomePage extends Component {
   render() {
     return (
       <div>
-        <h2>Get Free Months</h2>
-        <h2>Invite friends and you will both get a free month of Lanter PRO when they sign up!</h2>
-        <ReferralCode />
-        <RaisedButton label="Email Invite" />
-        <RaisedButton label="Share On Social" />
+        <ScreenFree />
       </div>
     )
   }

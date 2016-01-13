@@ -1,26 +1,8 @@
 .wrapper {
 	background-color: #FEFEFE;
 	color: #222222;
-	max-width: 978px;
+	max-width: 100%;
 	margin: 0 auto;
-}
-
-.home__wrapper a {
-	color: #222222;
-}
-
-.home__wrapper h1,
-.home__wrapper h2 {
-	text-align: center;
-}
-
-.btn {
-	display: inline-block;
-	background-color: skyblue;
-	padding: 0.5em;
-	color: #FEFEFE;
-	border-radius: 3px;
-	text-decoration: none;
 }
 
 .logo {
@@ -28,17 +10,76 @@
 	margin: 0 auto;
 	display: block;
 }
-
-.home__label {
-	display: block;
-	width: 100%;
-	margin: 1em 0;
+#main_nav{
+  position: absolute;
 }
 
-.home__input {
-	margin-left: 0.5em;
-	border-radius: 2px;
-	border-width: 1px;
-	border-color: grey;
-	padding: 0.3em;
+#top_sheet{
+  padding: 50px;
+  margin: 0;
+}
+#middle_sheet{
+	background-color: $middle-sheet-bg;
+  padding: 10px;
+  margin: 0;
+	h2 {
+		text-align: center;
+		color: $header-line-color;
+		font-family: $font-roboto;
+		font-weight: 400;
+		font-size: $header-line-font-size;
+    margin: 0;
+		padding: 22px 0;
+	}
+	ul{
+    width: 350px;
+		margin: 0 auto;
+		padding: 0;
+		li{
+			font-family: $font-roboto;
+			font-weight: 400;
+			font-size: 22px;
+			list-style: none;
+      line-height: 40px;
+			letter-spacing: 0.22px;
+			color: $white;
+			padding: 0 0 0 50px;
+			margin: 0;
+		}
+	}
+  #get_pro{
+    margin: 20px;
+    text-align: center;
+  }
+}
+
+#bottom_sheet{
+  background-color: $bottom-sheet-bg;
+  padding: 10px;
+  margin: 0;
+  h3{
+    font-family: $font-roboto;
+    font-weight: 400;
+    font-size: 34px;
+    letter-spacing: 0.34px;
+    color: $white;
+    margin: 0;
+    padding: 24px 0 0 0;
+    text-align: center;
+  }
+  p{
+    font-family: $font-roboto;
+    color: $white;
+    font-weight: 400;
+    text-align: center;
+    font-size : 14px;
+    line-height : 20px;
+    opacity : 0.87;
+    margin: 0;
+    padding: 10px 0 0 0;
+  }
+  #get_code{
+    margin: 10px 0 20px 0;
+    text-align: center;
+  }
 }

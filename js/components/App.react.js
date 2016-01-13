@@ -24,8 +24,12 @@ class App extends Component {
   render() {
     return (
       <div className="wrapper">
-        <Navigation />
-        <img className="logo" src={Logo} />
+        <div id="main_nav">
+          <Navigation />
+        </div>
+        <section id="top_sheet">
+          <img className="logo" src={Logo} />
+        </section>
         { this.props.children }
       </div>
     )
