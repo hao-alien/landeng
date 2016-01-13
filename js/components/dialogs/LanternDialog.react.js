@@ -3,6 +3,8 @@ import { asyncDialog } from '../../actions/AppActions'
 import React from 'react'
 import { connect } from 'react-redux'
 import Dialog from 'material-ui/lib/dialog'
+import ThemeManager from 'material-ui/lib/styles/theme-manager'
+import LightTheme from 'material-ui/lib/styles/raw-themes/light-raw-theme'
 
 import Language from './Language.react'
 import Mobile from './Mobile.react'
@@ -13,6 +15,10 @@ class LanternDialog extends React.Component {
   constructor(props) {
     super(props)
     this._handleClose = this._handleClose.bind(this)
+  }
+
+  getChildContext() {
+    return { muiTheme: ThemeManager.getMuiTheme(LightTheme) }
   }
 
   _handleClose() {
@@ -45,6 +51,8 @@ LanternDialog.propTypes = {
   data: React.PropTypes.object,
   dispatch: React.PropTypes.func,
 }
+
+LanternDialog.childContextTypes = { muiTheme: React.PropTypes.object }
 
 // REDUX STUFF
 

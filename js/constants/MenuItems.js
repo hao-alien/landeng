@@ -7,7 +7,7 @@ const menuItems = [
     name: 'lanternpro',
   },
   {
-    title: 'Lantern RPO Sign in',
+    title: 'Lantern PRO Sign in',
     name: 'signin',
   },
   {
