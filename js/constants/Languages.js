@@ -1,3 +1,4 @@
+/* Array that include the languages of the APP */
 const Languages = [
   {
     title: 'English',

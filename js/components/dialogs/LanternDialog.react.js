@@ -4,8 +4,9 @@ import React from 'react'
 import { connect } from 'react-redux'
 import Dialog from 'material-ui/lib/dialog'
 
-import SignIn from './SignIn.react'
 import Language from './Language.react'
+import Mobile from './Mobile.react'
+import SignIn from './SignIn.react'
 
 
 class LanternDialog extends React.Component {
@@ -23,6 +24,7 @@ class LanternDialog extends React.Component {
     const components = {
       'signin': <SignIn />,
       'language': <Language />,
+      'mobile': <Mobile />,
     }
 
     return (

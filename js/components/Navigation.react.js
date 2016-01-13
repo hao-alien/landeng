@@ -35,7 +35,7 @@ class MainNav extends React.Component {
   }
 
   addMenuItem(item, i) {
-    /* Render the MenuItems from 'js/constants/MenuItem' */
+    /* * Render the MenuItems from 'js/constants/MenuItem' */
     let Item = null
     if (item.name === 'exit') {
       Item = <MenuItem key={i} onTouchTap={this._exit}>{item.title}</MenuItem>
