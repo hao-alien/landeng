@@ -12,6 +12,10 @@ import Mobile from './Mobile.react'
 import Settings from './Settings.react'
 import SignIn from './SignIn.react'
 
+const customContentStyle = {
+  width: '650px',
+  // height: '500px',
+}
 
 class LanternDialog extends React.Component {
   constructor(props) {
@@ -30,7 +34,8 @@ class LanternDialog extends React.Component {
   render() {
     const { dialog } = this.props.data
     const components = {
-      'checkout': <SignIn />,
+      'lanternpro': <SignIn />,
+      'checkout': <Checkout />,
       'signin': <Checkout />,
       'language': <Language />,
       'mobile': <Mobile />,
@@ -43,6 +48,10 @@ class LanternDialog extends React.Component {
           title={dialog.title}
           modal={false} /* Close at clicking the background */
           open={dialog.open}
+          bodyClassName="dialog_body"
+          titleClassName="dialog_title"
+          autoScrollBodyContent
+          contentStyle={customContentStyle}
           onRequestClose={this._handleClose}>
           {components[dialog.name]}
         </Dialog>

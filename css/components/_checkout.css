@@ -1,0 +1,31 @@
+#checkout_referral_code{
+  text-align: center;
+  width: 60%;
+  margin: 0 auto;
+  #checkout_total{
+    width: 80%;
+    position: relative;
+    margin: 0 auto;
+    top: 25px;
+    b{
+      float: left;
+      font-family: $font-roboto;
+      font-size : 18px;
+      letter-spacing : 0.09px;
+      text-transform : uppercase;
+      color : $black;
+    }
+    span{
+      float: right;
+      font-family: $font-roboto;
+      font-size : 18px;
+      color: $checkout-total-price-color;
+    }
+  }
+  #checkout_submit{
+    clear: both;
+    width: 80%;
+    margin: 0 auto;
+    padding: 50px 0 20px 0;
+  }
+}

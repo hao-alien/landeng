@@ -8,10 +8,13 @@ import IconEmail from 'material-ui/lib/svg-icons/communication/email'
 
 import CreditCard from '../../inputs/CreditCard'
 
+import inputCheckoutStyle from '../../constants/componentStyles'
+
 
 const iconStyles = {
   marginRight: 10,
 }
+
 
 class Checkout extends React.Component {
   constructor(props) {
@@ -55,34 +58,71 @@ class Checkout extends React.Component {
   render() {
     return (
       <div>
-        <IconEmail style={iconStyles} />
-        <TextField
-          hintText="Enter your email address"
-          floatingLabelText="Email"
-          errorText={this.state.errorEmail}
-          onBlur={this._emailValidation}
-          ref="email" />
-        <CreditCard />
-        <TextField
-          hintText="Enter the expiration month of your credit card"
-          floatingLabelText="MM/YYYY"
-          errorText={this.state.errorExpirationDate}
-          ref="expirationDate" />
-        <TextField
-          hintText="Enter the Card Verification Value (CVV) of your credit card"
-          floatingLabelText="CVV"
-          errorText={this.state.errorCVV}
-          type="password"
-          ref="cardVerificationValue" />
-        <TextField
-          hintText="Referral Code"
-          floatingLabelText="Referral Code"
-          errorText={this.state.referralCode}
-          ref="referralCode" />
-        <div>
-          <b>Total:</b><span>${this.state.totalCheckout}</span>
+        <div className="input_inline">
+          <div className="input_inline_icon">
+            <IconEmail style={iconStyles} />
+          </div>
+          <div className="input_inline_text">
+            <TextField
+              hintText="Enter your email address"
+              floatingLabelText="Email"
+              style={inputCheckoutStyle}
+              errorText={this.state.errorEmail}
+              onBlur={this._emailValidation}
+              ref="email" />
+          </div>
         </div>
-        <RaisedButton label="Checkout" onTouchTap={this.lanternCheckout} />
+        <div className="input_inline">
+          <CreditCard />
+        </div>
+        <div className="input_inline">
+          <div className="input_inline_icon">
+            <IconEmail style={iconStyles} />
+          </div>
+          <div className="input_inline_text">
+            <TextField
+              hintText="Enter the expiration month of your credit card"
+              floatingLabelText="MM/YYYY"
+              style={inputCheckoutStyle}
+              errorText={this.state.errorExpirationDate}
+              ref="expirationDate" />
+          </div>
+        </div>
+        <div className="input_inline">
+          <div className="input_inline_icon">
+            <IconEmail style={iconStyles} />
+          </div>
+          <div className="input_inline_text">
+            <TextField
+              hintText="Enter the Card Verification Value (CVV) of your credit card"
+              floatingLabelText="CVV"
+              style={inputCheckoutStyle}
+              errorText={this.state.errorCVV}
+              type="password"
+              ref="cardVerificationValue" />
+          </div>
+        </div>
+        <div id="checkout_referral_code">
+          <div className="input_inline">
+            <div className="input_inline_icon">
+              <IconEmail style={iconStyles} />
+            </div>
+            <div className="input_inline_text">
+              <TextField
+                hintText="Referral Code"
+                floatingLabelText="Referral Code"
+                style={inputCheckoutStyle}
+                errorText={this.state.referralCode}
+                ref="referralCode" />
+            </div>
+          </div>
+          <div id="checkout_total">
+            <b>Total:</b><span>${this.state.totalCheckout}</span>
+          </div>
+          <div id="checkout_submit">
+            <RaisedButton label="Checkout" onTouchTap={this.lanternCheckout} />
+          </div>
+        </div>
       </div>
     )
   }

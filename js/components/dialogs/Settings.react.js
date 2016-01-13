@@ -27,26 +27,36 @@ class Settings extends React.Component {
     const { settings } = this.props.data
     return (
       <div>
-          <Checkbox
-            name="systemStart"
-            labelPosition="left"
-            defaultChecked={settings.systemStart}
-            onCheck={this.saveSettings}
-            label="Run Lantern on System Start"/>
+        <div id="settings_header">
+        </div>
+        <div id="settings_body">
+          <div className="settings_option">
+            <Checkbox
+              name="systemStart"
+              labelPosition="left"
+              defaultChecked={settings.systemStart}
+              onCheck={this.saveSettings}
+              label="Run Lantern on System Start"/>
+          </div>
           <Divider />
-          <Checkbox
-            name="proxyTraffic"
-            labelPosition="left"
-            defaultChecked={settings.proxyTraffic}
-            onCheck={this.saveSettings}
-            label="Proxy all traffic"/>
+          <div className="settings_option">
+            <Checkbox
+              name="proxyTraffic"
+              labelPosition="left"
+              defaultChecked={settings.proxyTraffic}
+              onCheck={this.saveSettings}
+              label="Proxy all traffic"/>
+          </div>
           <Divider />
-          <Checkbox
-            name="sendStatistics"
-            labelPosition="left"
-            defaultChecked={settings.sendStatistics}
-            onCheck={this.saveSettings}
-            label="Securelly report usage statistics to contribute to Lantern"/>
+          <div className="settings_option">
+            <Checkbox
+              name="sendStatistics"
+              labelPosition="left"
+              defaultChecked={settings.sendStatistics}
+              onCheck={this.saveSettings}
+              label="Securelly report usage statistics to contribute to Lantern"/>
+          </div>
+        </div>
       </div>
     )
   }

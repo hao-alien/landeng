@@ -1,0 +1,31 @@
+/*This file contains all styles related to the button component.*/
+.dialog_title{
+  background-color: $dialog-top-bar-color;
+  font-family: $font-roboto;
+  font-weight: 400 !important;
+  font-size: 20px !important;
+  color : $white !important;
+  padding: 20px 0 20px 64px !important;
+  margin: 0 !important;
+}
+
+.dialog_body{
+  margin: 0;
+  padding: 0 !important;
+  max-height: 100%;
+}
+
+.input_inline{
+  width: 100%;
+  clear: both;
+  margin: 0 !important;
+  padding: 0 25px !important;
+  .input_inline_icon{
+    float: left;
+    padding-top: 40px;
+  }
+  .input_inline_text{
+    float: left;
+    width: 90%;
+  }
+}

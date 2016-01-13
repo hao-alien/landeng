@@ -20,6 +20,11 @@ class ScreenFree extends Component {
       errorMail: '',
     }
     this._emailValidation = this._emailValidation.bind(this)
+    this.getCode = this.getCode.bind(this)
+  }
+
+  getCode() {
+
   }
 
   _emailValidation() {
@@ -30,6 +35,7 @@ class ScreenFree extends Component {
       this.setState({ errorMail: 'Write a valid email address' })
     }
   }
+
 
   render() {
     return (
@@ -55,9 +61,10 @@ class ScreenFree extends Component {
               hintText="Enter your email address"
               floatingLabelText="Email"
               errorText={this.state.errorMail}
+              onBlur={this._emailValidation}
               ref="email" />
             <br />
-            <RaisedButton label="Get Code" onTouchTap={this._emailValidation} />
+            <RaisedButton label="Get Code" onTouchTap={this.getCode} />
           </div>
         </section>
       </div>

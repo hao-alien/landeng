@@ -3,6 +3,9 @@
 $font-roboto: 'Roboto', 'Helvetica Neue Light', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
 
 $white: #fff;
+$black: #000;
+$dialog-top-bar-color: #00BCD4;
+$dialog-header-color: #00BCD4;
 
 $header-line-color: $white;
 $header-line-font-size: 45px;
@@ -12,3 +15,7 @@ $middle-sheet-bg: #00BCD4;
 
 /*** Bottom Sheet */
 $bottom-sheet-bg: #0097A7;
+
+/*** Dialogs **/
+/* Checkout */
+$checkout-total-price-color: #24BCD3;

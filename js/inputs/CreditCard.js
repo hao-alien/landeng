@@ -4,6 +4,8 @@ import IconCreditCard from 'material-ui/lib/svg-icons/action/credit-card'
 
 import cards from './CardTypes'
 
+import inputCheckoutStyle from '../constants/componentStyles'
+
 const iconColors = {
   'mastercard': 'red',
   'visa': 'yellow',
@@ -72,12 +74,18 @@ class CreditCard extends Component {
   render() {
     return (
       <div>
-        <IconCreditCard style={{marginRight: 10}} color={this.state.iconColor} />
-        <TextField
-          autoComplete="off"
-          onChange={(e)=> this.setCardNumber(e)}
-          onKeyPress={(e)=> this.handleCCNumberInput(e)}
-          placeholder="• • • •   • • • •   • • • •   • • • •" />
+        <div className="input_inline_icon">
+          <IconCreditCard style={{marginRight: 10}} color={this.state.iconColor} />
+        </div>
+        <div className="input_inline_text">
+          <TextField
+            autoComplete="off"
+            floatingLabelText="Credit Card Number"
+            style={inputCheckoutStyle}
+            onChange={(e)=> this.setCardNumber(e)}
+            onKeyPress={(e)=> this.handleCCNumberInput(e)}
+          />
+        </div>
       </div>
     )
   }
