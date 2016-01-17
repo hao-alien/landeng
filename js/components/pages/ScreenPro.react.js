@@ -5,13 +5,9 @@
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import TextField from 'material-ui/lib/text-field'
 import RaisedButton from 'material-ui/lib/raised-button'
-import IconEmail from 'material-ui/lib/svg-icons/communication/email'
 
-import styles from '../../constants/styles'
-
-class ScreenFree extends Component {
+class ScreenPro extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -39,38 +35,22 @@ class ScreenFree extends Component {
     return (
       <div>
         <section id="middle_sheet">
-          <h2>Upgrade to LanternPRO</h2>
-          <ul>
-            <li>Faster connection Speed</li>
-            <li>Smarter Servers</li>
-            <li>Stronger Blocking Resistance</li>
-            <li>Starting at $4.99/month</li>
-          </ul>
-          <div id="get_pro">
-            <RaisedButton label="Upgrade To PRO" />
+          <h2>Get Free Months</h2>
+          <p>Invite friends and you will both get a free month of Lantern Pro when they Sing up!</p>
+          <div id="invite_pro">
+            <span><RaisedButton label="Email Invite" /></span>
+            <span><RaisedButton label="Share on social" /></span>
           </div>
         </section>
         <section id="bottom_sheet">
-          <h3>Get Free Months</h3>
-          <p>Enter your email to receive a code to share with your friends and get a free month of PRO when they sign up</p>
-          <div id="get_code">
-            <IconEmail style={styles.iconStyles} color="white" />
-            <TextField
-              hintText="Enter your email address"
-              floatingLabelText="Email"
-              errorText={this.state.errorMail}
-              onBlur={this._emailValidation}
-              ref="email" />
-            <br />
-            <RaisedButton label="Get Code" onTouchTap={this.getCode} />
-          </div>
+          <p>Time left in your Lantern PRO account</p>
         </section>
       </div>
     )
   }
 }
 
-ScreenFree.propTypes = {
+ScreenPro.propTypes = {
   dispatch: React.PropTypes.func,
   data: React.PropTypes.object,
 }
@@ -86,4 +66,4 @@ function select(state) {
 
 
 // Wrap the component to inject dispatch and state into it
-export default connect(select)(ScreenFree)
+export default connect(select)(ScreenPro)

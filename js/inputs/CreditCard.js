@@ -4,7 +4,7 @@ import IconCreditCard from 'material-ui/lib/svg-icons/action/credit-card'
 
 import cards from './CardTypes'
 
-import inputCheckoutStyle from '../constants/componentStyles'
+import styles from '../constants/styles'
 
 const iconColors = {
   'mastercard': 'red',
@@ -81,7 +81,7 @@ class CreditCard extends Component {
           <TextField
             autoComplete="off"
             floatingLabelText="Credit Card Number"
-            style={inputCheckoutStyle}
+            style={styles.textInputInline}
             onChange={(e)=> this.setCardNumber(e)}
             onKeyPress={(e)=> this.handleCCNumberInput(e)}
           />

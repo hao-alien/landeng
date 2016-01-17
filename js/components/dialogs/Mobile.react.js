@@ -6,11 +6,7 @@ import TextField from 'material-ui/lib/text-field'
 import RaisedButton from 'material-ui/lib/raised-button'
 import IconEmail from 'material-ui/lib/svg-icons/communication/email'
 
-import inputCheckoutStyle from '../../constants/componentStyles'
-
-const iconStyles = {
-  marginRight: 10,
-}
+import styles from '../../constants/styles'
 
 class Mobile extends React.Component {
   constructor(props) {
@@ -44,13 +40,13 @@ class Mobile extends React.Component {
           <p>Receive Lantern for Android via email</p>
           <div className="input_inline">
             <div className="input_inline_icon">
-              <IconEmail style={iconStyles} />
+              <IconEmail style={styles.iconStyles} />
             </div>
             <div className="input_inline_text">
               <TextField
                 hintText="Enter your email address"
                 floatingLabelText="Email"
-                style={inputCheckoutStyle}
+                style={styles.textInputInline}
                 errorText={this.state.errorText}
                 ref="email" />
             </div>

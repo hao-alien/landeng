@@ -6,13 +6,21 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
+import Display from '../Display.react'
 import ScreenFree from './ScreenFree.react'
+import ScreenPro from './ScreenPro.react'
 
 class HomePage extends Component {
   render() {
+    const { user } = this.props.data
     return (
       <div>
-        <ScreenFree />
+        <Display display={user.pro}>
+          <ScreenPro />
+        </Display>
+        <Display display={!user.pro}>
+          <ScreenFree />
+        </Display>
       </div>
     )
   }
