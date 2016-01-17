@@ -6,16 +6,16 @@ import Dialog from 'material-ui/lib/dialog'
 import ThemeManager from 'material-ui/lib/styles/theme-manager'
 import LightTheme from 'material-ui/lib/styles/raw-themes/light-raw-theme'
 
+import IconButton from 'material-ui/lib/icon-button'
+import NavigationClose from 'material-ui/lib/svg-icons/navigation/close'
+
 import Checkout from './Checkout.react'
 import Language from './Language.react'
 import Mobile from './Mobile.react'
 import Settings from './Settings.react'
 import SignIn from './SignIn.react'
 
-const customContentStyle = {
-  width: '650px',
-  // height: '500px',
-}
+import styles from '../../constants/styles'
 
 class LanternDialog extends React.Component {
   constructor(props) {
@@ -51,7 +51,8 @@ class LanternDialog extends React.Component {
           bodyClassName="dialog_body"
           titleClassName="dialog_title"
           autoScrollBodyContent
-          contentStyle={customContentStyle}
+          contentStyle={styles.modalContentStyle}
+          iconElementRight={<IconButton><NavigationClose /></IconButton>}
           onRequestClose={this._handleClose}>
           {components[dialog.name]}
         </Dialog>

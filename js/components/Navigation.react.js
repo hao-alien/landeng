@@ -15,13 +15,10 @@ import FontIcon from 'material-ui/lib/font-icon'
 import ThemeManager from 'material-ui/lib/styles/theme-manager'
 import darkTheme from 'material-ui/lib/styles/raw-themes/dark-raw-theme'
 
-import menuItems from '../constants/menuItems'
-
 import LanternDialog from './dialogs/LanternDialog.react'
 
-const iconStyles = {
-  marginRight: 24,
-}
+import menuItems from '../constants/menuItems'
+import styles from '../constants/styles'
 
 class MainNav extends React.Component {
 
@@ -64,7 +61,7 @@ class MainNav extends React.Component {
           label="Lantern PRO"
           labelPosition="after"
           onTouchTap={this._handleToggle}>
-          <FontIcon style={iconStyles} className="muidocs-icon-navigation-menu" />
+          <FontIcon style={styles.iconStyles} className="muidocs-icon-navigation-menu" />
         </FlatButton>
         <LeftNav open={openMenu}>
           {menuItems.map(this.addMenuItem)}

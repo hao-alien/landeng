@@ -8,13 +8,7 @@ import IconEmail from 'material-ui/lib/svg-icons/communication/email'
 
 import CreditCard from '../../inputs/CreditCard'
 
-import inputCheckoutStyle from '../../constants/componentStyles'
-
-
-const iconStyles = {
-  marginRight: 10,
-}
-
+import styles from '../../constants/styles'
 
 class Checkout extends React.Component {
   constructor(props) {
@@ -60,13 +54,13 @@ class Checkout extends React.Component {
       <div>
         <div className="input_inline">
           <div className="input_inline_icon">
-            <IconEmail style={iconStyles} />
+            <IconEmail style={styles.iconStyles} />
           </div>
           <div className="input_inline_text">
             <TextField
               hintText="Enter your email address"
               floatingLabelText="Email"
-              style={inputCheckoutStyle}
+              style={styles.textInputInline}
               errorText={this.state.errorEmail}
               onBlur={this._emailValidation}
               ref="email" />
@@ -77,26 +71,26 @@ class Checkout extends React.Component {
         </div>
         <div className="input_inline">
           <div className="input_inline_icon">
-            <IconEmail style={iconStyles} />
+            <IconEmail style={styles.iconStyles} />
           </div>
           <div className="input_inline_text">
             <TextField
               hintText="Enter the expiration month of your credit card"
               floatingLabelText="MM/YYYY"
-              style={inputCheckoutStyle}
+              style={styles.textInputInline}
               errorText={this.state.errorExpirationDate}
               ref="expirationDate" />
           </div>
         </div>
         <div className="input_inline">
           <div className="input_inline_icon">
-            <IconEmail style={iconStyles} />
+            <IconEmail style={styles.iconStyles} />
           </div>
           <div className="input_inline_text">
             <TextField
               hintText="Enter the Card Verification Value (CVV) of your credit card"
               floatingLabelText="CVV"
-              style={inputCheckoutStyle}
+              style={styles.textInputInline}
               errorText={this.state.errorCVV}
               type="password"
               ref="cardVerificationValue" />
@@ -105,13 +99,13 @@ class Checkout extends React.Component {
         <div id="checkout_referral_code">
           <div className="input_inline">
             <div className="input_inline_icon">
-              <IconEmail style={iconStyles} />
+              <IconEmail style={styles.iconStyles} />
             </div>
             <div className="input_inline_text">
               <TextField
                 hintText="Referral Code"
                 floatingLabelText="Referral Code"
-                style={inputCheckoutStyle}
+                style={styles.textInputInline}
                 errorText={this.state.referralCode}
                 ref="referralCode" />
             </div>
