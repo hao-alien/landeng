@@ -1,4 +1,5 @@
-import pro from 'lantern-pro-js-client'
+import * as pro from 'lantern-pro-js-client'
+import assignToEmpty from '../utils/assign'
 import {PURCHASE} from '../constants/ProAPIConstants'
 
 const PRO_API = 'http://localhost:5000'
@@ -33,11 +34,13 @@ function purchaseReducer(state = initialState, action) {
 export default purchaseReducer
 
 function purchase(state) {
-  let client = pro.Client({ApiAddr: PRO_API, deviceId: 'fake-id'})
+  let client = new pro.Client({ApiAddr: PRO_API, deviceId: 'fake-id'})
   return client.purchase(state.id, pro.TRIAL_PLAN, state.email)
   .then( (res) => {
+    console.log(res)
     return res
   }, (e) => {
+    console.log("failed" + e)
     return state
   })
 }

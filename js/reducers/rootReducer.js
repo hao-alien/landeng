@@ -4,11 +4,13 @@
  */
 
 import pro from 'lantern-pro-js-client'
+import { combineReducers } from 'redux';
 import homeReducer from './homeReducer'
+import purchaseReducer from './purchaseReducer'
 
 // Replace line below once you have several reducers with
 // import { combineReducers } from 'redux';
-// const rootReducer = combineReducers({ homeReducer, yourReducer })
-const rootReducer = homeReducer
+const rootReducer = combineReducers({ homeReducer, purchaseReducer })
+// const rootReducer = homeReducer
 
 export default rootReducer
