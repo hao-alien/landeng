@@ -9,11 +9,10 @@ import LightTheme from 'material-ui/lib/styles/raw-themes/light-raw-theme'
 import IconButton from 'material-ui/lib/icon-button'
 import NavigationClose from 'material-ui/lib/svg-icons/navigation/close'
 
-import Checkout from './Checkout.react'
 import Language from './Language.react'
 import Mobile from './Mobile.react'
 import Settings from './Settings.react'
-import SignIn from './SignIn.react'
+import Plans from './Plans.react'
 
 import styles from '../../constants/styles'
 
@@ -34,9 +33,9 @@ class LanternDialog extends React.Component {
   render() {
     const { dialog } = this.props.data
     const components = {
-      'lanternpro': <SignIn />,
-      'checkout': <Checkout />,
-      'signin': <Checkout />,
+      'plans': <Plans />,
+      //'signin': <StripeCheckout />,
+      //'checkout': <StripeCheckout />,
       'language': <Language />,
       'mobile': <Mobile />,
       'settings': <Settings />,
@@ -45,13 +44,13 @@ class LanternDialog extends React.Component {
     return (
       <div>
         <Dialog
-          title={dialog.title}
           modal={false} /* Close at clicking the background */
           open={dialog.open}
-          bodyClassName="dialog_body"
-          titleClassName="dialog_title"
-          autoScrollBodyContent
           contentStyle={styles.modalContentStyle}
+          title={dialog.title}
+          titleClassName="dialog_title"
+          bodyClassName="dialog_body"
+          bodyStyle={styles.modalBodyStyle}
           iconElementRight={<IconButton><NavigationClose /></IconButton>}
           onRequestClose={this._handleClose}>
           {components[dialog.name]}

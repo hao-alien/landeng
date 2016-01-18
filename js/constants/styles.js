@@ -8,6 +8,9 @@ const styles = {
   modalContentStyle: {
     width: '650px',
   },
+  modalBodyStyle: {
+    minHeight: '420px',
+  },
 }
 
 export default styles

@@ -27,7 +27,7 @@
 // It makes more sense to have the asnyc actions before the non-async ones
 /* eslint-disable no-use-before-define */
 
-import * from '../constants/ProAPIConstants'
+import PURCHASE from '../constants/ProAPIConstants'
 
 export function asyncPurchase(status) {
   return (dispatch) => {
