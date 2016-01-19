@@ -68,6 +68,13 @@ module.exports = function(options) {
     exclude: ['.htaccess'] // No need to cache that. See https://support.hostgator.com/articles/403-forbidden-or-no-permission-to-access
   })); */
 
+  // http://mts.io/2015/04/08/webpack-shims-polyfills/
+  plugins.push(
+    new webpack.ProvidePlugin({
+    'fetch': 'imports?this=>global!exports?global.fetch!whatwg-fetch'
+  })
+  );
+
   return {
     entry: entry,
     output: { // Compile into js/build.js
@@ -76,36 +83,36 @@ module.exports = function(options) {
     },
     module: {
       loaders: [{
-          test: /\.js$/, // Transform all .js files required somewhere within an entry point...
-          loader: 'babel', // ...with the specified loaders...
-          exclude: path.join(__dirname, '/node_modules/') // ...except for the node_modules folder.
-        }, {
-          test:   /\.css$/, // Transform all .css files required somewhere within an entry point...
-          loader: cssLoaders // ...with PostCSS
-        }, {
-          test: /\.jpe?g$|\.gif$|\.png$/i,
-          loader: 'url-loader?limit=10000'
-        }
+        test: /\.js$/, // Transform all .js files required somewhere within an entry point...
+        loader: 'babel', // ...with the specified loaders...
+        exclude: path.join(__dirname, '/node_modules/') // ...except for the node_modules folder.
+      }, {
+        test:   /\.css$/, // Transform all .css files required somewhere within an entry point...
+        loader: cssLoaders // ...with PostCSS
+      }, {
+        test: /\.jpe?g$|\.gif$|\.png$/i,
+        loader: 'url-loader?limit=10000'
+      }
       ]
     },
     plugins: plugins,
     postcss: function() {
       return [
         require('postcss-import')({ // Import all the css files...
-          glob: true,
-          onImport: function (files) {
-              files.forEach(this.addDependency); // ...and add dependecies from the main.css files to the other css files...
-          }.bind(this) // ...so they get hot–reloaded when something changes...
-        }),
-        require('postcss-simple-vars')(), // ...then replace the variables...
-        require('precss')(),
-        require('postcss-focus')(), // ...add a :focus to ever :hover...
-        require('autoprefixer')({ // ...and add vendor prefixes...
-          browsers: ['last 2 versions', 'IE > 8'] // ...supporting the last 2 major browser versions and IE 8 and up...
-        }),
-        require('postcss-reporter')({ // This plugin makes sure we get warnings in the console
-          clearMessages: true
-        })
+        glob: true,
+        onImport: function (files) {
+          files.forEach(this.addDependency); // ...and add dependecies from the main.css files to the other css files...
+        }.bind(this) // ...so they get hot–reloaded when something changes...
+      }),
+      require('postcss-simple-vars')(), // ...then replace the variables...
+      require('precss')(),
+      require('postcss-focus')(), // ...add a :focus to ever :hover...
+      require('autoprefixer')({ // ...and add vendor prefixes...
+        browsers: ['last 2 versions', 'IE > 8'] // ...supporting the last 2 major browser versions and IE 8 and up...
+      }),
+      require('postcss-reporter')({ // This plugin makes sure we get warnings in the console
+        clearMessages: true
+      })
       ];
     },
     target: 'web', // Make web variables accessible to webpack, e.g. window

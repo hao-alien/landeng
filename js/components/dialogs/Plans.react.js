@@ -1,16 +1,20 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import assignToEmpty from '../../utils/assign'
 import Plans from '../../constants/Plans'
 import SelectPlan from '../../Inputs/SelectPlan'
 import {asyncPurchase} from '../../actions/ProAPIActions'
 
-
 class SignIn extends React.Component {
-  onToken (token) {
-    this.props.dispatch(asyncPurchase(token))
+  onToken (plan, token) {
+    this.props.dispatch(asyncPurchase(assignToEmpty(token, {plan: plan})))
   }
 
-  render() {
+  renderPurchased() {
+    this.props.dispatch(asyncDialog({ open: true, name: 'bbout', title: 'About' }))
+  }
+
+  renderPlans() {
     return (
       <div>
         <div id="plans_header">
@@ -36,6 +40,11 @@ class SignIn extends React.Component {
         </div>
     )
   }
+
+
+  render() {
+    return this.props.data.status === "ok" ? this.renderPurchased() : this.renderPlans()
+  }
 }
 
 SignIn.propTypes = {
@@ -48,7 +57,7 @@ SignIn.propTypes = {
 // Which props do we want to inject, given the global state?
 function select(state) {
   return {
-    data: state,
+    data: state.purchaseReducer,
   }
 }
 
