@@ -9,14 +9,14 @@ const PRO_API = 'http://localhost:5000'
 export function asyncPurchase(status) {
   return (dispatch) => {
     dispatch({type: INITIATE_PURCHASE, status: status})
+    let {id: token, plan, email} = status
     let client = new pro.Client({ApiAddr: PRO_API, deviceId: 'fake-id'})
-    return client.purchase(status.id, status.plan, status.email)
+    return client.purchase(token, plan, email)
     .then( (res) => {
-      console.log(res)
-      dispatch({type: PURCHASED, status: status})
+      dispatch({type: PURCHASED, status: res})
     }, (e) => {
       console.log("failed" + e)
-      dispatch({type: PURCHASE_FAILED, status: status})
+      dispatch({type: PURCHASE_FAILED, status: e})
     })
   }
 }

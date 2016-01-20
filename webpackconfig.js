@@ -9,12 +9,10 @@ module.exports = function(options) {
 
   // If production is true
   if (options.prod) {
-    // Entry
     entry = [
       path.resolve(__dirname, 'js/app.js') // Start with js/app.js...
     ];
     cssLoaders = ExtractTextPlugin.extract('style-loader', 'css-loader!postcss-loader');
-    // Plugins
     plugins = [// Plugins for Webpack
       new webpack.optimize.UglifyJsPlugin({ // Optimize the JavaScript...
         compress: {
@@ -47,7 +45,6 @@ module.exports = function(options) {
 
   // If app is in development
   } else {
-    // Entry
     entry = [
       'webpack-dev-server/client?http://localhost:2000', // Needed for hot reloading
       'webpack/hot/only-dev-server', // See above
@@ -85,7 +82,7 @@ module.exports = function(options) {
       loaders: [{
         test: /\.js$/, // Transform all .js files required somewhere within an entry point...
         loader: 'babel', // ...with the specified loaders...
-        exclude: path.join(__dirname, '/node_modules/') // ...except for the node_modules folder.
+        exclude: path.join(__dirname, '/node_modules/')
       }, {
         test:   /\.css$/, // Transform all .css files required somewhere within an entry point...
         loader: cssLoaders // ...with PostCSS

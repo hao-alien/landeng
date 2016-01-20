@@ -4,14 +4,19 @@ import assignToEmpty from '../../utils/assign'
 import Plans from '../../constants/Plans'
 import SelectPlan from '../../Inputs/SelectPlan'
 import {asyncPurchase} from '../../actions/ProAPIActions'
+import {asyncDialog} from '../../actions/AppActions'
 
-class SignIn extends React.Component {
+class PlansComponent extends React.Component {
   onToken (plan, token) {
     this.props.dispatch(asyncPurchase(assignToEmpty(token, {plan: plan})))
   }
 
-  renderPurchased() {
-    this.props.dispatch(asyncDialog({ open: true, name: 'bbout', title: 'About' }))
+  renderPurchased(result) {
+    return <div>Purchased!{JSON.stringify(result)}</div>
+  }
+
+  renderError(error) {
+    return <div>Error!{error.message}</div>
   }
 
   renderPlans() {
@@ -43,11 +48,18 @@ class SignIn extends React.Component {
 
 
   render() {
-    return this.props.data.status === "ok" ? this.renderPurchased() : this.renderPlans()
+    let data = this.props.data
+    if (data.showResult) {
+      return this.renderPurchased(data.result)
+    } else if (data.showError) {
+      return this.renderError(data.error)
+    } else {
+      return this.renderPlans()
+    }
   }
 }
 
-SignIn.propTypes = {
+PlansComponent.propTypes = {
   data: React.PropTypes.object,
   dispatch: React.PropTypes.func,
 }
@@ -62,4 +74,4 @@ function select(state) {
 }
 
 // Wrap the component to inject dispatch and state into it
-export default connect(select)(SignIn)
+export default connect(select)(PlansComponent)
