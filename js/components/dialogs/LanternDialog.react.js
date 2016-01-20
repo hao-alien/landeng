@@ -7,7 +7,13 @@ import ThemeManager from 'material-ui/lib/styles/theme-manager'
 import LightTheme from 'material-ui/lib/styles/raw-themes/light-raw-theme'
 
 import IconButton from 'material-ui/lib/icon-button'
-import NavigationClose from 'material-ui/lib/svg-icons/navigation/close'
+import IconClose from 'material-ui/lib/svg-icons/navigation/close'
+import IconCreditCard from 'material-ui/lib/svg-icons/action/credit-card'
+import IconTranslate from 'material-ui/lib/svg-icons/action/translate'
+import IconInfo from 'material-ui/lib/svg-icons/action/info'
+import IconSettings from 'material-ui/lib/svg-icons/action/settings'
+import IconShare from 'material-ui/lib/svg-icons/social/share'
+import IconPhone from 'material-ui/lib/svg-icons/hardware/phone-android'
 
 import Language from './Language.react'
 import Mobile from './Mobile.react'
@@ -30,30 +36,44 @@ class LanternDialog extends React.Component {
     this.props.dispatch(asyncDialog({ open: false, name: '', title: '' }))
   }
 
+  renderTitle(title, icon) {
+    return (<div className="dialog_title">
+      {icon}
+      <span>{title}</span>
+      <IconButton iconStyle={{
+        marginRight: -16,
+        marginLeft: 'auto'}}
+        onClick={this._handleClose}>
+        <IconClose />
+      </IconButton>
+    </div>)
+  }
+
   render() {
     const { dialog } = this.props.data
     const components = {
-      'plans': <Plans />,
+      'plans': {icon: <IconCreditCard color="white" />, children: <Plans />},
       //'signin': <StripeCheckout />,
       //'checkout': <StripeCheckout />,
-      'language': <Language />,
-      'mobile': <Mobile />,
-      'settings': <Settings />,
+      'language': {icon: <IconTranslate color="white" />, children: <Language />},
+      'mobile': {icon: <IconPhone color="white" />, children: <Mobile />},
+      'settings': {icon: <IconSettings color="white" />, children: <Settings />},
     }
 
+    if (!dialog.open || !components[dialog.name]) {
+      return null;
+    }
     return (
       <div>
         <Dialog
           modal={false} /* Close at clicking the background */
           open={dialog.open}
           contentStyle={styles.modalContentStyle}
-          title={dialog.title}
-          titleClassName="dialog_title"
+          title={this.renderTitle(dialog.title, components[dialog.name].icon)}
           bodyClassName="dialog_body"
           bodyStyle={styles.modalBodyStyle}
-          iconElementRight={<IconButton><NavigationClose /></IconButton>}
           onRequestClose={this._handleClose}>
-          {components[dialog.name]}
+          {components[dialog.name].children}
         </Dialog>
       </div>
     )
