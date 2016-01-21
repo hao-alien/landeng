@@ -4,9 +4,9 @@
 }
 
 .progress-pie-chart {
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
+  width: $progress-circle-width;
+  height: $progress-circle-width;
+  border-radius: $progress-circle-border;
   background-color: $progress-circle-chart-bg;
   position: relative;
   &.gt-50 {
@@ -17,21 +17,21 @@
 .ppc-progress {
   content: "";
   position: absolute;
-  border-radius: 50%;
-  left: calc(50% - 100px);
-  top: calc(50% - 100px);
-  width: 200px;
-  height: 200px;
-  clip: rect(0, 200px, 200px, 100px);
+  border-radius: $progress-circle-border;
+  left: calc($progress-circle-border - $progress-circle-middle);
+  top: calc($progress-circle-border - $progress-circle-middle);
+  width: $progress-circle-width;
+  height: $progress-circle-width;
+  clip: rect(0, $progress-circle-width, $progress-circle-width, $progress-circle-middle);
   .ppc-progress-fill {
     content: "";
     position: absolute;
-    border-radius: 50%;
-    left: calc(50% - 100px);
-    top: calc(50% - 100px);
-    width: 200px;
-    height: 200px;
-    clip: rect(0, 100px, 200px, 0);
+    border-radius: $progress-circle-border;
+    left: calc($progress-circle-border - $progress-circle-middle);
+    top: calc($progress-circle-border - $progress-circle-middle);
+    width: $progress-circle-width;
+    height: $progress-circle-width;
+    clip: rect(0, $progress-circle-middle, $progress-circle-width, 0);
     background: $middle-sheet-bg;
     transition: all 1s ease;
     transform: rotate(0deg);
@@ -39,9 +39,9 @@
 }
 .gt-50{
   .ppc-progress {
-    clip: rect(0, 100px, 200px, 0);
+    clip: rect(0, $progress-circle-middle, $progress-circle-width, 0);
     .ppc-progress-fill {
-      clip: rect(0, 200px, 200px, 100px);
+      clip: rect(0, $progress-circle-width, $progress-circle-width, $progress-circle-middle);
       background: $middle-sheet-bg;
     }
   }
@@ -51,26 +51,30 @@
   content: "";
   position: absolute;
   border-radius: 50%;
-  left: calc(50% - 173.91304px/2);
-  top: calc(50% - 173.91304px/2);
-  width: 173.91304px;
-  height: 173.91304px;
+  left: calc($progress-circle-border - $progress-circle-center/2);
+  top: calc($progress-circle-border - $progress-circle-center/2);
+  width: $progress-circle-center;
+  height: $progress-circle-center;
   background: $bottom-sheet-bg;
   text-align: center;
   display: table;
-}
-.pcc-percents-wrapper {
-  display: table-cell;
-  vertical-align: middle;
-  color: $progress-circle-label;
-  span {
-    display: block;
-    &.ppc-percent{
-      font-size: 2.6em;
-      font-weight: bold;
-    }
-    &.ppc-label{
-      text-transform: capitalize;
+  font-family: $font-roboto;
+  .pcc-percents-wrapper {
+    display: table-cell;
+    vertical-align: middle;
+    color: $progress-circle-label;
+    span {
+      display: block;
+      &.ppc-percent{
+        margin: 0; padding: 0;
+        font-size: 42px;
+      }
+      &.ppc-label{
+        position: relative;
+        top: -6px;
+        font-size: 12px;
+        text-transform: capitalize;
+      }
     }
   }
 }

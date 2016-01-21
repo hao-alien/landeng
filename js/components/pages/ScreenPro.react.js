@@ -34,6 +34,7 @@ class ScreenPro extends Component {
 
 
   render() {
+    const { user } = this.props.data
     return (
       <div>
         <section id="middle_sheet">
@@ -45,7 +46,7 @@ class ScreenPro extends Component {
           </div>
         </section>
         <section id="bottom_sheet">
-          <TimeLeftPro deadline="December 31 2016 23:59:59 GMT+02:00" />
+          <TimeLeftPro deadline={user.deadline} />
         </section>
       </div>
     )
@@ -62,7 +63,7 @@ ScreenPro.propTypes = {
 // Which props do we want to inject, given the global state?
 function select(state) {
   return {
-    data: state,
+    data: state.homeReducer,
   }
 }
 

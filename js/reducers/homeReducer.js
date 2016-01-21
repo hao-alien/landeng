@@ -30,6 +30,7 @@ const initialState = {
   },
   user: {
     pro: true,
+    deadline: 'December 31 2016 23:59:59 GMT+02:00',
   },
 }
 

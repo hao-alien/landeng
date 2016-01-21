@@ -61,7 +61,6 @@ class TimeLeftPro extends React.Component {
         <ProgressCircle percent={this.state.days} reference="days" />
         <ProgressCircle percent={this.state.hours} reference="hours" />
         <ProgressCircle percent={this.state.minutes} reference="minutes" />
-        <ProgressCircle percent={this.state.seconds} reference="seconds" />
         <p>Invite more friends and get more time for Free!</p>
       </div>
     )
