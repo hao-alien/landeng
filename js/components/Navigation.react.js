@@ -16,8 +16,13 @@ import ThemeManager from 'material-ui/lib/styles/theme-manager'
 import darkTheme from 'material-ui/lib/styles/raw-themes/dark-raw-theme'
 
 import LanternDialog from './dialogs/LanternDialog.react'
+import PlansDialog from './dialogs/Plans.react'
+import WelcomeToProDialog from './dialogs/WelcomeToPro.react'
+import MobileDialog from './dialogs/Mobile.react'
+
 
 import styles from '../constants/styles'
+import * as dialogs from '../constants/Dialogs'
 
 class MainNav extends React.Component {
 
@@ -38,18 +43,55 @@ class MainNav extends React.Component {
 
   addMenuItem(item, i) {
     /* * Render the MenuItems from 'js/constants/MenuItem' */
-    let Item = null
     if (item.name === 'exit') {
-      Item = <MenuItem key={i} onTouchTap={this._exit}>{item.title}</MenuItem>
+      return <MenuItem key={i} onTouchTap={this._exit}>
+        {item.title}
+      </MenuItem>
     } else {
-      Item = <MenuItem key={i} onTouchTap={() => { this.props.dispatch(asyncDialog({ open: true, name: item.name, title: item.title })) }}>{item.title}</MenuItem>
+      return <MenuItem key={i} onTouchTap={() => {
+        this.props.dispatch(asyncDialog({
+          open: true,
+          name: item.name,
+          title: item.title,
+          dialog: item.dialog
+        }))
+      }}>
+      {item.title}
+    </MenuItem>
     }
-    return Item
   }
 
   _handleToggle() {
     const { openMenu } = this.props.data
     this.props.dispatch(asyncOpenMenu(!openMenu))
+  }
+
+  renderDialog(dialog) {
+    switch (dialog) {
+      case dialogs.PLANS_DIALOG:
+        return <PlansDialog />
+      case dialogs.WELCOME_TO_PRO_DIALOG:
+        return <WelcomeToProDialog />
+      case dialogs.SIGNIN_DIALOG:
+        return null
+
+      case dialogs.MOBILE_DIALOG:
+        return <MobileDialog />
+
+      case dialogs.LANGUAGE_DIALOG:
+        return null
+
+      case dialogs.SETTINGS_DIALOG:
+        return null
+
+      case dialogs.SHARE_DIALOG:
+        return null
+
+      case dialogs.ABOUT_DIALOG:
+        return null
+      default:
+        return null
+    }
   }
 
   render() {
@@ -65,7 +107,7 @@ class MainNav extends React.Component {
         <LeftNav open={openMenu}>
           {menuItems.map(this.addMenuItem)}
         </LeftNav>
-        <LanternDialog dialog={dialog} />
+        {this.renderDialog(dialog.dialog)}
       </div>
     )
   }
@@ -92,37 +134,42 @@ function select(state) {
 // Wrap the component to inject dispatch and state into it
 export default connect(select)(MainNav)
 
-const menuItems = [
-  {
-    title: 'Lantern PRO Plans',
-    name: 'plans',
-  },
-  {
-    title: 'Lantern PRO Sign in',
-    name: 'signin',
-  },
-  {
-    title: 'Get Mobile Version',
-    name: 'mobile',
-  },
-  {
-    title: 'Language',
-    name: 'language',
-  },
-  {
-    title: 'Share',
-    name: 'share',
-  },
-  {
-    title: 'Settings',
-    name: 'settings',
-  },
-  {
-    title: 'About',
-    name: 'about',
-  },
-  {
-    title: 'Exit',
-    name: 'exit',
-  },
-]
+const menuItems = [{
+  title: 'Lantern PRO Plans',
+  name: 'plans',
+  dialog: dialogs.PLANS_DIALOG,
+},
+{
+  title: 'Lantern PRO Sign in',
+  name: 'signin',
+  dialog: dialogs.SIGNIN_DIALOG,
+},
+{
+  title: 'Get Mobile Version',
+  name: 'mobile',
+  dialog: dialogs.MOBILE_DIALOG,
+},
+{
+  title: 'Language',
+  name: 'language',
+  dialog: dialogs.LANGUAGE_DIALOG,
+},
+{
+  title: 'Share',
+  name: 'share',
+  dialog: dialogs.SHARE_DIALOG,
+},
+{
+  title: 'Settings',
+  name: 'settings',
+  dialog: dialogs.SETTINGS_DIALOG,
+},
+{
+  title: 'About',
+  name: 'about',
+  dialog: dialogs.ABOUT_DIALOG,
+},
+{
+  title: 'Exit',
+  name: 'exit',
+}]

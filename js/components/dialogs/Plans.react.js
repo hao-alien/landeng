@@ -1,27 +1,26 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import IconCreditCard from 'material-ui/lib/svg-icons/action/credit-card'
 import assignToEmpty from '../../utils/assign'
 import Plans from '../../constants/Plans'
 import SelectPlan from '../../Inputs/SelectPlan'
 import {asyncPurchase} from '../../actions/ProAPIActions'
-import {asyncDialog} from '../../actions/AppActions'
+import LanternDialog from './Dialog.react'
 
-class PlansComponent extends React.Component {
+class PlansDialog extends React.Component {
   onToken (plan, token) {
     this.props.dispatch(asyncPurchase(assignToEmpty(token, {plan: plan})))
   }
 
-  renderPurchased(result) {
-    return <div>Purchased!{JSON.stringify(result)}</div>
-  }
-
   renderError(error) {
-    return <div>Error!{error.message}</div>
+    //return <div>Error!{error.message}</div>{this.renderPlans()}
+    return this.renderPlans()
   }
 
   renderPlans() {
     return (
-      <div>
+      <LanternDialog title="Lantern PRO Plans"
+        icon = {<IconCreditCard color="white" />}>
         <div id="plans_header">
           <div id="plans_header_icon"></div>
           <div id="plans_header_info">
@@ -42,16 +41,14 @@ class PlansComponent extends React.Component {
               onToken={this.onToken.bind(this, plan.id)} />
             })}
           </div>
-        </div>
+        </LanternDialog>
     )
   }
 
 
   render() {
     let data = this.props.data
-    if (data.showResult) {
-      return this.renderPurchased(data.result)
-    } else if (data.showError) {
+    if (data.showError) {
       return this.renderError(data.error)
     } else {
       return this.renderPlans()
@@ -59,7 +56,7 @@ class PlansComponent extends React.Component {
   }
 }
 
-PlansComponent.propTypes = {
+PlansDialog.propTypes = {
   data: React.PropTypes.object,
   dispatch: React.PropTypes.func,
 }
@@ -74,4 +71,4 @@ function select(state) {
 }
 
 // Wrap the component to inject dispatch and state into it
-export default connect(select)(PlansComponent)
+export default connect(select)(PlansDialog)

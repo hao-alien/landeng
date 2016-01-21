@@ -1,4 +1,3 @@
-/*This file contains all styles related to the button component.*/
 .dialog_title{
   background-color: $dialog-top-bar-color;
   font-family: $font-roboto;
@@ -9,10 +8,30 @@
   margin: 0 !important;
 }
 
-.dialog_body{
+.dialog_body {
   margin: 0;
   padding: 0 !important;
   max-height: 100%;
+  .illustrated_header {
+    width: 100%;
+    height: 200px;
+    overflow: auto;
+    background-color: $dialog-header-color;
+    display: block;
+    img {
+      height: 80%;
+      width: 100%;
+      margin: auto;
+    }
+  }
+  .illustrated_body {
+    width: 100%;
+    h4, p, a {
+      margin: 0 40px;
+      padding: 20px 0 10px 0;
+      text-align: center;
+    }
+  }
 }
 
 .input_inline{

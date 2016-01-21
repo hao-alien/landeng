@@ -51,6 +51,10 @@ export function openDialog(status) {
   return { type: DIALOG, status }
 }
 
+export function noDialog() {
+  return openDialog({open: false, dialog: null})
+}
+
 /* Language Modal functions */
 export function asyncSetLanguage(name) {
   return (dispatch) => {

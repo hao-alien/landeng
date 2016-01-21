@@ -2,7 +2,9 @@
 
 import * as pro from 'lantern-pro-js-client'
 import assignToEmpty from '../utils/assign'
+import {asyncDialog} from './AppActions'
 import {INITIATE_PURCHASE, PURCHASED, PURCHASE_FAILED} from '../constants/ProAPIConstants'
+import {WELCOME_TO_PRO_DIALOG} from '../constants/Dialogs'
 
 const PRO_API = 'http://localhost:5000'
 
@@ -14,6 +16,7 @@ export function asyncPurchase(status) {
     return client.purchase(token, plan, email)
     .then( (res) => {
       dispatch({type: PURCHASED, status: res})
+      dispatch(asyncDialog({open: true, dialog: WELCOME_TO_PRO_DIALOG}))
     }, (e) => {
       console.log("failed" + e)
       dispatch({type: PURCHASE_FAILED, status: e})
