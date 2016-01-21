@@ -4,6 +4,8 @@ $font-roboto: 'Roboto', 'Helvetica Neue Light', 'Helvetica Neue', 'Helvetica', '
 
 $white: #fff;
 $black: #000;
+$gray: #666;
+$link-color: #00BCD4;
 $dialog-top-bar-color: #00BCD4;
 $dialog-header-color: #00BCD4;
 

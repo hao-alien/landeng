@@ -4,7 +4,7 @@
   font-weight: 400 !important;
   font-size: 20px !important;
   color : $white !important;
-  padding: 23px 0 0 15px;
+  padding: 17px 0 11px 15px;
   margin: 0 !important;
   overflow: auto;
   .dialog__title__icon{
@@ -15,10 +15,9 @@
     padding: 0 0 0 15px;
   }
   .dialog__title__close{
-    float: right;
-    position: relative;
+    position: absolute;;
     right: 5px;
-    top: -10px;
+    top: 5px;
     button{
       margin: 0 !important;
       padding: 0 !important;
