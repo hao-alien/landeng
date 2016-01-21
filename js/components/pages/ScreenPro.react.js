@@ -45,7 +45,7 @@ class ScreenPro extends Component {
           </div>
         </section>
         <section id="bottom_sheet">
-          <TimeLeftPro />
+          <TimeLeftPro deadline="December 31 2016 23:59:59 GMT+02:00" />
         </section>
       </div>
     )

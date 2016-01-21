@@ -1,0 +1,76 @@
+.progress {
+  position: relative;
+  float: left;
+}
+
+.progress-pie-chart {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background-color: $progress-circle-chart-bg;
+  position: relative;
+  &.gt-50 {
+    background-color: $progress-circle-chart-bg;
+  }
+}
+
+.ppc-progress {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  left: calc(50% - 100px);
+  top: calc(50% - 100px);
+  width: 200px;
+  height: 200px;
+  clip: rect(0, 200px, 200px, 100px);
+  .ppc-progress-fill {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    left: calc(50% - 100px);
+    top: calc(50% - 100px);
+    width: 200px;
+    height: 200px;
+    clip: rect(0, 100px, 200px, 0);
+    background: $middle-sheet-bg;
+    transition: all 1s ease;
+    transform: rotate(0deg);
+  }
+}
+.gt-50{
+  .ppc-progress {
+    clip: rect(0, 100px, 200px, 0);
+    .ppc-progress-fill {
+      clip: rect(0, 200px, 200px, 100px);
+      background: $middle-sheet-bg;
+    }
+  }
+}
+
+.ppc-percents {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  left: calc(50% - 173.91304px/2);
+  top: calc(50% - 173.91304px/2);
+  width: 173.91304px;
+  height: 173.91304px;
+  background: $bottom-sheet-bg;
+  text-align: center;
+  display: table;
+}
+.pcc-percents-wrapper {
+  display: table-cell;
+  vertical-align: middle;
+  color: $progress-circle-label;
+  span {
+    display: block;
+    &.ppc-percent{
+      font-size: 2.6em;
+      font-weight: bold;
+    }
+    &.ppc-label{
+      text-transform: capitalize;
+    }
+  }
+}

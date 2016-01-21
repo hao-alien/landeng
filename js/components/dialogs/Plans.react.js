@@ -8,12 +8,11 @@ import {asyncPurchase} from '../../actions/ProAPIActions'
 import LanternDialog from './Dialog.react'
 
 class PlansDialog extends React.Component {
-  onToken (plan, token) {
+  onToken(plan, token) {
     this.props.dispatch(asyncPurchase(assignToEmpty(token, {plan: plan})))
   }
 
   renderError(error) {
-    //return <div>Error!{error.message}</div>{this.renderPlans()}
     return this.renderPlans()
   }
 

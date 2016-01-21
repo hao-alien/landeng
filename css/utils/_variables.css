@@ -19,3 +19,8 @@ $bottom-sheet-bg: #0097A7;
 /*** Dialogs **/
 /* Checkout */
 $checkout-total-price-color: #24BCD3;
+
+
+/*** Progress Circle */
+$progress-circle-chart-bg: #00828E;
+$progress-circle-label: #4CCFE0;
