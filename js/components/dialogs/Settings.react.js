@@ -1,20 +1,17 @@
-import { asyncDialog, asyncSettings } from '../../actions/AppActions'
 
 import React from 'react'
 import { connect } from 'react-redux'
 import Checkbox from 'material-ui/lib/checkbox'
 import Divider from 'material-ui/lib/divider'
+import IconSettings from 'material-ui/lib/svg-icons/action/settings'
+import { asyncSettings } from '../../actions/AppActions'
+import IllustratedDialog from './IllustratedDialog.react'
 
 
 class Settings extends React.Component {
   constructor(props) {
     super(props)
-    this._handleClose = this._handleClose.bind(this)
     this.saveSettings = this.saveSettings.bind(this)
-  }
-
-  _handleClose() {
-    this.props.dispatch(asyncDialog({ open: false, name: '', title: '' }))
   }
 
   saveSettings(input) {
@@ -26,9 +23,9 @@ class Settings extends React.Component {
   render() {
     const { settings } = this.props.data
     return (
-      <div>
-        <div id="settings_header">
-        </div>
+      <IllustratedDialog title="Welcome To Lantern PRO"
+        icon = {<IconSettings color="white"/>}
+        illustration = "settings.svg">
         <div id="settings_body">
           <div className="settings_option">
             <Checkbox
@@ -57,7 +54,7 @@ class Settings extends React.Component {
               label="Securelly report usage statistics to contribute to Lantern"/>
           </div>
         </div>
-      </div>
+      </IllustratedDialog>
     )
   }
 }
@@ -72,7 +69,7 @@ Settings.propTypes = {
 // Which props do we want to inject, given the global state?
 function select(state) {
   return {
-    data: state,
+    data: state.homeReducer,
   }
 }
 

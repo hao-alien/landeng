@@ -1,5 +1,3 @@
-import { asyncDialog, asyncSetLanguage } from '../../actions/AppActions'
-
 import React from 'react'
 import { connect } from 'react-redux'
 
@@ -8,19 +6,18 @@ import TableBody from 'material-ui/lib/table/table-body'
 import TableFooter from 'material-ui/lib/table/table-footer'
 import TableRow from 'material-ui/lib/table/table-row'
 import TableRowColumn from 'material-ui/lib/table/table-row-column'
+import IconTranslate from 'material-ui/lib/svg-icons/action/translate'
 
+import LanternDialog from './Dialog.react'
 import languages from '../../constants/languages'
+import { asyncSetLanguage } from '../../actions/AppActions'
+
 
 class Language extends React.Component {
   constructor(props) {
     super(props)
-    this._handleClose = this._handleClose.bind(this)
     this._onRowSelection = this._onRowSelection.bind(this)
-    this.addMenuItem = this.addMenuItem.bind(this)
-  }
-
-  _handleClose() {
-    this.props.dispatch(asyncDialog({ open: false, name: '', title: '' }))
+    this.addLangItem = this.addLangItem.bind(this)
   }
 
   _onRowSelection(lang) {
@@ -30,7 +27,7 @@ class Language extends React.Component {
     }
   }
 
-  addMenuItem(item, i) {
+  addLangItem(item, i) {
     /* Render the Languages from 'js/constants/Languages' */
     const { language } = this.props.data
     let selected = false
@@ -46,7 +43,8 @@ class Language extends React.Component {
 
   render() {
     return (
-      <div>
+      <LanternDialog title="Languages"
+        icon = {<IconTranslate color="white" />}>
         <Table
           height={'300px'}
           fixedHeader
@@ -58,11 +56,11 @@ class Language extends React.Component {
             deselectOnClickaway
             showRowHover={false}
             stripedRows={false}>
-            {languages.map(this.addMenuItem)}
+            {languages.map(this.addLangItem)}
           </TableBody>
           <TableFooter />
         </Table>
-      </div>
+      </LanternDialog>
     )
   }
 }

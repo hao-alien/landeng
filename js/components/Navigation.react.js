@@ -19,6 +19,9 @@ import LanternDialog from './dialogs/LanternDialog.react'
 import PlansDialog from './dialogs/Plans.react'
 import WelcomeToProDialog from './dialogs/WelcomeToPro.react'
 import MobileDialog from './dialogs/Mobile.react'
+import LanguageDialog from './dialogs/Language.react'
+import SettingsDialog from './dialogs/Settings.react'
+import AboutDialog from './dialogs/About.react'
 
 
 import styles from '../constants/styles'
@@ -79,16 +82,16 @@ class MainNav extends React.Component {
         return <MobileDialog />
 
       case dialogs.LANGUAGE_DIALOG:
-        return null
+        return <LanguageDialog />
 
       case dialogs.SETTINGS_DIALOG:
-        return null
+        return <SettingsDialog />
 
       case dialogs.SHARE_DIALOG:
         return null
 
       case dialogs.ABOUT_DIALOG:
-        return null
+        return <AboutDialog />
       default:
         return null
     }
