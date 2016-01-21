@@ -40,6 +40,10 @@ class ScreenPro extends Component {
         <section id="middle_sheet">
           <h2>Get Free Months</h2>
           <p>Invite friends and you will both get a free month of Lantern Pro when they Sing up!</p>
+          <div id="referral_code">
+            <p>Your referral code</p>
+            <span>133742</span>
+          </div>
           <div id="invite_pro">
             <span><RaisedButton label="Email Invite" /></span>
             <span><RaisedButton label="Share on social" /></span>

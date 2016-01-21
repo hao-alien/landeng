@@ -56,12 +56,18 @@ class TimeLeftPro extends React.Component {
   render() {
     return (
       <div>
-        <p>Time Left on your LanterPRO account</p>
-        <ProgressCircle percent={this.state.months} reference="months" />
-        <ProgressCircle percent={this.state.days} reference="days" />
-        <ProgressCircle percent={this.state.hours} reference="hours" />
-        <ProgressCircle percent={this.state.minutes} reference="minutes" />
-        <p>Invite more friends and get more time for Free!</p>
+        <div className="timeleft--copy">
+          <p>Time Left on your LanterPRO account</p>
+        </div>
+        <div id="countdown">
+          <ProgressCircle percent={this.state.months} reference="months" />
+          <ProgressCircle percent={this.state.days} reference="days" />
+          <ProgressCircle percent={this.state.hours} reference="hours" />
+          <ProgressCircle percent={this.state.minutes} reference="minutes" />
+        </div>
+        <div className="timeleft--copy">
+          <p>Invite more friends and get more time for Free!</p>
+        </div>
       </div>
     )
   }

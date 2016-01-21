@@ -19,6 +19,9 @@
   margin: 0;
 }
 #middle_sheet{
+	background-image: url('/img/backgrounds/background-middle-screen.svg');
+	background-repeat: repeat;
+	background-size: cover;
 	background-color: $middle-sheet-bg;
   padding: 10px;
   margin: 0;
@@ -47,13 +50,45 @@
 			margin: 0;
 		}
 	}
+	p{
+		font-family: $font-roboto;
+		font-weight: 200;
+		font-size: 16px;
+		color: $white;
+		text-align: center;
+	}
   #get_pro{
-    margin: 20px;
+    margin: 20px auto;
     text-align: center;
+		span{
+			margin: 10px;
+		}
   }
+	#invite_pro{
+    margin: 20px auto 60px auto;
+    text-align: center;
+		span{
+			margin: 10px;
+		}
+  }
+	#referral_code{
+		margin: 0 auto;
+		padding: 10px 0 30px 0;
+		text-align: center;
+		text-transform: uppercase;
+		p{
+			font-size: 14px;
+			margin: 0; padding: 0;
+		}
+		span{
+			margin: 0; padding: 0;
+			font-size: 20px;
+		}
+	}
 }
 
 #bottom_sheet{
+	overflow: auto;
   background-color: $bottom-sheet-bg;
   padding: 10px;
   margin: 0;
@@ -82,4 +117,17 @@
     margin: 10px 0 20px 0;
     text-align: center;
   }
+	.timeleft--copy{
+		clear: both;
+		p{
+			padding: 10px 0 20px 0;
+			margin: 0 auto;
+		}
+	}
+	#countdown{
+		margin: 0 auto 20px auto;
+		width: 540px;
+		overflow: auto;
+		text-align: center;
+	}
 }
