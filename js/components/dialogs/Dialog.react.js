@@ -27,24 +27,28 @@ class LanternDialog extends React.Component {
   }
 
   renderTitle(title, icon) {
-    return (<div className="dialog_title">
-      {icon}
-      <span>{title}</span>
-      <IconButton iconStyle={{
-        marginRight: -16,
-        marginLeft: 'auto'}}
-        onTouchTap={this.handleClose}>
-        <IconClose />
-      </IconButton>
-    </div>)
+    return (
+      <div className="dialog__title">
+        <div className="dialog__title__icon">{icon}</div>
+        <div className="dialog__title__text"><span>{title}</span></div>
+        <div className="dialog__title__close">
+          <IconButton iconStyle={{
+            marginRight: -16,
+            marginLeft: 'auto'}}
+            onTouchTap={this.handleClose}>
+            <IconClose />
+          </IconButton>
+        </div>
+      </div>
+    )
   }
 
   render() {
-    let {open, title, icon} = this.props
+    const { title, icon} = this.props
     return (<div>
       <Dialog
         modal={false} /* Close at clicking the background */
-        open={true}
+        open
         contentStyle={modalContentStyle}
         title={this.renderTitle(title, icon)}
         bodyClassName="dialog_body"
@@ -61,6 +65,8 @@ LanternDialog.childContextTypes = { muiTheme: React.PropTypes.object }
 LanternDialog.propTypes = {
   title: React.PropTypes.string,
   icon: React.PropTypes.object,
+  dispatch: React.PropTypes.func,
+  children: React.PropTypes.node,
 }
 
 // REDUX STUFF

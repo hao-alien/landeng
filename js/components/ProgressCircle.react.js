@@ -17,7 +17,7 @@ class ProgressCircle extends React.Component {
     const percent = parseInt((this.props.percent * 100 ) / this.props.topPercents[this.props.reference], 10)
     const element = this.refs[this.props.reference]
     const deg = parseInt((360 * percent) / 100, 10)
-    element.style.transform = 'rotate(-' + deg + 'deg)'
+    element.style.transform = 'rotate(' + deg + 'deg)'
   }
 
   classSet(classes) {

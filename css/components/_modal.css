@@ -1,14 +1,36 @@
-.dialog_title{
+.dialog__title{
   background-color: $dialog-top-bar-color;
   font-family: $font-roboto;
   font-weight: 400 !important;
   font-size: 20px !important;
   color : $white !important;
-  padding: 20px 0 20px 64px !important;
+  padding: 23px 0 0 15px;
   margin: 0 !important;
+  overflow: auto;
+  .dialog__title__icon{
+    float: left;
+  }
+  .dialog__title__text{
+    float: left;
+    padding: 0 0 0 15px;
+  }
+  .dialog__title__close{
+    float: right;
+    position: relative;
+    right: 5px;
+    top: -10px;
+    button{
+      margin: 0 !important;
+      padding: 0 !important;
+      svg{
+        margin: 0 !important;
+      }
+    }
+  }
 }
 
 .dialog_body {
+  clear: both;
   margin: 0;
   padding: 0 !important;
   max-height: 100%;

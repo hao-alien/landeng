@@ -83,6 +83,7 @@
 		span{
 			margin: 0; padding: 0;
 			font-size: 20px;
+			color: #005f63;
 		}
 	}
 }
@@ -125,9 +126,9 @@
 		}
 	}
 	#countdown{
-		margin: 0 auto 20px auto;
+		margin: 0 auto;
+		padding: 0 0 20px 0;
 		width: 540px;
-		overflow: auto;
 		text-align: center;
 	}
 }
