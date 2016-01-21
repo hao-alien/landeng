@@ -20,6 +20,7 @@ import PlansDialog from './dialogs/Plans.react'
 import WelcomeToProDialog from './dialogs/WelcomeToPro.react'
 import MobileDialog from './dialogs/Mobile.react'
 import LanguageDialog from './dialogs/Language.react'
+import ShareDialog from './dialogs/Share.react'
 import SettingsDialog from './dialogs/Settings.react'
 import AboutDialog from './dialogs/About.react'
 
@@ -126,19 +127,14 @@ class MainNav extends React.Component {
       return <WelcomeToProDialog />
     case dialogs.SIGNIN_DIALOG:
       return null
-
     case dialogs.MOBILE_DIALOG:
       return <MobileDialog />
-
     case dialogs.LANGUAGE_DIALOG:
       return <LanguageDialog />
-
     case dialogs.SETTINGS_DIALOG:
       return <SettingsDialog />
-
     case dialogs.SHARE_DIALOG:
-      return null
-
+      return <ShareDialog />
     case dialogs.ABOUT_DIALOG:
       return <AboutDialog />
     default:
