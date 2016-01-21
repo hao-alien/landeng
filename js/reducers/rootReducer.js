@@ -3,8 +3,8 @@
  * If we were to do this in store.js, reducers wouldn't be hot reloadable.
  */
 
-import pro from 'lantern-pro-js-client'
-import { combineReducers } from 'redux';
+// import pro from 'lantern-pro-js-client'
+import { combineReducers } from 'redux'
 import homeReducer from './homeReducer'
 import purchaseReducer from './purchaseReducer'
 

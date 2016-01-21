@@ -7,6 +7,8 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import RaisedButton from 'material-ui/lib/raised-button'
 
+import TimeLeftPro from '../TimeLeftPro.react'
+
 class ScreenPro extends Component {
   constructor(props) {
     super(props)
@@ -43,7 +45,7 @@ class ScreenPro extends Component {
           </div>
         </section>
         <section id="bottom_sheet">
-          <p>Time left in your Lantern PRO account</p>
+          <TimeLeftPro />
         </section>
       </div>
     )

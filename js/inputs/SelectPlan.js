@@ -13,15 +13,15 @@ class SelectPlan extends React.Component {
           : null
         }
         <h3>{this.props.title}</h3>
-        <span className="plans_price">${this.props.monthlyRate/100}/mo</span>
+        <span className="plans_price">${this.props.monthlyRate / 100}/mo</span>
         <p>for {this.props.months} month</p>
         <StripeCheckout
-          label='Select'
+          label="Select"
           token={this.props.onToken}
-          alipay = {true}
-          panelLabel = 'Pay {{amount}}'
+          alipay
+          panelLabel = "Pay {{amount}}"
           amount = {this.props.monthlyRate * this.props.months}
-          image = '/img/logo.png'
+          image = "/img/logo.png"
           // showLoadingDialog
           stripeKey={STRIPE_PUB_KEY}>
           <div className="plans_input">
@@ -34,6 +34,14 @@ class SelectPlan extends React.Component {
         </div>
     )
   }
+}
+
+SelectPlan.propTypes = {
+  bestValue: React.PropTypes.string,
+  title: React.PropTypes.string,
+  monthlyRate: React.PropTypes.number,
+  months: React.PropTypes.number,
+  onToken: React.PropTypes.string,
 }
 
 export default SelectPlan
