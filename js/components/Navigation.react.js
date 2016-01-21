@@ -17,7 +17,6 @@ import darkTheme from 'material-ui/lib/styles/raw-themes/dark-raw-theme'
 
 import LanternDialog from './dialogs/LanternDialog.react'
 
-import menuItems from '../constants/menuItems'
 import styles from '../constants/styles'
 
 class MainNav extends React.Component {
@@ -92,3 +91,38 @@ function select(state) {
 
 // Wrap the component to inject dispatch and state into it
 export default connect(select)(MainNav)
+
+const menuItems = [
+  {
+    title: 'Lantern PRO Plans',
+    name: 'plans',
+  },
+  {
+    title: 'Lantern PRO Sign in',
+    name: 'signin',
+  },
+  {
+    title: 'Get Mobile Version',
+    name: 'mobile',
+  },
+  {
+    title: 'Language',
+    name: 'language',
+  },
+  {
+    title: 'Share',
+    name: 'share',
+  },
+  {
+    title: 'Settings',
+    name: 'settings',
+  },
+  {
+    title: 'About',
+    name: 'about',
+  },
+  {
+    title: 'Exit',
+    name: 'exit',
+  },
+]
