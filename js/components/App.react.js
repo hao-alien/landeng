@@ -9,7 +9,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import injectTapEventPlugin from 'react-tap-event-plugin'
-import Logo from '../../img/logo.png'
 
 import Navigation from './Navigation.react'
 
@@ -22,13 +21,14 @@ injectTapEventPlugin()
 
 class App extends Component {
   render() {
+    const lanternLogo = require('../../img/lantern_logo.svg')
     return (
       <div className="wrapper">
         <div id="main_nav">
           <Navigation />
         </div>
         <section id="top_sheet">
-          <img className="logo" src={Logo} />
+          <div className="logo" dangerouslySetInnerHTML={{__html: lanternLogo}}></div>
         </section>
         { this.props.children }
       </div>

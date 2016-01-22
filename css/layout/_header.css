@@ -1,1 +1,7 @@
 /*This file contains all styles related to the header of the site/application.*/
+.logo {
+	max-height: 5em;
+	margin: 0 auto;
+	display: block;
+	width: 120px;
+}

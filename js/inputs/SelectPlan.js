@@ -21,14 +21,14 @@ class SelectPlan extends React.Component {
           alipay
           panelLabel = "Pay {{amount}}"
           amount = {this.props.monthlyRate * this.props.months}
-          image = "/img/logo.png"
+          image = "/img/lantern_logo_stripe.svg"
           // showLoadingDialog
           stripeKey={STRIPE_PUB_KEY}>
           <div className="plans_input">
             {this.props.bestValue ?
               <RaisedButton label="Select" secondary />
               : <RaisedButton label="Select" primary />
-              }
+            }
             </div>
           </StripeCheckout>
         </div>
