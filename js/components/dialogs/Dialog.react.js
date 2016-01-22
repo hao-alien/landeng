@@ -4,13 +4,12 @@ import Dialog from 'material-ui/lib/dialog'
 import ThemeManager from 'material-ui/lib/styles/theme-manager'
 import LightTheme from 'material-ui/lib/styles/raw-themes/light-raw-theme'
 
+import {noDialog} from '../../actions/AppActions'
+
 import IconButton from 'material-ui/lib/icon-button'
 import IconClose from 'material-ui/lib/svg-icons/navigation/close'
 
-import {noDialog} from '../../actions/AppActions'
-
-const modalContentStyle = { width: '650px' }
-const modalBodyStyle = { minHeight: '420px' }
+import styles from '../../constants/styles'
 
 class LanternDialog extends React.Component {
   constructor(props) {
@@ -49,10 +48,10 @@ class LanternDialog extends React.Component {
       <Dialog
         modal={false} /* Close at clicking the background */
         open
-        contentStyle={modalContentStyle}
+        contentStyle={styles.modalContentStyle}
         title={this.renderTitle(title, icon)}
         bodyClassName="dialog_body"
-        bodyStyle={modalBodyStyle}
+        bodyStyle={styles.modalBodyStyle}
         onRequestClose={this.handleClose}>
         {this.props.children}
       </Dialog>

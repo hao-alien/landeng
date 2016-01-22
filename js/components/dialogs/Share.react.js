@@ -1,5 +1,4 @@
 import React from 'react'
-import IconInfo from 'material-ui/lib/svg-icons/social/share'
 import LanternDialog from './Dialog.react'
 import ShareButton from '../ShareButton.react'
 
@@ -67,10 +66,10 @@ class Share extends React.Component {
         },
       },
       wechat: {
-        popup: true,
+        popup: false,
         url: `${shareText} - ${shareURL}`,
         action() {
-          console.log(`WeChat ${this.url}`)
+          console.log(`WeChat: ${this.url}`)
         },
       },
     }
@@ -79,21 +78,27 @@ class Share extends React.Component {
 
   render() {
     return (
-      <LanternDialog title="Share" icon = {<IconInfo color="white" />}>
-        <div id="share">
-          <h1>Share Lantern</h1>
-          <div className="share__buttons">
-            <ShareButton title="Email" icon="mail" clickHandler={this.share.bind(null, 'mail')} />
-            <ShareButton title="WeChat" icon="wechat" clickHandler={this.share.bind(null, 'wechat')} />
-            <ShareButton title="GooglePlus" icon="gplus" clickHandler={this.share.bind(null, 'gplus')} />
-            <ShareButton title="Facebook" icon="facebook" clickHandler={this.share.bind(null, 'facebook')} />
-            <ShareButton title="Twitter" icon="twitter" clickHandler={this.share.bind(null, 'twitter')} />
-            <ShareButton title="Github" icon="github" clickHandler={this.share.bind(null, 'github')} />
+      <LanternDialog
+        title="Share"
+        icon={this.props.icon}>
+          <div id="share">
+            <h1>Share Lantern</h1>
+            <div className="share__buttons">
+              <ShareButton title="Email" icon="mail" clickHandler={this.share.bind(null, 'mail')} />
+              <ShareButton title="WeChat" icon="wechat" clickHandler={this.share.bind(null, 'wechat')} />
+              <ShareButton title="Google Plus" icon="gplus" clickHandler={this.share.bind(null, 'gplus')} />
+              <ShareButton title="Facebook" icon="facebook" clickHandler={this.share.bind(null, 'facebook')} />
+              <ShareButton title="Twitter" icon="twitter" clickHandler={this.share.bind(null, 'twitter')} />
+              <ShareButton title="Github" icon="github" clickHandler={this.share.bind(null, 'github')} />
+            </div>
           </div>
-        </div>
       </LanternDialog>
     )
   }
+}
+
+Share.propTypes = {
+  icon: React.PropTypes.object,
 }
 
 export default Share

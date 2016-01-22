@@ -4,6 +4,7 @@ const styles = {
   },
   iconStyles: {
     marginRight: 24,
+    color: '#fff',
   },
   modalContentStyle: {
     width: '650px',

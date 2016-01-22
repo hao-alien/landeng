@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import IconCreditCard from 'material-ui/lib/svg-icons/action/credit-card'
 import assignToEmpty from '../../utils/assign'
 import Plans from '../../constants/Plans'
 import SelectPlan from '../../Inputs/SelectPlan'
@@ -18,31 +17,33 @@ class PlansDialog extends React.Component {
 
   renderPlans() {
     return (
-      <LanternDialog title="Lantern PRO Plans"
-        icon = {<IconCreditCard color="white" />}>
-        <div id="plans_header">
-          <div id="plans_header_icon"></div>
-          <div id="plans_header_info">
-            <ul>
-              <li>Faster Connection Speed</li>
-              <li>Smarter Servers</li>
-              <li>Stronger Blocking Resistance</li>
-            </ul>
+      <LanternDialog
+        title="Lantern PRO Plans"
+        icon = {this.props.icon}>
+          <div id="plans_header">
+            <div id="plans_header_icon"></div>
+            <div id="plans_header_info">
+              <ul>
+                <li>Faster Connection Speed</li>
+                <li>Smarter Servers</li>
+                <li>Stronger Blocking Resistance</li>
+              </ul>
+            </div>
           </div>
-        </div>
-        <div id="plans_select">
-          {Plans.map((plan) => {
-            return (
-              <SelectPlan
-                key={Symbol.keyFor(plan.id)}
-                bestValue={plan.bestValue}
-                title={plan.title}
-                monthlyRate = {plan.monthlyRate}
-                months = {plan.months}
-                onToken={this.onToken.bind(this, plan.id)} />
-            )
-          })}
-        </div>
+          <div id="plans_select">
+            {Plans.map((plan) => {
+              return (
+                <SelectPlan
+                  key={Symbol.keyFor(plan.id)}
+                  bestValue={plan.bestValue}
+                  title={plan.title}
+                  monthlyRate = {plan.monthlyRate}
+                  months = {plan.months}
+                  onToken={this.onToken.bind(this, plan.id)}
+                />
+              )
+            })}
+          </div>
       </LanternDialog>
     )
   }
@@ -57,6 +58,7 @@ class PlansDialog extends React.Component {
 PlansDialog.propTypes = {
   data: React.PropTypes.object,
   dispatch: React.PropTypes.func,
+  icon: React.PropTypes.object,
 }
 
 // REDUX STUFF

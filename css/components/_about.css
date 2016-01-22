@@ -16,9 +16,12 @@
 		text-decoration: none;
 		text-transform: uppercase;
 		display: block;
-		margin: 5px 0;
+		margin: 10px 0;
 		&:hover{
 			text-decoration: underline;;
 		}
+	}
+	.about_logo{
+		width: 185px;
 	}
 }

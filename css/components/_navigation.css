@@ -1,0 +1,15 @@
+.menuitem{
+  display: block;
+  .menuitem__icon{
+    display: inline;
+    margin: 3px 0;
+    svg{
+      position: relative;
+      top: 7px;
+    }
+  }
+  .menuitem__text{
+    display: inline;
+    padding-left: 13px;
+  }
+}

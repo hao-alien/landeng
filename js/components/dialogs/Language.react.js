@@ -6,7 +6,6 @@ import TableBody from 'material-ui/lib/table/table-body'
 import TableFooter from 'material-ui/lib/table/table-footer'
 import TableRow from 'material-ui/lib/table/table-row'
 import TableRowColumn from 'material-ui/lib/table/table-row-column'
-import IconTranslate from 'material-ui/lib/svg-icons/action/translate'
 
 import LanternDialog from './Dialog.react'
 import languages from '../../constants/languages'
@@ -43,23 +42,24 @@ class Language extends React.Component {
 
   render() {
     return (
-      <LanternDialog title="Languages"
-        icon = {<IconTranslate color="white" />}>
-        <Table
-          height={'300px'}
-          fixedHeader
-          fixedFooter
-          selectable
-          multiSelectable={false}
-          onRowSelection={this._onRowSelection}>
-          <TableBody
-            deselectOnClickaway
-            showRowHover={false}
-            stripedRows={false}>
-            {languages.map(this.addLangItem)}
-          </TableBody>
-          <TableFooter />
-        </Table>
+      <LanternDialog
+        title="Languages"
+        icon={this.props.icon}>
+          <Table
+            height={'300px'}
+            fixedHeader
+            fixedFooter
+            selectable
+            multiSelectable={false}
+            onRowSelection={this._onRowSelection}>
+            <TableBody
+              deselectOnClickaway
+              showRowHover={false}
+              stripedRows={false}>
+              {languages.map(this.addLangItem)}
+            </TableBody>
+            <TableFooter />
+          </Table>
       </LanternDialog>
     )
   }
@@ -68,6 +68,7 @@ class Language extends React.Component {
 Language.propTypes = {
   data: React.PropTypes.object,
   dispatch: React.PropTypes.func,
+  icon: React.PropTypes.object,
 }
 
 // REDUX STUFF

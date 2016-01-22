@@ -21,14 +21,13 @@ injectTapEventPlugin()
 
 class App extends Component {
   render() {
-    const lanternLogo = require('../../img/lantern_logo.svg')
     return (
       <div className="wrapper">
         <div id="main_nav">
           <Navigation />
         </div>
         <section id="top_sheet">
-          <div className="logo" dangerouslySetInnerHTML={{__html: lanternLogo}}></div>
+          <img className="logo" src="/img/lantern_logo.svg" />
         </section>
         { this.props.children }
       </div>

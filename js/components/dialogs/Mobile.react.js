@@ -2,8 +2,6 @@ import React from 'react'
 import TextField from 'material-ui/lib/text-field'
 import RaisedButton from 'material-ui/lib/raised-button'
 import IconEmail from 'material-ui/lib/svg-icons/communication/email'
-import IconPhone from 'material-ui/lib/svg-icons/hardware/phone-android'
-
 import IllustratedDialog from './IllustratedDialog.react'
 import styles from '../../constants/styles'
 
@@ -27,8 +25,9 @@ class MobileDialog extends React.Component {
 
   render() {
     return (
-      <IllustratedDialog title="Get Mobile Version"
-        icon = {<IconPhone color="white"/>}
+      <IllustratedDialog
+        title="Get Mobile Version"
+        icon = {this.props.icon}
         illustration = "mobile.svg">
         <h4>Receive Lantern for Android via email</h4>
         <div className="input_inline">
@@ -50,6 +49,9 @@ class MobileDialog extends React.Component {
       </IllustratedDialog>
     )
   }
+}
+MobileDialog.propTypes = {
+  icon: React.PropTypes.object,
 }
 
 export default MobileDialog

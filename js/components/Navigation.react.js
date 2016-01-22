@@ -11,7 +11,7 @@ import { connect } from 'react-redux'
 import LeftNav from 'material-ui/lib/left-nav'
 import MenuItem from 'material-ui/lib/menus/menu-item'
 import FlatButton from 'material-ui/lib/raised-button'
-import FontIcon from 'material-ui/lib/font-icon'
+
 import ThemeManager from 'material-ui/lib/styles/theme-manager'
 import darkTheme from 'material-ui/lib/styles/raw-themes/dark-raw-theme'
 
@@ -23,6 +23,15 @@ import ShareDialog from './dialogs/Share.react'
 import SettingsDialog from './dialogs/Settings.react'
 import AboutDialog from './dialogs/About.react'
 
+import FontIcon from 'material-ui/lib/font-icon'
+import IconInfo from 'material-ui/lib/svg-icons/action/info'
+import IconShare from 'material-ui/lib/svg-icons/social/share'
+import IconPhone from 'material-ui/lib/svg-icons/hardware/phone-android'
+import IconCreditCard from 'material-ui/lib/svg-icons/action/credit-card'
+import IconSettings from 'material-ui/lib/svg-icons/action/settings'
+import IconTranslate from 'material-ui/lib/svg-icons/action/translate'
+import IconFace from 'material-ui/lib/svg-icons/image/tag-faces'
+import IconClose from 'material-ui/lib/svg-icons/navigation/close'
 
 import styles from '../constants/styles'
 import * as dialogs from '../constants/Dialogs'
@@ -31,41 +40,49 @@ const menuItems = [
   {
     title: 'Lantern PRO Plans',
     name: 'plans',
+    icon: <IconCreditCard />,
     dialog: dialogs.PLANS_DIALOG,
   },
   {
     title: 'Lantern PRO Sign in',
     name: 'signin',
+    icon: <IconInfo />,
     dialog: dialogs.SIGNIN_DIALOG,
   },
   {
     title: 'Get Mobile Version',
     name: 'mobile',
+    icon: <IconPhone />,
     dialog: dialogs.MOBILE_DIALOG,
   },
   {
     title: 'Language',
     name: 'language',
+    icon: <IconTranslate />,
     dialog: dialogs.LANGUAGE_DIALOG,
   },
   {
     title: 'Share',
     name: 'share',
+    icon: <IconShare />,
     dialog: dialogs.SHARE_DIALOG,
   },
   {
     title: 'Settings',
     name: 'settings',
+    icon: <IconSettings />,
     dialog: dialogs.SETTINGS_DIALOG,
   },
   {
     title: 'About',
     name: 'about',
+    icon: <IconInfo />,
     dialog: dialogs.ABOUT_DIALOG,
   },
   {
     title: 'Exit',
     name: 'exit',
+    icon: <IconClose />,
   },
 ]
 
@@ -75,7 +92,9 @@ class MainNav extends React.Component {
   constructor(props) {
     super(props)
     this.addMenuItem = this.addMenuItem.bind(this)
+    this.renderMenuItem = this.renderMenuItem.bind(this)
     this._handleToggle = this._handleToggle.bind(this)
+    this._openDialog = this._openDialog.bind(this)
     this._exit = this._exit.bind(this)
   }
 
@@ -88,29 +107,12 @@ class MainNav extends React.Component {
   }
 
   addMenuItem(item, i) {
-    /* * Render the MenuItems from 'js/constants/MenuItem' */
-    let Item = null
-    if (item.name === 'exit') {
-      Item = (
-        <MenuItem key={i} onTouchTap={this._exit}>
-          {item.title}
-        </MenuItem>
-      )
-    } else {
-      Item = (
-        <MenuItem key={i} onTouchTap={ () => {
-          this.props.dispatch(asyncDialog({
-            open: true,
-            name: item.name,
-            title: item.title,
-            dialog: item.dialog,
-          }))
-        }}>
-          {item.title}
-        </MenuItem>
-      )
-    }
-    return Item
+    const menuItemAction = (item.name === 'exit') ? this._exit : this._openDialog.bind(null, item)
+    return (
+      <MenuItem key={i} onTouchTap={menuItemAction}>
+        {this.renderMenuItem(item)}
+      </MenuItem>
+    )
   }
 
   _handleToggle() {
@@ -118,24 +120,42 @@ class MainNav extends React.Component {
     this.props.dispatch(asyncOpenMenu(!openMenu))
   }
 
+  _openDialog(item) {
+    this.props.dispatch(asyncDialog({
+      open: true,
+      name: item.name,
+      title: item.title,
+      dialog: item.dialog,
+    }))
+  }
+
+  renderMenuItem(item) {
+    return (
+      <div className="menuitem">
+        <div className="menuitem__icon">{item.icon}</div>
+        <div className="menuitem__text"><span>{item.title}</span></div>
+      </div>
+    )
+  }
+
   renderDialog(dialog) {
     switch (dialog) {
     case dialogs.PLANS_DIALOG:
-      return <PlansDialog />
+      return <PlansDialog icon={<IconCreditCard color="white" />} />
     case dialogs.WELCOME_TO_PRO_DIALOG:
-      return <WelcomeToProDialog />
+      return <WelcomeToProDialog icon={<IconFace color="white" />} />
     case dialogs.SIGNIN_DIALOG:
       return null
     case dialogs.MOBILE_DIALOG:
-      return <MobileDialog />
+      return <MobileDialog icon={<IconPhone color="white" />} />
     case dialogs.LANGUAGE_DIALOG:
-      return <LanguageDialog />
+      return <LanguageDialog icon={<IconTranslate color="white" />} />
     case dialogs.SETTINGS_DIALOG:
-      return <SettingsDialog />
+      return <SettingsDialog icon={<IconSettings color="white" />} />
     case dialogs.SHARE_DIALOG:
-      return <ShareDialog />
+      return <ShareDialog icon={<IconShare color="white" />} />
     case dialogs.ABOUT_DIALOG:
-      return <AboutDialog />
+      return <AboutDialog icon={<IconInfo color="white" />} />
     default:
       return null
     }
@@ -149,7 +169,7 @@ class MainNav extends React.Component {
           label="Lantern PRO"
           labelPosition="after"
           onTouchTap={this._handleToggle}>
-          <FontIcon style={styles.iconStyles} className="muidocs-icon-navigation-menu" />
+          <FontIcon color="white" style={styles.iconStyles} className="muidocs-icon-navigation-menu" />
         </FlatButton>
         <LeftNav open={openMenu}>
           {menuItems.map(this.addMenuItem)}
