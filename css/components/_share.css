@@ -19,7 +19,7 @@
 		flex-flow: row wrap;
 	  justify-content: space-around;
 	}
-	.share__buton{
+	.share__button{
 		width: 80px;
 		height: 80px;
 		margin: 20px 5px;
@@ -27,6 +27,52 @@
 		display: block;
 		border: 1px solid $white;
 		position: relative;
+		text-align: center;
+		svg{
+			path{
+				fill: $white
+			}
+		}
+		.share__button--github, .share__button--twitter{
+			position: relative;
+			top: 14px;
+			svg{
+				width: 50px;
+				height: 50px;
+			}
+		}
+		.share__button--mail{
+			position: relative;
+			top: 3px;
+			svg{
+				width: 70px;
+				height: 70px;
+			}
+		}
+		.share__button--wechat{
+			position: relative;
+			top: 5px;
+			svg{
+				width: 70px;
+				height: 70px;
+			}
+		}
+		.share__button--gplus{
+			position: relative;
+			top: 15px;
+			svg{
+				width: 50px;
+				height: 50px;
+			}
+		}
+		.share__button--facebook{
+			position: relative;
+			top: 15px;
+			svg{
+				width: 50px;
+				height: 50px;
+			}
+		}
 		span{
 			width: 80px;
 			text-align: center;
@@ -40,6 +86,11 @@
 		&:hover{
 			border: 1px solid $bottom-sheet-bg;
 			cursor: pointer;
+			svg{
+				path{
+					fill: $bottom-sheet-bg
+				}
+			}
 		}
 	}
 }

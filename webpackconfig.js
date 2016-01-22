@@ -89,8 +89,10 @@ module.exports = function(options) {
       }, {
         test: /\.jpe?g$|\.gif$|\.png$/i,
         loader: 'url-loader?limit=10000'
-      }
-      ]
+      }, {
+        test: /\.svg$/,
+        loader: 'raw',
+      }]
     },
     plugins: plugins,
     postcss: function() {

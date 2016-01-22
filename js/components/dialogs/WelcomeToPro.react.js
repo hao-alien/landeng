@@ -3,7 +3,6 @@ import RaisedButton from 'material-ui/lib/raised-button'
 import IconFace from 'material-ui/lib/svg-icons/image/tag-faces'
 
 import IllustratedDialog from './IllustratedDialog.react'
-import styles from '../../constants/styles'
 
 class WelcomeToProDialog extends React.Component {
   invite() {
@@ -16,9 +15,7 @@ class WelcomeToProDialog extends React.Component {
 
   render() {
     return (
-      <IllustratedDialog title="Welcome To Lantern PRO"
-        icon = {<IconFace color="white"/>}
-        illustration = "welcome-to-lantern-pro.svg">
+      <IllustratedDialog title="Welcome To Lantern PRO" icon = {<IconFace color="white"/>} illustration = "welcome-to-lantern-pro.svg">
         <h4>Thanks for your purchase of Lantern PRO!</h4>
         <p>Invite friends and you will both get a free month of Lantern PRO when they sign up. Start inviting!</p>
         <div id="mobile_input">

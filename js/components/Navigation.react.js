@@ -15,7 +15,6 @@ import FontIcon from 'material-ui/lib/font-icon'
 import ThemeManager from 'material-ui/lib/styles/theme-manager'
 import darkTheme from 'material-ui/lib/styles/raw-themes/dark-raw-theme'
 
-// import LanternDialog from './dialogs/LanternDialog.react'
 import PlansDialog from './dialogs/Plans.react'
 import WelcomeToProDialog from './dialogs/WelcomeToPro.react'
 import MobileDialog from './dialogs/Mobile.react'
