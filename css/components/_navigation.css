@@ -1,3 +1,9 @@
+.toggleMenuButton{
+  background: $white !important;
+  &:hover{
+    background: #fafafa !important
+  }
+}
 .menuitem{
   display: block;
   .menuitem__icon{

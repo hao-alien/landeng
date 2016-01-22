@@ -23,7 +23,7 @@ import ShareDialog from './dialogs/Share.react'
 import SettingsDialog from './dialogs/Settings.react'
 import AboutDialog from './dialogs/About.react'
 
-import FontIcon from 'material-ui/lib/font-icon'
+import NavigationIcon from 'material-ui/lib/svg-icons/navigation/menu'
 import IconInfo from 'material-ui/lib/svg-icons/action/info'
 import IconShare from 'material-ui/lib/svg-icons/social/share'
 import IconPhone from 'material-ui/lib/svg-icons/hardware/phone-android'
@@ -166,10 +166,15 @@ class MainNav extends React.Component {
     return (
       <div>
         <FlatButton
-          label="Lantern PRO"
+          label="Lantern"
           labelPosition="after"
-          onTouchTap={this._handleToggle}>
-          <FontIcon color="white" style={styles.iconStyles} className="muidocs-icon-navigation-menu" />
+          className="toggleMenuButton"
+          style={styles.toggleMenuButton}
+          labelStyle={styles.toggleMenuLabel}
+          hoverColor="#ff0"
+          onTouchTap={this._handleToggle}
+        >
+            <NavigationIcon style={styles.toggleMenuIcon} />
         </FlatButton>
         <LeftNav open={openMenu}>
           {menuItems.map(this.addMenuItem)}
