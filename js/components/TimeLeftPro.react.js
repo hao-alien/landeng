@@ -1,7 +1,6 @@
 /**
- *
  * TimeLeftPro.react.js
- * This component shows the TimeLeftPro to getlantern PRO
+ * This component shows the TimeLeft Chart of lantern PRO
  */
 
 

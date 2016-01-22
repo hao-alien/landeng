@@ -1,9 +1,7 @@
 /**
- *
  * ReferalCode.react.js
  * This component shows the ReferalCode to getlantern PRO
  */
-
 
 import React from 'react'
 

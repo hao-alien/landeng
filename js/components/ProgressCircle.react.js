@@ -1,9 +1,7 @@
 /**
- *
  * ProgressCircle.react.js
- * This component shows the TimeLeftPro to getlantern PRO
+ * This component shows the ProgressCircle chart of the timeLeft of lantern PRO
  */
-
 
 import React from 'react'
 

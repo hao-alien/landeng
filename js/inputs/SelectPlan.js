@@ -41,7 +41,7 @@ SelectPlan.propTypes = {
   title: React.PropTypes.string,
   monthlyRate: React.PropTypes.number,
   months: React.PropTypes.number,
-  onToken: React.PropTypes.string,
+  onToken: React.PropTypes.func,
 }
 
 export default SelectPlan
