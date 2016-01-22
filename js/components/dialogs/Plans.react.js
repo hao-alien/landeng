@@ -12,7 +12,7 @@ class PlansDialog extends React.Component {
     this.props.dispatch(asyncPurchase(assignToEmpty(token, {plan: plan})))
   }
 
-  renderError(error) {
+  renderError() {
     return this.renderPlans()
   }
 
@@ -32,26 +32,25 @@ class PlansDialog extends React.Component {
         </div>
         <div id="plans_select">
           {Plans.map((plan) => {
-            return <SelectPlan key={Symbol.keyFor(plan.id)}
-              bestValue={plan.bestValue}
-              title={plan.title}
-              monthlyRate = {plan.monthlyRate}
-              months = {plan.months}
-              onToken={this.onToken.bind(this, plan.id)} />
-            })}
-          </div>
-        </LanternDialog>
+            return (
+              <SelectPlan
+                key={Symbol.keyFor(plan.id)}
+                bestValue={plan.bestValue}
+                title={plan.title}
+                monthlyRate = {plan.monthlyRate}
+                months = {plan.months}
+                onToken={this.onToken.bind(this, plan.id)} />
+            )
+          })}
+        </div>
+      </LanternDialog>
     )
   }
 
 
   render() {
-    let data = this.props.data
-    if (data.showError) {
-      return this.renderError(data.error)
-    } else {
-      return this.renderPlans()
-    }
+    const data = this.props.data
+    return (data.showError) ? this.renderError(data.error) : this.renderPlans()
   }
 }
 
