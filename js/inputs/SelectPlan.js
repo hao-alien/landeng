@@ -37,7 +37,7 @@ class SelectPlan extends React.Component {
 }
 
 SelectPlan.propTypes = {
-  bestValue: React.PropTypes.string,
+  bestValue: React.PropTypes.bool,
   title: React.PropTypes.string,
   monthlyRate: React.PropTypes.number,
   months: React.PropTypes.number,
