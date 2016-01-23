@@ -27,7 +27,7 @@
 // It makes more sense to have the asnyc actions before the non-async ones
 /* eslint-disable no-use-before-define */
 
-import { SETTINGS, DIALOG, OPEN_MENU, LANGUAGE } from '../constants/AppConstants'
+import { SETTINGS, DIALOG, OPEN_MENU, LANGUAGE, LANTERN } from '../constants/AppConstants'
 
 /* MainNav functions */
 export function asyncOpenMenu(status) {
@@ -75,4 +75,15 @@ export function asyncSettings(obj) {
 
 export function setSettings(obj) {
   return { type: SETTINGS, obj }
+}
+
+/* Settings Modal functions */
+export function asyncLanternStatus(obj) {
+  return (dispatch) => {
+    return dispatch(setLanternStatus(obj))
+  }
+}
+
+export function setLanternStatus(obj) {
+  return { type: LANTERN, obj }
 }

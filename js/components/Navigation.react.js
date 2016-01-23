@@ -171,7 +171,6 @@ class MainNav extends React.Component {
           className="toggleMenuButton"
           style={styles.toggleMenuButton}
           labelStyle={styles.toggleMenuLabel}
-          hoverColor="#ff0"
           onTouchTap={this._handleToggle}
         >
             <NavigationIcon style={styles.toggleMenuIcon} />
