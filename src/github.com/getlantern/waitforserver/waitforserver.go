@@ -1,5 +1,5 @@
-// package waitforserver provides a function to wait for a server at given
-// address.
+// package waitforserver provides functions to wait for a server at given
+// address being up or down.
 //
 // Typical usage:
 //
@@ -24,10 +24,17 @@ import (
 	"time"
 )
 
-// WaitForServer waits for a TCP server to start at the given address, waiting
-// up to the given limit and reporting an error if the server didn't start
-// within the time limit.
+// WaitForServer waits for a server speaking the given protocol to be listening
+// at the given address, waiting up to the given limit and reporting an error if
+// the server didn't start within the time limit.
 func WaitForServer(protocol string, addr string, limit time.Duration) error {
+	return WaitForServerUp(protocol, addr, limit)
+}
+
+// WaitForServerUp waits for a server speaking the given protocol to be
+// listening at the given address, waiting up to the given limit and reporting
+// an error if the server didn't start within the time limit.
+func WaitForServerUp(protocol string, addr string, limit time.Duration) error {
 	cutoff := time.Now().Add(limit)
 	for {
 		if time.Now().After(cutoff) {
@@ -36,6 +43,27 @@ func WaitForServer(protocol string, addr string, limit time.Duration) error {
 		c, err := net.DialTimeout(protocol, addr, limit)
 		if err == nil {
 			return c.Close()
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+}
+
+// WaitForServerDown waits for a server speaking the given protocol to stop
+// listening at the given address, waiting up to the given limit and reporting
+// an error if the server didn't start within the time limit, with each attempt
+// at dialing timing out within dialTimeout.
+func WaitForServerDown(protocol string, addr string, limit time.Duration,
+	dialTimeout time.Duration) error {
+	cutoff := time.Now().Add(limit)
+	for {
+		if time.Now().After(cutoff) {
+			return fmt.Errorf("Server never went down at %s address %s", protocol, addr)
+		}
+		c, err := net.DialTimeout(protocol, addr, dialTimeout)
+		if err == nil {
+			c.Close()
+		} else {
+			return nil
 		}
 		time.Sleep(50 * time.Millisecond)
 	}
