@@ -1,5 +1,4 @@
 /**
- *
  * App.react.js
  *
  * This component is the skeleton around the actual pages, and should only
@@ -11,6 +10,7 @@ import { connect } from 'react-redux'
 import injectTapEventPlugin from 'react-tap-event-plugin'
 
 import Navigation from './Navigation.react'
+import LanternStatus from './LanternStatus.react'
 
 /* Needed for onTouchTap
 * Can go away when react 1.0 release
@@ -26,6 +26,7 @@ class App extends Component {
         <div id="main_nav">
           <Navigation />
         </div>
+        <LanternStatus />
         <section id="top_sheet">
           <img className="logo" src="/img/lantern_logo.svg" />
         </section>
