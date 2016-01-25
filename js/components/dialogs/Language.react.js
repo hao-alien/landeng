@@ -8,7 +8,7 @@ import TableRow from 'material-ui/lib/table/table-row'
 import TableRowColumn from 'material-ui/lib/table/table-row-column'
 
 import LanternDialog from './Dialog.react'
-import languages from '../../constants/languages'
+import languages from '../../constants/Languages'
 import { asyncSetLanguage } from '../../actions/AppActions'
 
 
