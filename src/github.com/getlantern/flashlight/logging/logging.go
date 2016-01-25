@@ -153,6 +153,9 @@ func Close() error {
 		return nil
 	} else {
 		golog.ResetOutputs()
+		if logFile == nil {
+			return nil
+		}
 		return logFile.Close()
 	}
 }

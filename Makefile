@@ -525,7 +525,8 @@ genconfig:
 android-lib:
 	@source setenv.bash && \
 	gomobile bind -target=android -tags='headless' -o=$(LANTERN_MOBILE_LIBRARY) -ldflags='$(LDFLAGS_MOBILE)' $(LANTERN_MOBILE_PKG); \
-	mkdir -p $(LANTERN_MOBILE_DIR)/sdk/libs && mkdir -p tmp && mv libflashlight.aar tmp && cd tmp && jar xf libflashlight.aar && cp classes.jar ../$(LANTERN_MOBILE_DIR)/sdk/libs && cp -r jni ../$(LANTERN_MOBILE_DIR)/sdk/libs && cd .. && rm -rf tmp
+	# mkdir -p $(LANTERN_MOBILE_DIR)/sdk/libs && mkdir -p tmp && mv libflashlight.aar tmp && cd tmp && jar xf libflashlight.aar && cp classes.jar ../$(LANTERN_MOBILE_DIR)/sdk/libs && cp -r jni ../$(LANTERN_MOBILE_DIR)/sdk/libs && cd .. && rm -rf tmp
+	cp libflashlight.aar src/github.com/getlantern/lantern-mobile/LanternMobileTestbed/app/libs
 	if [ -d "$(FIRETWEET_MAIN_DIR)" ]; then \
 		cp -v $(LANTERN_MOBILE_DIR)/lantern/$(LANTERN_MOBILE_LIBRARY) $(FIRETWEET_MAIN_DIR)/libs/$(LANTERN_MOBILE_LIBRARY); \
 	else \

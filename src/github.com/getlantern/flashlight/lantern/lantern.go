@@ -328,7 +328,9 @@ func (self *Lantern) ProcessConfig(f func(*config.Config)) *config.Config {
 	// for the first time. User can still quit Lantern through systray menu when it happens.
 	cfg, err := config.Init(PackageVersion)
 	if err != nil {
-		Exit(fmt.Errorf("Unable to initialize configuration: %v", err))
+		err = fmt.Errorf("Unable to initialize configuration: %v", err)
+		log.Error(err)
+		Exit(err)
 		return nil
 	}
 	self.config = cfg

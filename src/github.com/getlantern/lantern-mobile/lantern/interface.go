@@ -1,7 +1,12 @@
-package client
+// Package lantern provides an interface for embedding Lantern inside of android
+// applications.
+package lantern
 
 import (
-	"net"
+	"fmt"
+	"os/user"
+	"path/filepath"
+	"time"
 
 	"github.com/getlantern/appdir"
 	"github.com/getlantern/flashlight/config"
@@ -9,103 +14,90 @@ import (
 	"github.com/getlantern/flashlight/logging"
 	"github.com/getlantern/flashlight/settings"
 	"github.com/getlantern/golog"
-	"github.com/getlantern/lantern-mobile/lantern/interceptor"
-	"github.com/getlantern/lantern-mobile/lantern/protected"
+	"github.com/getlantern/waitforserver"
 )
 
 var (
-	log         = golog.LoggerFor("lantern-android.client")
-	i           *interceptor.Interceptor
-	appSettings *settings.Settings
-
-	trackingCodes = map[string]string{
-		"FireTweet": "UA-21408036-4",
-		"Lantern":   "UA-21815217-14",
-	}
+	log = golog.LoggerFor("lantern-android.client")
 )
 
-type Provider interface {
-	Model() string
-	Device() string
-	Version() string
-	AppName() string
-	VpnMode() bool
-	GetDnsServer() string
-	SettingsDir() string
-	AfterStart(string, string, string)
-	Protect(fileDescriptor int) error
-	Notice(message string, fatal bool)
+const (
+	// Right now, the httpAddr is always localhost:8787. It defaults to this, and
+	// it looks like it gets set to this from the cloud configuration too, so
+	// there's no way of overriding this.
+	httpProxyAddr = "localhost:8787"
+)
+
+// AndroidInfo contains information about the current Android app
+type AndroidInfo struct {
+	AppName    string
+	Model      string
+	Device     string
+	SdkVersion string
 }
 
-func Configure(provider Provider) error {
-
-	log.Debugf("Configuring Lantern version: %s", lantern.GetVersion())
-
-	if provider.VpnMode() {
-		dnsServer := provider.GetDnsServer()
-		protected.Configure(provider, dnsServer, true)
+// On turns Lantern on. On does not return until something is listening on port
+// 8787 or 30 seconds have elapsed.
+//
+// appInfo - information about the app embedding lantern.  AppName is required,
+// other stuff is optional.
+func On(appName string,
+	model string,
+	device string,
+	sdkVersion string) error {
+	err := configure(appName, model, device, sdkVersion)
+	if err != nil {
+		return nil
 	}
 
-	settingsDir := provider.SettingsDir()
+	return startIfNecessary()
+}
+
+func configure(appName string,
+	model string,
+	device string,
+	sdkVersion string) error {
+	if appName == "" {
+		return fmt.Errorf("Please specify an appName")
+	}
+	usr, err := user.Current()
+	if err != nil {
+		return fmt.Errorf("Unable to determine user's home directory: %v", err)
+	}
+	settingsDir := filepath.Join(usr.HomeDir, ".lantern-embedded", appName)
 	log.Debugf("settings directory is %s", settingsDir)
 
 	appdir.AndroidDir = settingsDir
 	settings.SetAndroidPath(settingsDir)
-	appSettings = settings.Load(lantern.GetVersion(), lantern.GetRevisionDate(), "")
+
+	logging.ConfigureAndroid(map[string]string{
+		"androidDevice":     device,
+		"androidModel":      model,
+		"androidSdkVersion": sdkVersion,
+	})
 
 	return nil
 }
 
-// Start creates a new client at the given address.
-func Start(provider Provider) error {
+func startIfNecessary() error {
+	// Check if something is already listening on 8787
+	err := waitforserver.WaitForServer("tcp", httpProxyAddr, 10*time.Millisecond)
+	if err == nil {
+		log.Debug("Something already listening at localhost:8787, assuming it's Lantern")
+		return nil
+	}
 
-	go func() {
+	_, err = lantern.Start(false, true, false, true, func(cfg *config.Config) {})
+	if err != nil {
+		log.Fatalf("Could not start Lantern: %v", err)
+	}
 
-		androidProps := map[string]string{
-			"androidDevice":     provider.Device(),
-			"androidModel":      provider.Model(),
-			"androidSdkVersion": provider.Version(),
-		}
-		logging.ConfigureAndroid(androidProps)
-
-		cfgFn := func(cfg *config.Config) {
-
-		}
-
-		l, err := lantern.Start(false, true, false,
-			true, cfgFn)
-
-		if err != nil {
-			log.Fatalf("Could not start Lantern")
-		}
-
-		if provider.VpnMode() {
-			i, err = interceptor.Do(l.Client, appSettings.SocksAddr, appSettings.HttpAddr, provider.Notice)
-			if err != nil {
-				log.Errorf("Error starting SOCKS proxy: %v", err)
-			}
-			lantern.AddExitFunc(func() {
-				if i != nil {
-					i.Stop()
-				}
-			})
-		}
-
-		proxyHost, proxyPort, _ := net.SplitHostPort(appSettings.HttpAddr)
-
-		provider.AfterStart(lantern.GetVersion(), proxyHost,
-			proxyPort)
-	}()
-	return nil
+	return waitforserver.WaitForServer("tcp", httpProxyAddr, 30*time.Second)
 }
 
-func Restart(provider Provider) {
-	log.Debugf("Restarting Lantern..")
-	Stop()
-	Configure(provider)
-	Start(provider)
-}
-
-func Stop() {
+// Off turns Lantern off. Off does not return until nothing is listening on port
+// 8787 or 30 seconds have elapsed.
+func Off() error {
 	go lantern.Exit(nil)
+	return waitforserver.WaitForServerDown("tcp", httpProxyAddr, 30*time.Second, 25*time.Millisecond)
 }
