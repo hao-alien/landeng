@@ -9,7 +9,7 @@ import {noDialog} from '../../actions/AppActions'
 import IconButton from 'material-ui/lib/icon-button'
 import IconClose from 'material-ui/lib/svg-icons/navigation/close'
 
-import styles from '../../constants/styles'
+import styles from '../../constants/Styles'
 
 class LanternDialog extends React.Component {
   constructor(props) {

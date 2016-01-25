@@ -4,18 +4,43 @@
     background: #fafafa !important
   }
 }
-.menuitem{
+
+.menuItem{
   display: block;
-  .menuitem__icon{
-    display: inline;
-    margin: 3px 0;
+}
+.menuItem__icon{
+  display: inline;
+  margin: 3px 0;
+  svg{
+    position: relative;
+    top: 7px;
+  }
+}
+.menuItem__text{
+  display: inline;
+  padding-left: 13px;
+}
+
+.menuTitle{
+  display: block;
+  padding: 12px 0 12px 15px;
+  margin: 0 0 20px 0;
+  color: $white;
+  font-family: $font-roboto;
+  font-size: 19px;
+  cursor: pointer;
+  .menuItem__icon{
     svg{
       position: relative;
-      top: 7px;
+      top: 5px
     }
   }
-  .menuitem__text{
-    display: inline;
-    padding-left: 13px;
+  &:hover{
+    color: #999;
+    .menuItem__icon{
+      svg{
+        fill: #999 !important;
+      }
+    }
   }
 }

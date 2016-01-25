@@ -33,10 +33,16 @@ import IconTranslate from 'material-ui/lib/svg-icons/action/translate'
 import IconFace from 'material-ui/lib/svg-icons/image/tag-faces'
 import IconClose from 'material-ui/lib/svg-icons/navigation/close'
 
-import styles from '../constants/styles'
+import styles from '../constants/Styles'
 import * as dialogs from '../constants/Dialogs'
 
 const menuItems = [
+  {
+    title: 'Lantern',
+    name: 'lantern',
+    icon: <NavigationIcon />,
+    dialog: null,
+  },
   {
     title: 'Lantern PRO Plans',
     name: 'plans',
@@ -83,6 +89,7 @@ const menuItems = [
     title: 'Exit',
     name: 'exit',
     icon: <IconClose />,
+    dialog: null,
   },
 ]
 
@@ -93,6 +100,8 @@ class MainNav extends React.Component {
     super(props)
     this.addMenuItem = this.addMenuItem.bind(this)
     this.renderMenuItem = this.renderMenuItem.bind(this)
+    this.getMenuItem = this.getMenuItem.bind(this)
+    this.getMenuTitle = this.getMenuTitle.bind(this)
     this._handleToggle = this._handleToggle.bind(this)
     this._openDialog = this._openDialog.bind(this)
     this._exit = this._exit.bind(this)
@@ -102,17 +111,30 @@ class MainNav extends React.Component {
     return { muiTheme: ThemeManager.getMuiTheme(darkTheme) }
   }
 
-  _exit() {
-    this.props.dispatch(asyncOpenMenu(false))
-  }
-
-  addMenuItem(item, i) {
-    const menuItemAction = (item.name === 'exit') ? this._exit : this._openDialog.bind(null, item)
+  getMenuItem(item, i, menuItemAction) {
     return (
       <MenuItem key={i} onTouchTap={menuItemAction}>
         {this.renderMenuItem(item)}
       </MenuItem>
     )
+  }
+
+  getMenuTitle(item, i) {
+    return (
+      <div key={i} className="menuTitle" onClick={this._exit}>
+        <div className="menuItem__icon">{item.icon}</div>
+        <div className="menuItem__text"><span>{item.title}</span></div>
+      </div>
+    )
+  }
+
+  addMenuItem(item, i) {
+    const menuItemAction = (item.name === 'exit') ? this._exit : this._openDialog.bind(null, item)
+    return (item.name !== 'lantern') ? this.getMenuItem(item, i, menuItemAction) : this.getMenuTitle(item, i)
+  }
+
+  _exit() {
+    this.props.dispatch(asyncOpenMenu(false))
   }
 
   _handleToggle() {
@@ -131,9 +153,9 @@ class MainNav extends React.Component {
 
   renderMenuItem(item) {
     return (
-      <div className="menuitem">
-        <div className="menuitem__icon">{item.icon}</div>
-        <div className="menuitem__text"><span>{item.title}</span></div>
+      <div className="menuItem">
+        <div className="menuItem__icon">{item.icon}</div>
+        <div className="menuItem__text"><span>{item.title}</span></div>
       </div>
     )
   }

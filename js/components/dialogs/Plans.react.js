@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import assignToEmpty from '../../utils/assign'
 import Plans from '../../constants/Plans'
-import SelectPlan from '../../Inputs/SelectPlan'
+import SelectPlan from '../../inputs/SelectPlan'
 import {asyncPurchase} from '../../actions/ProAPIActions'
 import LanternDialog from './Dialog.react'
 

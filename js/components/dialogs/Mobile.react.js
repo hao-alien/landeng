@@ -3,7 +3,7 @@ import TextField from 'material-ui/lib/text-field'
 import RaisedButton from 'material-ui/lib/raised-button'
 import IconEmail from 'material-ui/lib/svg-icons/communication/email'
 import IllustratedDialog from './IllustratedDialog.react'
-import styles from '../../constants/styles'
+import styles from '../../constants/Styles'
 
 class MobileDialog extends React.Component {
   constructor(props) {
