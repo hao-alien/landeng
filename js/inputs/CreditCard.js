@@ -4,7 +4,7 @@ import IconCreditCard from 'material-ui/lib/svg-icons/action/credit-card'
 
 import cards from './CardTypes'
 
-import styles from '../constants/styles'
+import styles from '../constants/Styles'
 
 const iconColors = {
   'mastercard': 'red',
