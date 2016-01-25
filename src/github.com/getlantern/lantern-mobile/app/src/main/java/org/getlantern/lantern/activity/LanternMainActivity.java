@@ -7,7 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ApplicationInfo; 
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -34,10 +34,11 @@ import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-import android.view.MenuItem; 
+import android.view.MenuItem;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.support.v7.app.AppCompatActivity;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -55,12 +56,12 @@ import org.getlantern.lantern.vpn.LanternVpn;
 import org.getlantern.lantern.R;
 
 
-public class LanternMainActivity extends Activity implements Handler.Callback {
+public class LanternMainActivity extends AppCompatActivity implements Handler.Callback {
 
     private static final String TAG = "LanternMainActivity";
     private static final String PREFS_NAME = "LanternPrefs";
     private static final int CHECK_NEW_VERSION_DELAY = 10000;
- 
+    private final static int REQUEST_VPN = 7777;
     private SharedPreferences mPrefs = null;
     private BroadcastReceiver mReceiver;
 
@@ -76,6 +77,13 @@ public class LanternMainActivity extends Activity implements Handler.Callback {
         StrictMode.setThreadPolicy(policy);
 
         setContentView(R.layout.activity_lantern_main);
+
+        // we want to use the ActionBar from the AppCompat
+        // support library, but with our custom design
+        // we hide the default action bar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }  
 
         context = getApplicationContext();
         mPrefs = Utils.getSharedPrefs(context);
@@ -101,10 +109,9 @@ public class LanternMainActivity extends Activity implements Handler.Callback {
         }
 
         // setup our UI
-        try { 
+        try {
             // configure actions to be taken whenever slider changes state
             LanternUI.setupLanternSwitch();
-            PromptVpnActivity.LanternUI = LanternUI;
             LanternVpn.LanternUI = LanternUI;
         } catch (Exception e) {
             Log.d(TAG, "Got an exception " + e);
@@ -129,7 +136,7 @@ public class LanternMainActivity extends Activity implements Handler.Callback {
                 && event.getRepeatCount() == 0) {
             Log.d(TAG, "onKeyDown Called");
             onBackPressed();
-            return true; 
+            return true;
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -192,22 +199,62 @@ public class LanternMainActivity extends Activity implements Handler.Callback {
         return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
     }
 
+    // Make a VPN connection from the client
+    // We should only have one active VPN connection per client
+    private void startVpnService ()
+    {
+        Intent intent = VpnService.prepare(this);
+        if (intent != null) {
+            Log.w(TAG,"Requesting VPN connection");
+            startActivityForResult(intent, REQUEST_VPN);
+        } else {
+            Log.d(TAG, "VPN enabled, starting Lantern...");
+            LanternUI.toggleSwitch(true);
+            sendIntentToService();
+        }
+    }
+
+
     // Prompt the user to enable full-device VPN mode
     public void enableVPN() {
         Log.d(TAG, "Load VPN configuration");
 
-        Thread thread = new Thread() {
-            public void run() { 
-                Intent intent = new Intent(LanternMainActivity.this, PromptVpnActivity.class);
-                if (intent != null) {
-                    startActivity(intent);
-                }
-            }
-        };
-        thread.start();
+        try {
+            startVpnService();
+        } catch (Exception e) {
+            Log.d(TAG, "Could not establish VPN connection: " + e.getMessage());
+        }
     }
 
-    public void restart(final Context context, Intent intent) {
+    @Override
+    protected void onActivityResult(int request, int response, Intent data) {
+        super.onActivityResult(request, response, data);
+
+        if (request == REQUEST_VPN) {
+            if (response != RESULT_OK) {
+                // no permission given to open
+                // VPN connection; return to off state
+                LanternUI.toggleSwitch(false);
+            } else {
+                LanternUI.toggleSwitch(true);
+
+                Handler h = new Handler();
+                h.postDelayed(new Runnable () {
+
+                    public void run ()
+                    {
+                        sendIntentToService();
+                    }
+                }, 1000);
+            }
+        }
+    }
+
+    private void sendIntentToService() {
+        startService(new Intent(this, Service.class));
+    }
+
+    public void restart(final Context context, final Intent intent) {
         if (LanternUI.useVpn()) {
             Log.d(TAG, "Restarting Lantern...");
             Service.IsRunning = false;
@@ -216,20 +263,14 @@ public class LanternMainActivity extends Activity implements Handler.Callback {
             Handler h = new Handler();
             h.postDelayed(new Runnable () {
                 public void run() {
-                    Intent pIntent = Service.prepare(activity);
-                    if (pIntent == null) {
-                        context.startService(new Intent(context, Service.class));
-                    } else {
-                        startActivity(new Intent(LanternMainActivity.this, PromptVpnActivity.class));
-                    }
+                    enableVPN();
                 }
-
             }, 1000);
-        }  
+        }
     }
 
     public void stopLantern() {
-        Service.IsRunning = false;  
+        Service.IsRunning = false;
         Utils.clearPreferences(this);
     }
 
@@ -238,7 +279,7 @@ public class LanternMainActivity extends Activity implements Handler.Callback {
         // Pass the event to ActionBarDrawerToggle
         // If it returns true, then it has handled
         // the nav drawer indicator touch event
-        if (LanternUI != null && 
+        if (LanternUI != null &&
                 LanternUI.optionSelected(item)) {
             return true;
         }
@@ -259,11 +300,12 @@ public class LanternMainActivity extends Activity implements Handler.Callback {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
+            // whenever the device is powered off or the app
+            // abruptly closed, we want to clear user preferences
             if (action.equals(Intent.ACTION_SHUTDOWN)) {
                 Utils.clearPreferences(context);
-            } else if (action.equals(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION) || action.equals(Intent.ACTION_USER_PRESENT)) {
-                if (isNetworkAvailable()) 
-                    restart(context, intent);
+            } else if (action.equals(Intent.ACTION_USER_PRESENT)) {
+                //restart(context, intent);
             }
         }
     }
@@ -299,5 +341,5 @@ public class LanternMainActivity extends Activity implements Handler.Callback {
         } catch (PackageManager.NameNotFoundException e) {
             Log.e(TAG, "Error fetching package information");
         }
-    }  
+    }
 }

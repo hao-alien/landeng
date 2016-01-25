@@ -322,6 +322,7 @@ public class UI {
                 if (!activity.isNetworkAvailable()) {
                     powerLantern.setChecked(false);
                     Utils.showAlertDialog(activity, "Lantern", "No Internet connection available!");
+                    toggleSwitch(false);
                     return;
                 }
 

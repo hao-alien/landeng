@@ -72,7 +72,9 @@ func init() {
 
 	rand.Seed(time.Now().UnixNano())
 
-	settings.Load(version, revisionDate, buildDate)
+	if runtime.GOOS != "android" {
+		settings.Load(version, revisionDate, buildDate)
+	}
 }
 
 func GetVersion() string {
@@ -198,6 +200,7 @@ func (self *Lantern) RunClientProxy(cfg *config.Config, android bool, clearProxy
 			}
 		})
 		if err != nil {
+			log.Errorf("Error calling listen and serve: %v", err)
 			Exit(fmt.Errorf("Error calling listen and serve: %v", err))
 		}
 	}()
@@ -262,6 +265,7 @@ func RunServerProxy(cfg *config.Config) {
 // the exit.
 func Exit(err error) {
 	defer func() { exitCh <- err }()
+	log.Errorf("Exit called with error: %v", err)
 	for {
 		select {
 		case f := <-chExitFuncs:
@@ -337,6 +341,7 @@ func (self *Lantern) ProcessConfig(f func(*config.Config)) *config.Config {
 			configUpdates <- updated
 		})
 		if err != nil {
+			log.Errorf("Could not apply config updates: %v", err)
 			Exit(err)
 		}
 	}()

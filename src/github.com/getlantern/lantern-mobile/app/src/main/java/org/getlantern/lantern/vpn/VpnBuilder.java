@@ -13,8 +13,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 
-import org.apache.http.conn.util.InetAddressUtils;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 import java.net.NetworkInterface;
@@ -81,7 +79,7 @@ public class VpnBuilder extends VpnService {
         for (String routeAddress : getResources().getStringArray(R.array.bypass_private_route)) {
             String[] addr = routeAddress.split("/");
             builder.addRoute(addr[0], Integer.parseInt(addr[1]));
-        }                                                   
+        }
 
         Intent intent = new Intent(this, LanternMainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
@@ -100,12 +98,16 @@ public class VpnBuilder extends VpnService {
         vpnThread = new Thread() {
             public void run() {
                 createBuilder();
+
                 String socksAddr = "127.0.0.1:9131";
-                String udpgwAddr = "127.0.0.1:7131";
-                if (settings != null) {
+                String udpgwAddr = "127.0.0.1:7300";
+                if (settings != null &&
+                    settings.get("socksaddr") != null &&
+                    settings.get("udpgwaddr") != null) {
                     socksAddr = (String)settings.get("socksaddr");
                     udpgwAddr = (String)settings.get("udpgwaddr");
                 }
+
                 Tun2Socks.Start(
                         mInterface,
                         VPN_MTU,
@@ -114,7 +116,7 @@ public class VpnBuilder extends VpnService {
                         socksAddr,
                         udpgwAddr,
                         true
-                        );  
+                        );
             }
         };
         vpnThread.start();
@@ -136,8 +138,8 @@ public class VpnBuilder extends VpnService {
         close();
         Handler mHandler = new Handler();
         mHandler.postDelayed(new Runnable () {
-            public void run () { 
-                try { 
+            public void run () {
+                try {
                     configure(settings);
                 } catch (Exception e) {
                     Log.e(TAG, "Could not call configure again!" + e.getMessage());
@@ -233,6 +235,6 @@ public class VpnBuilder extends VpnService {
                 return this.toString().equals(o.toString());
             }
         }
-    } 
+    }
 
 }
