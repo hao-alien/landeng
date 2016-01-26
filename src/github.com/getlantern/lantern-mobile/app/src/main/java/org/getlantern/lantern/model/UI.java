@@ -90,7 +90,7 @@ public class UI {
     final private LanternMainActivity activity;
 
     private ToggleButton powerLantern;
-    private TextView versionNum;
+    private TextView versionNum, btnText;
 
     private static final int onColor = Color.parseColor("#39C2D6");
     private static final int offColor = Color.parseColor("#FAFBFB"); 
@@ -130,6 +130,7 @@ public class UI {
         this.colorFadeOut.setDuration(500);
 
         this.powerLantern = (ToggleButton)this.activity.findViewById(R.id.powerLantern);
+        this.btnText = (TextView)this.activity.findViewById(R.id.on_off_desc);
 
         this.shareable = new Shareable(this.activity);
 
@@ -329,6 +330,19 @@ public class UI {
                 // disable the on/off switch while the VpnService
                 // is updating the connection
                 powerLantern.setEnabled(false);
+
+                String statusText;
+                Resources r = activity.getResources();
+
+                if (isChecked) {
+                    statusText = r.getString(R.string.on_desc);
+                    btnText.setTextColor(r.getColor(R.color.accent_white));
+                } else {
+                    statusText = r.getString(R.string.off_desc);
+                    btnText.setTextColor(r.getColor(R.color.black)); 
+                }
+                btnText.setText(statusText);
+
 
                 if (isChecked) {
                     activity.enableVPN();

@@ -43,6 +43,23 @@
             android:textOff=""
             android:textOn="" />
 
+        <TextView
+            android:id="@+id/on_off_desc"
+            android:layout_width="wrap_content"        
+            android:layout_height="wrap_content"
+            android:paddingBottom="30dp"
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="10dp"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:maxWidth="200dp"
+            android:text="@string/off_desc"
+            android:textSize="14sp"
+            android:alpha=".54"
+            android:textColor="@color/black"/>
+
+
         <LinearLayout android:orientation="vertical"
             android:background="@color/cyan"
             android:layout_alignParentBottom="true"

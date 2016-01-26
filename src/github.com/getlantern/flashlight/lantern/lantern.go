@@ -46,8 +46,9 @@ var (
 )
 
 type Lantern struct {
-	config *config.Config
-	Client *client.Client
+	config     *config.Config
+	Client     *client.Client
+	AfterStart func()
 }
 
 func init() {
@@ -128,6 +129,18 @@ func configureDesktop(cfg *config.Config, clearProxySettings bool, showui bool) 
 	}
 }
 
+func New(addr string) *Lantern {
+	return &Lantern{
+		Client: &client.Client{
+			Addr:         addr,
+			ReadTimeout:  0, // don't timeout
+			WriteTimeout: 0,
+			Version:      version,
+			RevisionDate: revisionDate,
+		},
+	}
+}
+
 // runClientProxy runs the client-side (get mode) proxy.
 func (self *Lantern) RunClientProxy(cfg *config.Config, android bool, clearProxySettings bool, showui bool, startup bool) {
 	if !android {
@@ -167,6 +180,7 @@ func (self *Lantern) RunClientProxy(cfg *config.Config, android bool, clearProxy
 	}()
 
 	AddExitFunc(func() { doneCfg <- true })
+	//AddExitFunc(self.Client.Stop)
 
 	if !android {
 		// watchDirectAddrs will spawn a goroutine that will add any site that is
@@ -278,13 +292,11 @@ func Exit(err error) {
 	}
 }
 
-func Start(showui bool, android bool, clearProxySettings bool, startup bool, cfgFn func(cfgFn *config.Config)) (*Lantern, error) {
-
-	lantern := &Lantern{}
+func (self *Lantern) Start(showui bool, android bool, clearProxySettings bool, startup bool, cfgFn func(cfgFn *config.Config)) error {
 
 	if !android {
 		if err := logging.Init(); err != nil {
-			return nil, err
+			return err
 		}
 	}
 
@@ -292,7 +304,7 @@ func Start(showui bool, android bool, clearProxySettings bool, startup bool, cfg
 	handleSignals()
 	AddExitFunc(func() {
 		if err := logging.Close(); err != nil {
-			log.Debugf("Error closing log: %v", err)
+			log.Errorf("Error closing log: %v", err)
 		}
 	})
 
@@ -305,24 +317,24 @@ func Start(showui bool, android bool, clearProxySettings bool, startup bool, cfg
 
 	if !android && showui {
 		if err := configureSystemTray(); err != nil {
-			return nil, err
+			return err
 		}
 	}
 
 	displayVersion()
 
-	lantern.ProcessConfig(cfgFn)
+	self.ProcessConfig(cfgFn)
 
 	log.Debug("Running proxy")
-	if lantern.config.IsDownstream() {
+	if self.config.IsDownstream() {
 		// This will open a proxy on the address and port given by -addr
-		lantern.RunClientProxy(lantern.config, android,
+		self.RunClientProxy(self.config, android,
 			clearProxySettings, showui, startup)
 	} else {
-		RunServerProxy(lantern.config)
+		RunServerProxy(self.config)
 	}
 
-	return lantern, nil
+	return WaitForExit()
 }
 
 func (self *Lantern) ProcessConfig(f func(*config.Config)) *config.Config {
@@ -347,7 +359,9 @@ func (self *Lantern) ProcessConfig(f func(*config.Config)) *config.Config {
 	}()
 
 	log.Debugf("Processed config")
-	f(cfg)
+	if f != nil {
+		f(cfg)
+	}
 	return cfg
 }
 

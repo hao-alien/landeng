@@ -10,6 +10,8 @@
     <string name="send_button">Send Desktop</string>
     <string name="on_text">On</string>
     <string name="off_text">Off</string>
+    <string name="on_desc">You can now access\r\nblocked sites and services</string>
+    <string name="off_desc">Click the button to access blocked sites and services</string>
     <string name="desktop_option">Desktop Version</string>
     <string name="contact_option">Contact</string>
     <string name="privacy_policy">Privacy Policy</string>
