@@ -2,7 +2,11 @@ import React from 'react'
 import RaisedButton from 'material-ui/lib/raised-button'
 import StripeCheckout from 'react-stripe-checkout'
 
-const STRIPE_PUB_KEY = 'pk_test_4MSPZvz9QtXGWEKdODmzV9ql'
+let STRIPE_PUB_KEY = 'pk_test_4MSPZvz9QtXGWEKdODmzV9ql';
+
+if (process.env.NODE_ENV === 'production') {
+  //STRIPE_PUB_KEY = 'pk_live_4MSPfR6qNHMwjG86TZJv4NI0';
+}
 
 class SelectPlan extends React.Component {
   render() {

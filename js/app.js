@@ -28,7 +28,7 @@ if ('serviceWorker' in navigator) {
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import { Router, Route } from 'react-router'
+import { Router, Route, IndexRoute, Redirect } from 'react-router'
 import { createStore, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
 import FontFaceObserver from 'fontfaceobserver'
@@ -46,7 +46,6 @@ openSansObserver.check().then(() => {
 
 // Import the pages
 import HomePage from './components/pages/HomePage.react'
-import NotFoundPage from './components/pages/NotFound.react'
 import App from './components/App.react'
 
 // Import the CSS file, which HtmlWebpackPlugin transfers to the build folder
@@ -73,7 +72,7 @@ ReactDOM.render(
     <Router history={createHistory()}>
       <Route component={App}>
         <Route path="/" component={HomePage} />
-        <Route path="*" component={NotFoundPage} />
+        <Redirect from="*" to="/" />
       </Route>
     </Router>
   </Provider>,

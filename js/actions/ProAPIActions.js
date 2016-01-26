@@ -5,7 +5,11 @@ import {asyncDialog} from './AppActions'
 import {INITIATE_PURCHASE, PURCHASED, PURCHASE_FAILED} from '../constants/ProAPIConstants'
 import {WELCOME_TO_PRO_DIALOG} from '../constants/Dialogs'
 
-const PRO_API = 'http://localhost:5000'
+let PRO_API = 'http://localhost:5000'
+
+if (process.env.NODE_ENV === 'production') {
+  PRO_API = 'http://quiet-island-5559.herokuapp.com'
+}
 
 export function asyncPurchase(status) {
   return (dispatch) => {
