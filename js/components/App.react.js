@@ -20,6 +20,18 @@ import LanternStatus from './LanternStatus.react'
 injectTapEventPlugin()
 
 class App extends Component {
+  componentDidMount() {
+    const windowHeight = window.innerHeight
+    const topSheet = document.getElementById('top_sheet')
+    const middleSheet = document.getElementById('middle_sheet')
+    const bottomSheet = document.getElementById('bottom_sheet')
+
+    topSheet.style.height = `${windowHeight * 0.21}px`
+    middleSheet.style.height = `${windowHeight * 0.5}px`
+    bottomSheet.style.height = `${windowHeight * 0.29}px`
+
+    console.log(windowHeight, { top: topSheet.style.height, middle: middleSheet.style.height, bottom: bottomSheet.style.height })
+  }
   render() {
     return (
       <div className="wrapper">

@@ -1,6 +1,11 @@
 /*This file contains all application-wide CSS variables.*/
 
 $font-roboto: 'Roboto', 'Helvetica Neue Light', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+$font-size-paragraph: 22pt;
+$font-size-referal-code-paragraph: 16pt;
+$font-size-referal-code: 22pt;
+
+$font-size-menu-item: 13pt;
 
 $white: #fff;
 $black: #000;

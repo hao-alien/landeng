@@ -11,7 +11,7 @@ new WebpackDevServer(webpack(config), { // Start a server
   hot: true, // With hot reloading
   inline: false,
   historyApiFallback: true,
-  quiet: false // Without logging
+  quiet: true // Without logging
 }).listen(2000, 'localhost', function (err, result) {
   if (err) {
     console.log(err)

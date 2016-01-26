@@ -47,8 +47,8 @@
 	}
 	p{
 		font-family: $font-roboto;
+		font-size: $font-size-paragraph;
 		font-weight: 200;
-		font-size: 16px;
 		color: $white;
 		text-align: center;
 	}
