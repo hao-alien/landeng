@@ -11,6 +11,7 @@ import injectTapEventPlugin from 'react-tap-event-plugin'
 
 import Navigation from './Navigation.react'
 import LanternStatus from './LanternStatus.react'
+import * as backend from '../actions/BackendActions'
 
 /* Needed for onTouchTap
  * Can go away when react 1.0 release
@@ -25,6 +26,7 @@ class App extends Component {
   }
 
   componentWillUnmount() {
+    this.closing = true
     this.ws.close()
   }
 
@@ -33,14 +35,28 @@ class App extends Component {
     this.ws = new WebSocket("ws://" + url.host + '/data');
     this.ws.onopen = (event) => {
       console.log('onopen');
-      this.ws.send('something');
+      this.props.dispatch(backend.connected({ws: this.ws}));
+    };
+
+    this.ws.onclose = (event) => {
+      this.props.dispatch(backend.gone());
+      if (!this.closing) {
+        window.setTimeout(() => {
+          this.initWebsocket()
+        }, 2000); // reconnect every 2s
+      }
     };
 
     this.ws.onmessage = (event) => {
-      console.log('onmessage');
+      var message = JSON.parse(event.data);
+      console.log('onmessage', message);
+      this.props.dispatch(backend.message(message));
     };
   }
 
+  send()  {
+    this.props.dispatch(backend.asyncSendMessage({text: 'something'}));
+  }
   render() {
     return (
       <div className="wrapper">
@@ -49,7 +65,7 @@ class App extends Component {
         </div>
         <LanternStatus />
         <section id="top_sheet">
-          <img className="logo" src="/img/lantern_logo.svg" />
+          <img className="logo" src="/img/lantern_logo.svg" onClick={this.send.bind(this)}/>
         </section>
         { this.props.children }
       </div>
@@ -58,6 +74,7 @@ class App extends Component {
 }
 
 App.propTypes = {
+  data: React.PropTypes.object,
   children: React.PropTypes.element,
 }
 

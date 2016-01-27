@@ -1,9 +1,8 @@
-
 import React from 'react'
 import { connect } from 'react-redux'
 import Checkbox from 'material-ui/lib/checkbox'
 import Divider from 'material-ui/lib/divider'
-import { asyncSettings } from '../../actions/AppActions'
+import { asyncSendMessage } from '../../actions/BackendActions'
 import IllustratedDialog from './IllustratedDialog.react'
 
 class Settings extends React.Component {
@@ -13,46 +12,46 @@ class Settings extends React.Component {
   }
 
   saveSettings(input) {
-    const { settings } = this.props.data
+    const { Settings: settings } = this.props.data
     settings[input.target.name] = input.target.checked
-    this.props.dispatch(asyncSettings(settings))
+    this.props.dispatch(asyncSendMessage(settings))
   }
 
   render() {
-    const { settings } = this.props.data
+    const { Settings: settings } = this.props.data
     return (
       <IllustratedDialog
         title="Settings Options"
         icon={this.props.icon}
         illustration="settings.svg">
-          <div id="settings_body">
-            <div className="settings_option">
-              <Checkbox
-                name="systemStart"
-                labelPosition="left"
-                defaultChecked={settings.systemStart}
-                onCheck={this.saveSettings}
-                label="Run Lantern on System Start"/>
-            </div>
-            <Divider />
-            <div className="settings_option">
-              <Checkbox
-                name="proxyTraffic"
-                labelPosition="left"
-                defaultChecked={settings.proxyTraffic}
-                onCheck={this.saveSettings}
-                label="Proxy all traffic"/>
-            </div>
-            <Divider />
-            <div className="settings_option">
-              <Checkbox
-                name="sendStatistics"
-                labelPosition="left"
-                defaultChecked={settings.sendStatistics}
-                onCheck={this.saveSettings}
-                label="Securelly report usage statistics to contribute to Lantern"/>
-            </div>
+        <div id="settings_body">
+          <div className="settings_option">
+            <Checkbox
+              name="AutoLaunch"
+              labelPosition="left"
+              defaultChecked={settings.AutoLaunch}
+              onCheck={this.saveSettings}
+              label="Run Lantern on System Start"/>
           </div>
+          <Divider />
+          <div className="settings_option">
+            <Checkbox
+              name="ProxyAll"
+              labelPosition="left"
+              defaultChecked={settings.ProxyAll}
+              onCheck={this.saveSettings}
+              label="Proxy all traffic"/>
+          </div>
+          <Divider />
+          <div className="settings_option">
+            <Checkbox
+              name="AutoReport"
+              labelPosition="left"
+              defaultChecked={settings.AutoReport}
+              onCheck={this.saveSettings}
+              label="Securelly report usage statistics to contribute to Lantern"/>
+          </div>
+        </div>
       </IllustratedDialog>
     )
   }
@@ -69,7 +68,7 @@ Settings.propTypes = {
 // Which props do we want to inject, given the global state?
 function select(state) {
   return {
-    data: state.home,
+    data: state.backend,
   }
 }
 

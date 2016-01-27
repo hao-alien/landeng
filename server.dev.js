@@ -15,7 +15,7 @@ new WebpackDevServer(webpack(config), { // Start a server
   hot: true, // With hot reloading
   inline: false,
   historyApiFallback: true,
-  quiet: false, // Without logging
+  quiet: true, // Without logging
   proxy: {
     '/data': {
       target: lanternBackend,
