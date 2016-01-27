@@ -48,17 +48,18 @@
         android:id="@+id/plans_bottom_sheet"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="#F4F6F6"
-        android:paddingTop="15dp"
+        android:background="@android:color/transparent"
         android:layout_weight="1">
 
 
         <LinearLayout
             android:id="@+id/plans_view"
             android:orientation="vertical"
-            android:gravity="center"
+            android:scaleType="center"
+            android:background="@drawable/zigzag"
+            android:gravity="center"           
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="304dp">
 
             <ImageView
                 android:id="@+id/features_image"
@@ -118,13 +119,15 @@
 
                 <TextView
                     android:id="@+id/best_value"
-                    android:layout_height="24dp"
+                    android:layout_height="33dp"
                     android:layout_width="104dp"
                     android:gravity="center"
                     android:elevation="1dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="5dp"
                     android:layout_marginLeft="30dp"
                     android:fontFamily="sans-serif-black"
-                    android:textSize="12sp"
+                    android:textSize="13sp"
                     android:text="@string/best_value"
                     android:background="@color/best_value"
                     android:alpha=".54"

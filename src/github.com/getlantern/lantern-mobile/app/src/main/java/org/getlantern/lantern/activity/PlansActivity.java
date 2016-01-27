@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.getlantern.lantern.activity.PaymentActivity;
@@ -31,6 +32,9 @@ public class PlansActivity extends Activity {
 
         featuresList = (TextView)findViewById(R.id.features_list);
         featuresList.setText(Html.fromHtml(getResources().getString(R.string.features_list)));
+
+        LinearLayout plansView = (LinearLayout)findViewById(R.id.plans_view);
+        plansView.bringToFront();
 
         backBtn.setOnClickListener(new View.OnClickListener() {
 
