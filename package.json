@@ -22,7 +22,7 @@
     "history": "1.17.0",
     "imports-loader": "^0.6.5",
     "lantern-pro-js-client": "git+ssh://git@github.com:getlantern/lantern-pro-js-client.git",
-    "material-ui": "^0.14.2",
+    "material-ui": "^0.14.3",
     "react": "^0.14.2",
     "react-dom": "^0.14.2",
     "react-redux": "^4.0.0",
