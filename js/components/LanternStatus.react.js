@@ -50,7 +50,7 @@ LanternStatus.defaultProps = {
 // Which props do we want to inject, given the global state?
 function select(state) {
   return {
-    data: state.homeReducer,
+    data: state.home,
   }
 }
 

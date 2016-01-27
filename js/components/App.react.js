@@ -13,13 +13,34 @@ import Navigation from './Navigation.react'
 import LanternStatus from './LanternStatus.react'
 
 /* Needed for onTouchTap
-* Can go away when react 1.0 release
-* Check this repo:
-* https://github.com/zilverline/react-tap-event-plugin
-*/
+ * Can go away when react 1.0 release
+ * Check this repo:
+ * https://github.com/zilverline/react-tap-event-plugin
+ */
 injectTapEventPlugin()
 
 class App extends Component {
+  componentWillMount() {
+    this.initWebsocket()
+  }
+
+  componentWillUnmount() {
+    this.ws.close()
+  }
+
+  initWebsocket() {
+    let url = document.location
+    this.ws = new WebSocket("ws://" + url.host + '/data');
+    this.ws.onopen = (event) => {
+      console.log('onopen');
+      this.ws.send('something');
+    };
+
+    this.ws.onmessage = (event) => {
+      console.log('onmessage');
+    };
+  }
+
   render() {
     return (
       <div className="wrapper">
@@ -38,6 +59,10 @@ class App extends Component {
 
 App.propTypes = {
   children: React.PropTypes.element,
+}
+
+App.contextTypes = {
+  router: React.PropTypes.object
 }
 
 // REDUX STUFF
