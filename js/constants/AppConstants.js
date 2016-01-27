@@ -9,6 +9,5 @@
 export const OPEN_MENU = 'OPEN_MENU'
 export const DIALOG = 'DIALOG'
 export const LANGUAGE = 'LANGUAGE'
-export const SETTINGS = 'SETTINGS'
 export const USER = 'USER'
 export const LANTERN = 'LANTERN'

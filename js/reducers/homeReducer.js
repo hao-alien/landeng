@@ -13,7 +13,7 @@
  * add it in the rootReducer.js.
  */
 
-import { SETTINGS, DIALOG, OPEN_MENU, LANGUAGE, USER, LANTERN } from '../constants/AppConstants'
+import { DIALOG, OPEN_MENU, LANGUAGE, USER, LANTERN } from '../constants/AppConstants'
 import assignToEmpty from '../utils/assign'
 
 const initialState = {
@@ -23,11 +23,6 @@ const initialState = {
   },
   openMenu: false,
   language: 'EN',
-  settings: {
-    systemStart: true,
-    proxyTraffic: false,
-    sendStatistics: false,
-  },
   user: {
     pro: true,
     deadline: 'December 31 2016 23:59:59 GMT+02:00',
@@ -46,8 +41,6 @@ function homeReducer(state = initialState, action) {
     return assignToEmpty(state, { openMenu: action.status })
   case LANGUAGE:
     return assignToEmpty(state, { language: action.name })
-  case SETTINGS:
-    return assignToEmpty(state, { settings: action.obj })
   case USER:
     return assignToEmpty(state, { user: action.obj })
   case LANTERN:
