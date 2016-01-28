@@ -39,7 +39,7 @@
     <string name="pro_welcome_text">Welcome to Lantern Pro!</string>
     <string name="thanks_purchase">Thanks for your purchase of Lantern Pro!</string>
     <string name="start_inviting">\r\nStart inviting!</string>
-    <string name="invite_friends">Invite friends and you will both get a free\r\nmonth of Lantern Pro when they sign up</string>
+    <string name="invite_friends">Enter your e-mail to receive a code to share with your friends. Get a free month of Pro when they sign up!</string>
     <string name="invite_friends_btn">Invite Friends</string>
     <string name="continue_to_pro">Continue to Pro</string>
     <string name="get_free_months">Get Free Months</string>
@@ -76,4 +76,7 @@
     <string name="best_value">Best value!</string>
     <string name="referral_code">Referral Code (optional)</string>
     <string name="total">Total:</string>
+    <string name="pro_account_header">Pro Account Management</string>
+    <string name="pro_account_text">You currently have a Lantern Pro yearly account. Your account will be automatically charged for another year at the end of the billing cycle.</string>
+    <string name="cancel_pro_account">Cancel Pro Account</string>
 </resources>

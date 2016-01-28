@@ -8,12 +8,15 @@ import (
 	"github.com/getlantern/golog"
 	"github.com/getlantern/lantern-mobile/lantern/interceptor"
 	"github.com/getlantern/lantern-mobile/lantern/protected"
+	proclient "github.com/getlantern/pro-server-client/go-client"
 )
 
 var (
 	log         = golog.LoggerFor("lantern-android.client")
 	i           *interceptor.Interceptor
 	appSettings *settings.Settings
+
+	proClient = proclient.NewClient()
 
 	trackingCodes = map[string]string{
 		"FireTweet": "UA-21408036-4",
@@ -94,6 +97,26 @@ func Start(provider Provider) {
 	}
 
 	provider.AfterStart(lantern.GetVersion())
+}
+
+func ReferralCode(email string) string {
+	u := proclient.User{
+		Email: email,
+	}
+	userRes, err := proClient.UserCreate(u)
+	if err != nil {
+		log.Errorf("Could not create a new Pro user: %v", err)
+	} else {
+		u = userRes.User
+		res, err := proClient.CreateCode(u)
+		if err != nil {
+			log.Errorf("Could not create code: %v", err)
+		} else {
+			log.Debugf("Referral code is %s", res.Code)
+			return res.Code
+		}
+	}
+	return ""
 }
 
 func Stop() {

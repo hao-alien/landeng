@@ -13,7 +13,6 @@ import java.io.File;
 import java.util.Map;
 import java.util.HashMap;
 
-
 import go.client.*;
 import org.getlantern.lantern.sdk.Utils;
 

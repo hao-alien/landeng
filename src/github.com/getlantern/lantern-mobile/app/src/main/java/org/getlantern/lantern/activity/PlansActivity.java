@@ -19,7 +19,7 @@ public class PlansActivity extends Activity {
 
     private static final String TAG = "PlansActivity";
 
-    private Button getCodeBtn;
+    private Button getCodeBtn, monthBtn, yearBtn;
 
     private TextView featuresList;
 
@@ -27,6 +27,11 @@ public class PlansActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pro_plans);
+
+        monthBtn = (Button)findViewById(R.id.month_btn);
+        monthBtn.setTag("$7.99");
+        yearBtn = (Button)findViewById(R.id.year_btn); 
+        yearBtn.setTag("$59.88");
 
         ImageView backBtn = (ImageView)findViewById(R.id.plansAvatar);
 
@@ -49,7 +54,9 @@ public class PlansActivity extends Activity {
 
     public void selectPlan(View view) {
         Log.d(TAG, "Plan selected...");
-        startActivity(new Intent(this, PaymentActivity.class));
+        Intent intent = new Intent(this, PaymentActivity.class);
+        intent.putExtra("AMOUNT_TO_CHARGE", (String)view.getTag());
+        startActivity(intent);
     }
 
 }  

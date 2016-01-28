@@ -163,8 +163,7 @@
                 android:clickable = "true"
                 android:layout_marginTop="10dp"
                 android:background="#0297A7"
-                android:layout_centerInParent="true"
-                android:onClick="continueToPro" />
+                android:layout_centerInParent="true"/>
 
         </LinearLayout>
 
@@ -195,7 +194,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
-            android:layout_marginBottom="40dp"
             android:fontFamily="sans-serif"
             android:text="@string/your_referral_code"
             android:textAllCaps="true"       
@@ -203,6 +201,23 @@
             android:alpha=".87"
             android:gravity="center"
             android:textColor="#000000"/>          
+
+        <TextView
+            android:id="@+id/referral_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="40dp"
+            android:layout_below="@id/your_referral_code"
+            android:fontFamily="sans-serif"
+            android:text="LRC5TWCX5"
+            android:textAllCaps="true"       
+            android:textSize="14sp"
+            android:alpha=".87"
+            android:gravity="center"   
+            android:textColor="@color/pro_blue_color"
+            />
+
+
         
             <Button
                 android:id="@+id/textInviteBtn"

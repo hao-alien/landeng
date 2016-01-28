@@ -106,6 +106,7 @@ public class UI {
     static final Map<String, Integer> menuOptions = ImmutableMap.<String, Integer>builder()
         .put("Share", R.drawable.ic_share)
         .put("Sign in to Pro", R.drawable.sign_in)
+        .put("Pro Account", R.drawable.get_free)
         .put("Pro Now", R.drawable.pro_now)
         .put("Get Free Months", R.drawable.get_free)
         .put("Language", R.drawable.language)
@@ -399,6 +400,10 @@ public class UI {
                     break;
                 case "Sign in to Pro":
                     intent = new Intent(this.activity, SignInActivity.class);
+                    break;
+                case "Pro Account":
+                    intent = new Intent(this.activity,
+                            ProAccountActivity.class);
                     break;
                 case "Contact":
                     contactOption();

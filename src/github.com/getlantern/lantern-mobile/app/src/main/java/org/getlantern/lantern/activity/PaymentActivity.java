@@ -19,7 +19,16 @@ import android.support.v4.app.FragmentActivity;
 import com.stripe.android.Stripe;
 import com.stripe.android.TokenCallback;
 import com.stripe.android.model.Card;
+import com.stripe.exception.APIException;
+import com.stripe.exception.APIConnectionException;
+import com.stripe.exception.AuthenticationException;
+import com.stripe.exception.CardException;
+import com.stripe.exception.InvalidRequestException;
+import com.stripe.model.Charge;
 import com.stripe.android.model.Token;
+
+import java.util.Map;
+import java.util.HashMap;
 
 import org.getlantern.lantern.fragment.PaymentFormFragment;
 import org.getlantern.lantern.model.ErrorDialogFragment;
@@ -36,10 +45,17 @@ public class PaymentActivity extends FragmentActivity {
     private Button checkoutBtn;
     private PaymentFormFragment paymentForm;
 
+    private TextView chargeAmount;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.checkout);
+
+        Intent intent = getIntent();
+
+        chargeAmount = (TextView)findViewById(R.id.amount_to_charge);
+        chargeAmount.setText(intent.getStringExtra("AMOUNT_TO_CHARGE"));
 
         paymentForm = (PaymentFormFragment)getSupportFragmentManager().findFragmentById(R.id.payment_form);
 
@@ -83,6 +99,8 @@ public class PaymentActivity extends FragmentActivity {
             stripe.createToken(card, publishableApiKey, new TokenCallback() {
                 public void onSuccess(Token token) {
                     // TODO: Send Token information to your backend to initiate a charge
+                    chargeUser(token.getId());
+
                     Toast.makeText(
                             getApplicationContext(),
                             "Token created: " + token.getId(),
@@ -105,6 +123,32 @@ public class PaymentActivity extends FragmentActivity {
             handleError("The card details that you entered are invalid");
         }
 	}
+
+    private void chargeUser(String token) {
+        try {
+            Map<String, Object> chargeParams = new HashMap<String, Object>();
+            chargeParams.put("amount", 5988); 
+            chargeParams.put("currency", "usd");
+            chargeParams.put("source", token);
+            chargeParams.put("description", "Lantern Pro Subscription");
+            Map<String, String> initialMetadata = new HashMap<String, String>();
+            //initialMetadata.put("order_id", "6735");
+            //chargeParams.put("metadata", initialMetadata);
+
+            Charge charge = Charge.create(chargeParams);
+
+        } catch (APIException e) {
+            handleError("API error");
+        } catch (APIConnectionException e) {
+            handleError("Could not connect to API");
+        } catch (CardException e) {
+            handleError("Card entered has been declined");
+        } catch (AuthenticationException e) {
+            handleError("Could not authenticate.");  
+        } catch (InvalidRequestException e) {
+            handleError("Invalid request.");  
+        }
+    }
 
 
     private void startProgress() {

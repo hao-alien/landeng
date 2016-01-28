@@ -117,12 +117,13 @@
             android:textColor="@color/black"/>
 
 
-        <TextView
+        <TextView         
+            android:id="@+id/amount_to_charge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:fontFamily="sans-serif"
-            android:text="$7.99"
+            android:text=""
             android:textSize="20sp"
             android:textStyle="bold"     
             android:textColor="@color/pro_blue_color"/>

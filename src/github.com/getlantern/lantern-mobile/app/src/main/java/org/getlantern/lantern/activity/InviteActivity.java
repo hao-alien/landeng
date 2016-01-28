@@ -8,8 +8,11 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import org.getlantern.lantern.R;
+
+import go.client.*;
 
 public class InviteActivity extends Activity {
 
@@ -17,6 +20,7 @@ public class InviteActivity extends Activity {
 
     private EditText emailInput;
     private Button getCodeBtn;
+    private TextView referralCode;
     private View getCodeView;
     private View referralView;
 
@@ -24,6 +28,8 @@ public class InviteActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.invite_friends);
+
+        referralCode = (TextView)findViewById(R.id.referral_code);
 
         getCodeView = findViewById(R.id.get_code_view);
         referralView = findViewById(R.id.referral_code_view);
@@ -35,8 +41,11 @@ public class InviteActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "Get code button pressed");
+                getCode(v);
+
                 referralView.setVisibility(View.VISIBLE);
                 getCodeView.setVisibility(View.INVISIBLE);
+
             }
         });
 
@@ -55,7 +64,8 @@ public class InviteActivity extends Activity {
 
     public void getCode(View view) {
         final String email = emailInput.getText().toString();
-
+        String code = Client.ReferralCode(email);
+        referralCode.setText(code);
     }
 
     public void textInvite(View view) {

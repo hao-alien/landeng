@@ -159,6 +159,7 @@
                     android:textColor="@color/black"/>
 
                 <Button
+                    android:id="@+id/year_btn"
                     android:layout_height="36dp"
                     android:layout_width="88dp"
                     android:text="@string/select"
@@ -215,6 +216,7 @@
 
 
                 <Button
+                    android:id="@+id/month_btn"
                     android:layout_height="36dp"
                     android:layout_width="88dp"
                     android:text="@string/select"

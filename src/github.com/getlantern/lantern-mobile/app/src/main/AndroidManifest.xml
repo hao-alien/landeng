@@ -63,6 +63,11 @@
             android:name=".activity.PlansActivity"
             android:launchMode="singleTask"
         />   
+
+        <activity
+            android:name=".activity.ProAccountActivity"
+            android:launchMode="singleTask"
+        />                                    
         <activity
             android:name=".activity.LanguageActivity"
             android:launchMode="singleTask"
