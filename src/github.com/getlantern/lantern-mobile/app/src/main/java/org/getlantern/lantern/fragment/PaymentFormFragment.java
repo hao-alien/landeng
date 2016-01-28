@@ -1,19 +1,29 @@
 package org.getlantern.lantern.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
 import org.getlantern.lantern.model.PaymentForm;
+import org.getlantern.lantern.sdk.Utils;
 import org.getlantern.lantern.R;
 import org.getlantern.lantern.activity.PaymentActivity;
 
 public class PaymentFormFragment extends Fragment implements PaymentForm {
+
+    private View checkoutEmailSep;
+    private Context context;
+
 
     Button checkoutBtn;
     EditText cardNumber;
@@ -29,6 +39,11 @@ public class PaymentFormFragment extends Fragment implements PaymentForm {
         this.cvc = (EditText) view.findViewById(R.id.cvc);
         this.monthSpinner = (Spinner) view.findViewById(R.id.expMonth);
         this.yearSpinner = (Spinner) view.findViewById(R.id.expYear);
+
+        context = getActivity().getApplicationContext();
+
+        Utils.configureEmailInput((EditText)view.findViewById(R.id.email), 
+                view.findViewById(R.id.emailSeparator));
 
         return view;
     }

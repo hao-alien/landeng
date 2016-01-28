@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import org.getlantern.lantern.R;
 
+import org.getlantern.lantern.sdk.Utils;
+ 
 import go.client.*;
 
 public class InviteActivity extends Activity {
@@ -34,7 +36,9 @@ public class InviteActivity extends Activity {
         getCodeView = findViewById(R.id.get_code_view);
         referralView = findViewById(R.id.referral_code_view);
 
-        this.emailInput = (EditText)findViewById(R.id.proEmailAddress);
+        Utils.configureEmailInput((EditText)findViewById(R.id.email), findViewById(R.id.emailSeparator));
+
+        this.emailInput = (EditText)findViewById(R.id.email);
         this.getCodeBtn = (Button)findViewById(R.id.getCodeBtn);
 
         this.getCodeBtn.setOnClickListener(new View.OnClickListener() {

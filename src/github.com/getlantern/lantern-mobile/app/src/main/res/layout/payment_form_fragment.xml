@@ -9,26 +9,30 @@
     android:paddingRight="8dp">
 
     <EditText
-        android:id="@+id/checkoutEmail"
+        android:id="@+id/email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:drawableLeft="@drawable/email_inactive"
+        android:drawablePadding="2dip"
         android:fontFamily="sans-serif" 
         android:background="@null"
         android:hint="@string/email_hint"
         android:ems="10"
         android:textColor="@color/edittext_color"
         android:autoText="false"
-        android:paddingBottom="5dp"
+        android:padding="5dp"
         android:gravity="fill_horizontal"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:inputType="textEmailAddress" />
 
     <View
+        android:id="@+id/emailSeparator"
         android:background="@color/edittext_color"
         android:layout_below="@+id/checkoutEmail"
         android:layout_width = "fill_parent"
         android:layout_height="1dip"
+        android:layout_marginLeft="20dp"
         android:layout_centerVertical ="true"
         android:layout_alignParentTop="true"
         />                               
@@ -38,11 +42,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="25dp"
+        android:drawableLeft="@drawable/card_inactive"
+        android:drawablePadding="2dip"
         android:fontFamily="sans-serif" 
         android:textColor="@color/edittext_color"
         android:ems="10"
         android:paddingTop="20dp"
-        android:paddingBottom="5dp"
+        android:padding="5dp"
         android:background="@null"
         android:hint="4242 4242 4242 4242" 
         android:textAppearance="?android:attr/textAppearanceMedium"
@@ -55,6 +61,7 @@
         android:layout_below="@+id/number"
         android:layout_width = "fill_parent"
         android:layout_height="1dip"
+        android:layout_marginLeft="20dp" 
         android:layout_centerVertical ="true"
         android:layout_alignParentTop="true"
         />
@@ -63,8 +70,15 @@
         android:layout_height="wrap_content"
         android:id="@+id/monthyear" 
         android:layout_marginTop="40dp"
+        android:drawablePadding="2dip"
         android:weightSum="2"
         android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/date_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/date_inactive"/>
 
         <Spinner 
             android:id="@+id/expMonth" 
@@ -83,6 +97,7 @@
         android:layout_below="@+id/monthyear"
         android:layout_width = "fill_parent"
         android:layout_height="1dip"
+        android:layout_marginLeft="20dp"
         android:layout_centerVertical ="true"
         android:layout_alignParentTop="true"
         />
@@ -93,12 +108,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="25dp"
+        android:drawableLeft="@drawable/cvv_inactive"
+        android:drawablePadding="2dip"
         android:fontFamily="sans-serif" 
         android:background="@null"
         android:hint="323"
         android:ems="10"
         android:textColor="@color/edittext_color"
-        android:paddingRight="20dp"
+        android:padding="5dp"
         android:autoText="false"
         android:paddingTop="20dp"
         android:gravity="fill_horizontal"
@@ -110,6 +127,7 @@
         android:layout_below="@+id/cvc"
         android:layout_width = "fill_parent"
         android:layout_height="1dip"
+        android:layout_marginLeft="20dp"
         android:layout_centerVertical ="true"
         android:layout_alignParentTop="true"
         />

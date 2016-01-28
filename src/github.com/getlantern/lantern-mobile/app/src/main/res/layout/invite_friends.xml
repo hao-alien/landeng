@@ -93,10 +93,12 @@
                 android:textColor="#000000"/>
 
             <EditText
-                android:id="@+id/proEmailAddress"
+                android:id="@+id/email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif" 
+                android:drawableLeft="@drawable/email_inactive"
+                android:drawablePadding="2dip"
                 android:background="@null"
                 android:hint="@string/email_hint"
                 android:gravity="fill_horizontal"
@@ -110,7 +112,7 @@
                 android:inputType="textEmailAddress" />
 
             <View
-                android:id="@+id/separator"
+                android:id="@+id/emailSeparator"
                 android:background="@color/edittext_color"
                 android:layout_below="@+id/sendEmail"
                 android:layout_width = "262dp"

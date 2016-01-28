@@ -4,7 +4,9 @@
 	android:layout_height="match_parent" 
 	android:orientation="vertical"
 	android:baselineAligned="false"
-	android:id="@+id/paymentView"
+    android:id="@+id/paymentView"
+    android:clickable="true" 
+    android:focusableInTouchMode="true"
 	tools:context=".PaymentActivity">
 
 	<RelativeLayout
@@ -68,9 +70,12 @@
 
     <EditText
         android:id="@+id/referralCode"
-        android:layout_width="334dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
         android:layout_marginLeft="20dp"
+        android:drawableLeft="@drawable/invitecode_inactive"
+        android:drawablePadding="2dip"
         android:fontFamily="sans-serif" 
         android:background="@null"
         android:hint="@string/referral_code"
@@ -80,16 +85,17 @@
         android:autoText="false"
         android:layout_marginTop="30dp"
         android:paddingBottom="5dp"
+        android:gravity="fill_horizontal"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:inputType="number" />
 
     <View
         android:background="@color/edittext_color"
         android:layout_below="@+id/referralCode"
-        android:layout_width = "330dp"
+        android:layout_width = "fill_parent"
         android:layout_height="1dip"
-        android:gravity="center"
-        android:layout_gravity="center" 
+        android:layout_marginLeft="35dp"
+        android:layout_marginRight="10dp"
         android:layout_centerVertical ="true"
         android:layout_alignParentTop="true"
         />                               

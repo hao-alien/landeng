@@ -9,12 +9,18 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.os.Looper;
 import android.util.Log;
+import android.view.View;               
 import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.InputStream;
+
+import org.getlantern.lantern.R;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -113,6 +119,29 @@ public class Utils {
 
         Looper.loop();
     }
+
+    public static void hideKeyboard(Context context, View view) {
+        InputMethodManager inputMethodManager = (InputMethodManager)context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    public static void configureEmailInput(final EditText emailInput, final View separator) {
+
+        OnFocusChangeListener focusListener = new OnFocusChangeListener() {
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    separator.setBackgroundResource(R.color.blue_color);
+                    emailInput.setCompoundDrawablesWithIntrinsicBounds(R.drawable.email_active, 0, 0, 0);
+                } else {
+                    separator.setBackgroundResource(R.color.edittext_color);
+                    emailInput.setCompoundDrawablesWithIntrinsicBounds(R.drawable.email_inactive, 0, 0, 0);    
+                }
+            }
+        };
+        emailInput.setOnFocusChangeListener(focusListener);
+
+    }
+
 
     public static void clearPreferences(Context context) {
 
