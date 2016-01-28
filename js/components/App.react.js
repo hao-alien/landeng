@@ -34,7 +34,6 @@ class App extends Component {
     let url = document.location
     this.ws = new WebSocket("ws://" + url.host + '/data');
     this.ws.onopen = (event) => {
-      console.log('onopen');
       this.props.dispatch(backend.connected({ws: this.ws}));
     };
 
@@ -49,7 +48,6 @@ class App extends Component {
 
     this.ws.onmessage = (event) => {
       var message = JSON.parse(event.data);
-      console.log('onmessage', message);
       this.props.dispatch(backend.message(message));
     };
   }

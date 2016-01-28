@@ -1,10 +1,10 @@
 /*
  * Home Screen for Free Users
- * This is the first thing users see of our App
  */
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { translate } from 'react-i18next/lib';
 import TextField from 'material-ui/lib/text-field'
 import RaisedButton from 'material-ui/lib/raised-button'
 import IconEmail from 'material-ui/lib/svg-icons/communication/email'
@@ -30,34 +30,34 @@ class ScreenFree extends Component {
     if (re.test( this.refs.email.getValue() )) {
       this.setState({ errorMail: '' })
     } else {
-      this.setState({ errorMail: 'Write a valid email address' })
+      this.setState({ errorMail: t('Write a valid email address') })
     }
   }
 
-
   render() {
+    const { t } = this.props
     return (
       <div>
         <section id="middle_sheet">
-          <h2>Upgrade to LanternPRO</h2>
+          <h2>{t('Upgrade to LanternPRO')}</h2>
           <ul>
-            <li>Faster connection Speed</li>
-            <li>Smarter Servers</li>
-            <li>Stronger Blocking Resistance</li>
-            <li>Starting at $4.99/month</li>
+            <li>{t('Faster connection Speed')}</li>
+            <li>{t('Smarter Servers')}</li>
+            <li>{t('Stronger Blocking Resistance')}</li>
+            <li>{t('Starting at $4.99/month')}</li>
           </ul>
           <div id="get_pro">
             <RaisedButton label="Upgrade To PRO" />
           </div>
         </section>
         <section id="bottom_sheet">
-          <h3>Get Free Months</h3>
-          <p>Enter your email to receive a code to share with your friends and get a free month of PRO when they sign up</p>
+          <h3>{t('Get Free Months')}</h3>
+          <p>{t('Enter your email to receive a code to share with your friends and get a free month of PRO when they sign up')}</p>
           <div id="get_code">
             <IconEmail style={styles.iconStyles} color="white" />
             <TextField
-              hintText="Enter your email address"
-              floatingLabelText="Email"
+              hintText={t('Enter your email address')}
+              floatingLabelText={t('Email')}
               errorText={this.state.errorMail}
               onBlur={this._emailValidation}
               ref="email" />
@@ -71,6 +71,7 @@ class ScreenFree extends Component {
 }
 
 ScreenFree.propTypes = {
+  t: React.PropTypes.func,
   dispatch: React.PropTypes.func,
   data: React.PropTypes.object,
 }
@@ -86,4 +87,4 @@ function select(state) {
 
 
 // Wrap the component to inject dispatch and state into it
-export default connect(select)(ScreenFree)
+export default translate(['translation'])(connect(select)(ScreenFree))

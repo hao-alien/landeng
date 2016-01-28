@@ -43,7 +43,9 @@ module.exports = function(options) {
         }
       }),
       new CopyWebpackPlugin([
-        { from: 'img', to: 'img' }
+        { from: 'img', to: 'img' },
+        { from: 'font', to: 'font' },
+        { from: 'locale', to: 'locale' }
       ])
     ];
     // If app is in development

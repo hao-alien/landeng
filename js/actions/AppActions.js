@@ -27,6 +27,7 @@
 // It makes more sense to have the asnyc actions before the non-async ones
 /* eslint-disable no-use-before-define */
 
+import i18next from 'i18next/lib'
 import { DIALOG, OPEN_MENU, LANGUAGE, LANTERN } from '../constants/AppConstants'
 
 /* MainNav functions */
@@ -58,7 +59,14 @@ export function noDialog() {
 /* Language Modal functions */
 export function asyncSetLanguage(name) {
   return (dispatch) => {
-    return dispatch(setLanguage(name))
+    return new Promise((resolve, reject) => {
+      i18next.changeLanguage(name, (err, t) => {
+        if (!err) {
+          return dispatch(setLanguage(name))
+        }
+        reject(err)
+      })
+    })
   }
 }
 
