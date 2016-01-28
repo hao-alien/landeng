@@ -31,3 +31,19 @@ export function asyncSaveSettings(settings) {
     return dispatch({type: constants.BACKEND_SETTINGS_SAVED, status: settings})
   }
 }
+
+export function asyncSaveUser(user) {
+  return (dispatch) => {
+    if (!ws) {
+      return dispatch({type: constants.BACKEND_SAVE_USER_FAILED, status: "no WebSocket available"})
+    }
+    dispatch({type: constants.BACKEND_SAVE_USER, status: user})
+    let data = {Type: 'User', Message: user}
+    try {
+      ws.send(JSON.stringify(data))
+    } catch (error) {
+      return dispatch({type: constants.BACKEND_SAVE_USER_FAILED, status: error})
+    }
+    return dispatch({type: constants.BACKEND_USER_SAVED, status: user})
+  }
+}

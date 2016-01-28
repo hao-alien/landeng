@@ -6,8 +6,8 @@ import ScreenPro from './ScreenPro.react'
 
 class HomePage extends Component {
   render() {
-    const { user } = this.props.data
-    return <div>{user.pro ? <ScreenPro /> : <ScreenFree /> }</div>
+    const { Pro: isPro } = this.props.data
+    return <div>{ isPro ? <ScreenPro /> : <ScreenFree /> }</div>
   }
 }
 
@@ -20,7 +20,7 @@ HomePage.propTypes = {
 // Which props do we want to inject, given the global state?
 function select(state) {
   return {
-    data: state.home,
+    data: state.pro,
   }
 }
 
