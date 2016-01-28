@@ -26,11 +26,12 @@ class ScreenFree extends Component {
   }
 
   _emailValidation() {
+    const { t } = this.props
     const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     if (re.test( this.refs.email.getValue() )) {
       this.setState({ errorMail: '' })
     } else {
-      this.setState({ errorMail: t('Write a valid email address') })
+      this.setState({ errorMail: t('free.use_valid_email') })
     }
   }
 
@@ -39,30 +40,30 @@ class ScreenFree extends Component {
     return (
       <div>
         <section id="middle_sheet">
-          <h2>{t('Upgrade to LanternPRO')}</h2>
+          <h2>{t('free.upgrade_headline')}</h2>
           <ul>
-            <li>{t('Faster connection Speed')}</li>
-            <li>{t('Smarter Servers')}</li>
-            <li>{t('Stronger Blocking Resistance')}</li>
-            <li>{t('Starting at $4.99/month')}</li>
+            <li>{t('free.li1')}</li>
+            <li>{t('free.li2')}</li>
+            <li>{t('free.li3')}</li>
+            <li>{t('free.li4')}</li>
           </ul>
           <div id="get_pro">
-            <RaisedButton label="Upgrade To PRO" />
+            <RaisedButton label={t('free.upgrade_button')} />
           </div>
         </section>
         <section id="bottom_sheet">
-          <h3>{t('Get Free Months')}</h3>
-          <p>{t('Enter your email to receive a code to share with your friends and get a free month of PRO when they sign up')}</p>
+          <h3>{t('free.get_months_headline')}</h3>
+          <p>{t('free.get_months_p')}</p>
           <div id="get_code">
             <IconEmail style={styles.iconStyles} color="white" />
             <TextField
-              hintText={t('Enter your email address')}
-              floatingLabelText={t('Email')}
+              hintText={t('free.enter_email')}
+              floatingLabelText={t('free.email')}
               errorText={this.state.errorMail}
               onBlur={this._emailValidation}
               ref="email" />
             <br />
-            <RaisedButton label="Get Code" onTouchTap={this.getCode} />
+            <RaisedButton label={t('free.get_code')} onTouchTap={this.getCode} />
           </div>
         </section>
       </div>
