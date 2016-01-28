@@ -13,9 +13,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.getlantern.lantern.model.MailSender;
 import org.getlantern.lantern.sdk.Utils;
 import org.getlantern.lantern.R;
@@ -112,7 +109,7 @@ public class DesktopActivity extends Activity {
 
             public void onTextChanged(CharSequence s, int start,
                     int before, int count) {
-                if (isEmailValid(s.toString())) {
+                if (Utils.isEmailValid(s.toString())) {
                     sendBtn.setBackgroundResource(R.drawable.send_btn_blue);
                     sendBtn.setClickable(true);
                 } else {
@@ -123,21 +120,4 @@ public class DesktopActivity extends Activity {
 
         });
     }
-
-    private static boolean isEmailValid(String email) {
-        boolean isValid = false;
-
-        String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
-        CharSequence inputStr = email;
-
-        Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(inputStr);
-        if (matcher.matches()) {
-            isValid = true;
-        }
-        return isValid;
-    }
-
- 
-
 }

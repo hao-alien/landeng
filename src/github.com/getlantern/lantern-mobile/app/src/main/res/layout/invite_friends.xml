@@ -210,7 +210,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="40dp"
-            android:layout_below="@id/your_referral_code"
             android:fontFamily="sans-serif"
             android:text="LRC5TWCX5"
             android:textAllCaps="true"       
@@ -237,7 +236,7 @@
                 android:clickable = "true"
                 android:background="#B6E3EB"
                 android:layout_centerInParent="true"
-                android:onClick="inviteFriends" />
+                android:onClick="textInvite" />
 
             <Button
                 android:id="@+id/emailInviteBtn"
@@ -255,7 +254,7 @@
                 android:layout_marginTop="10dp"
                 android:background="#0297A7"
                 android:layout_centerInParent="true"
-                android:onClick="continueToPro" />
+                android:onClick="emailInvite" />
 
         </LinearLayout>
 

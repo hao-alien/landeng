@@ -54,7 +54,9 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:nextFocusDown="@+id/expMonth" 
         android:nextFocusRight="@+id/expMonth" 
-        android:nextFocusForward="@+id/expMonth" />
+        android:nextFocusForward="@+id/expMonth" 
+        android:inputType="number"
+        />
 
     <View
         android:background="@color/edittext_color"
@@ -120,6 +122,7 @@
         android:paddingTop="20dp"
         android:gravity="fill_horizontal"
         android:textAppearance="?android:attr/textAppearanceMedium"
+        android:inputType="number"
         />
 
     <View

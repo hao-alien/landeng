@@ -116,12 +116,12 @@ public class PaymentActivity extends FragmentActivity {
 
                     // update shared preferences to indicate Pro user
                     // which affects how the main screen is displayed
-                    mPrefs.edit().putBoolean("proUser", true);
+                    mPrefs.edit().putBoolean("proUser", true).commit();
 
-                    Toast.makeText(
+                    /*Toast.makeText(
                             getApplicationContext(),
                             "Token created: " + token.getId(),
-                            Toast.LENGTH_LONG).show();
+                            Toast.LENGTH_LONG).show();*/
                     finishProgress();
                 }
 

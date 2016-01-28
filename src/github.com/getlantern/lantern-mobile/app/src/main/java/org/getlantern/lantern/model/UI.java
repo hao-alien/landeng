@@ -106,13 +106,11 @@ public class UI {
     static final Map<String, Integer> menuOptions = ImmutableMap.<String, Integer>builder()
         .put("Share", R.drawable.ic_share)
         .put("Sign in to Pro", R.drawable.sign_in)
-        .put("Pro Account", R.drawable.get_free)
         .put("Pro Now", R.drawable.pro_now)
         .put("Get Free Months", R.drawable.get_free)
         .put("Language", R.drawable.language)
         .put("Desktop Version", R.drawable.ic_desktop)
         .put("Contact", R.drawable.ic_contact)
-        .put("Welcome", R.drawable.ic_contact)
         .build();
 
     public UI(LanternMainActivity activity, SharedPreferences mPrefs) {
@@ -401,10 +399,6 @@ public class UI {
                 case "Sign in to Pro":
                     intent = new Intent(this.activity, SignInActivity.class);
                     break;
-                case "Pro Account":
-                    intent = new Intent(this.activity,
-                            ProAccountActivity.class);
-                    break;
                 case "Contact":
                     contactOption();
                     break;
@@ -415,16 +409,20 @@ public class UI {
                     intent = new Intent(this.activity, DesktopActivity.class);
                     break;
                 case "Pro Now":
-                    intent = new Intent(this.activity, PlansActivity.class);
+                    if (mPrefs.getBoolean("proUser", false)) {
+                        // if its a Pro user, display the 
+                        // Pro account management tab instead
+                        // of a list of payment options
+                        intent = new Intent(this.activity, ProAccountActivity.class);
+                    } else {
+                        intent = new Intent(this.activity, PlansActivity.class);
+                    }
                     break;
                 case "Get Free Months":
                     intent = new Intent(this.activity, InviteActivity.class);
                     break;
                 case "Language":
                     intent = new Intent(this.activity, LanguageActivity.class);
-                    break;
-                case "Welcome":
-                    intent = new Intent(this.activity, WelcomeActivity.class);
                     break;
                 default:
             }

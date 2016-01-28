@@ -132,6 +132,14 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
     protected void onResume() {
         super.onResume();
 
+        proUser = mPrefs.getBoolean("proUser", false);
+        // if it's a Lantern Pro user,
+        // hide the sign-up for Pro section
+        if (proUser) {
+            RelativeLayout proSection = (RelativeLayout)findViewById(R.id.lantern_pro);
+            proSection.setVisibility(View.GONE);
+        }
+
         // we check if mPrefs has been initialized before
         // since onCreate and onResume are always both called
         if (mPrefs != null) {

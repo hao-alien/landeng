@@ -15,15 +15,22 @@ import android.view.View.OnFocusChangeListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
+ 
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.InputStream;
 
 import org.getlantern.lantern.R;
+import org.getlantern.lantern.model.ErrorDialogFragment;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.yaml.snakeyaml.Yaml;
 
@@ -125,6 +132,21 @@ public class Utils {
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
+    public static boolean isEmailValid(String email) {
+        boolean isValid = false;
+
+        String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
+        CharSequence inputStr = email;
+
+        Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(inputStr);
+        if (matcher.matches()) {
+            isValid = true;
+        }
+        return isValid;
+    }
+
+
     public static void configureEmailInput(final EditText emailInput, final View separator) {
 
         OnFocusChangeListener focusListener = new OnFocusChangeListener() {
@@ -142,6 +164,11 @@ public class Utils {
 
     }
 
+    public static void showErrorDialog(final FragmentActivity activity, String error) {
+        DialogFragment fragment = ErrorDialogFragment.newInstance(R.string.validation_errors, error);
+        fragment.show(activity.getSupportFragmentManager(), "error");
+
+    }
 
     public static void clearPreferences(Context context) {
 

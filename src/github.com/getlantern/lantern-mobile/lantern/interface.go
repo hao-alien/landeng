@@ -37,6 +37,9 @@ type Provider interface {
 	Notice(message string, fatal bool)
 }
 
+type ReferralCode struct {
+}
+
 func Configure(provider Provider) error {
 
 	log.Debugf("Configuring Lantern version: %s", lantern.GetVersion())
@@ -99,7 +102,7 @@ func Start(provider Provider) {
 	provider.AfterStart(lantern.GetVersion())
 }
 
-func ReferralCode(email string) string {
+func ReferralCode(email string) {
 	u := proclient.User{
 		Email: email,
 	}
@@ -113,10 +116,9 @@ func ReferralCode(email string) string {
 			log.Errorf("Could not create code: %v", err)
 		} else {
 			log.Debugf("Referral code is %s", res.Code)
-			return res.Code
+			finish(res.Code)
 		}
 	}
-	return ""
 }
 
 func Stop() {
