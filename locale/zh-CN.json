@@ -15,5 +15,14 @@
   "pro.get_months_p": "你的朋友注册之后，你们俩都可以获得一个月的免费使用时间!",
   "pro.invite": "发邮件邀请",
   "pro.referral_code": "你的邀请码",
-  "pro.share": "分享到社交媒体"
+  "pro.share": "分享到社交媒体",
+  "nav.lantern": "Lantern",
+  "nav.plans": "Lantern PRO 套餐",
+  "nav.signin": "Lantern PRO 登录",
+  "nav.mobile": "获取移动版",
+  "nav.language": "语言",
+  "nav.share": "分享",
+  "nav.settings": "设置",
+  "nav.about": "关于",
+  "nav.exit": "退出"
 }
