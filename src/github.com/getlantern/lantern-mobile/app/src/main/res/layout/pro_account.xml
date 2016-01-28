@@ -88,7 +88,7 @@
                 android:layout_marginTop="14dp"
                 android:text="@string/pro_account_text"
                 android:textSize="14sp"
-                android:textStyle="bold"
+                android:padding="20dp"
                 android:alpha=".87"
                 android:layout_centerHorizontal="true"
                 android:gravity="center"

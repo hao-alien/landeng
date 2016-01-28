@@ -40,6 +40,9 @@ import org.getlantern.lantern.model.ProgressDialogFragment;
 import org.getlantern.lantern.model.PaymentForm;
 import org.getlantern.lantern.R;
 
+import org.getlantern.lantern.sdk.Utils;
+ 
+
 public class PaymentActivity extends FragmentActivity {
 
     private static final String TAG = "PaymentActivity";
@@ -113,7 +116,7 @@ public class PaymentActivity extends FragmentActivity {
 
                     // update shared preferences to indicate Pro user
                     // which affects how the main screen is displayed
-                    mPrefs.putBoolean("proUser", true);
+                    mPrefs.edit().putBoolean("proUser", true);
 
                     Toast.makeText(
                             getApplicationContext(),
