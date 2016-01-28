@@ -26,5 +26,6 @@ public class WelcomeActivity extends Activity {
 
     public void continueToPro(View view) {
         Log.d(TAG, "Continue to Pro button clicked!");
+        startActivity(new Intent(this, LanternMainActivity.class));
     }
 }

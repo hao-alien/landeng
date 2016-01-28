@@ -31,6 +31,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
+import android.widget.RelativeLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -69,6 +70,8 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
     private UI LanternUI;
     private Handler mHandler;
 
+    private boolean proUser = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +91,13 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
         context = getApplicationContext();
         mPrefs = Utils.getSharedPrefs(context);
 
+        proUser = mPrefs.getBoolean("proUser", false);
+        // if it's a Lantern Pro user,
+        // hide the sign-up for Pro section
+        if (proUser) {
+            RelativeLayout proSection = (RelativeLayout)findViewById(R.id.lantern_pro);
+            proSection.setVisibility(View.GONE);
+        }
 
         LanternUI = new UI(this, mPrefs);
 

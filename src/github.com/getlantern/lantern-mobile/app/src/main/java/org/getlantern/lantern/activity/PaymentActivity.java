@@ -1,7 +1,9 @@
 package org.getlantern.lantern.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -43,6 +45,9 @@ public class PaymentActivity extends FragmentActivity {
     private static final String TAG = "PaymentActivity";
     private static final String publishableApiKey = "pk_test_4MSPZvz9QtXGWEKdODmzV9ql";
 
+    private Context context;
+    private SharedPreferences mPrefs = null;
+
     private ProgressDialogFragment progressFragment;
     private Button checkoutBtn;
     private PaymentFormFragment paymentForm;
@@ -53,6 +58,9 @@ public class PaymentActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.checkout);
+
+        context = getApplicationContext();
+        mPrefs = Utils.getSharedPrefs(context);
 
         Intent intent = getIntent();
 
@@ -102,6 +110,10 @@ public class PaymentActivity extends FragmentActivity {
                 public void onSuccess(Token token) {
                     // TODO: Send Token information to your backend to initiate a charge
                     chargeUser(token.getId());
+
+                    // update shared preferences to indicate Pro user
+                    // which affects how the main screen is displayed
+                    mPrefs.putBoolean("proUser", true);
 
                     Toast.makeText(
                             getApplicationContext(),

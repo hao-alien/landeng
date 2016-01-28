@@ -62,13 +62,15 @@
             android:textColor="@color/black"/>
 
 
-        <LinearLayout android:orientation="vertical"
+        <LinearLayout 
+            android:id="@+id/lantern_pro_section"
+            android:orientation="vertical"
             android:background="@color/cyan"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:gravity="bottom"
             android:layout_weight="1"
-            android:layout_height="256dp"
+            android:layout_height="wrap_content"
             android:layout_width="match_parent">
 
             <RelativeLayout 
