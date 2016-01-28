@@ -39,7 +39,6 @@ public class PaymentFormFragment extends Fragment implements PaymentForm {
         this.cvc = (EditText) view.findViewById(R.id.cvc);
         this.monthSpinner = (Spinner) view.findViewById(R.id.expMonth);
         this.yearSpinner = (Spinner) view.findViewById(R.id.expYear);
-
         context = getActivity().getApplicationContext();
 
         Utils.configureEmailInput((EditText)view.findViewById(R.id.email), 
