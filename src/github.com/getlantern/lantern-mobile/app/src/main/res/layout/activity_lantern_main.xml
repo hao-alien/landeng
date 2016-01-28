@@ -53,6 +53,8 @@
             android:layout_marginLeft="10dp"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:includeFontPadding="false"
             android:maxWidth="200dp"
             android:text="@string/off_desc"
             android:textSize="14sp"

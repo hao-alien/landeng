@@ -84,6 +84,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
                 android:layout_marginTop="14dp"
+                android:padding="5dp"
                 android:text="@string/invite_friends"
                 android:textSize="14sp"
                 android:textStyle="bold"
@@ -94,8 +95,9 @@
 
             <EditText
                 android:id="@+id/email"
-                android:layout_width="wrap_content"
+                android:layout_width = "262dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
                 android:fontFamily="sans-serif" 
                 android:drawableLeft="@drawable/email_inactive"
                 android:drawablePadding="2dip"
@@ -105,8 +107,6 @@
                 android:ems="10"
                 android:textColor="#BDBDBD"
                 android:autoText="false"
-                android:layout_marginLeft="-5dp"
-                android:paddingTop="20dp"
                 android:paddingBottom="5dp"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:inputType="textEmailAddress" />
@@ -116,6 +116,7 @@
                 android:background="@color/edittext_color"
                 android:layout_below="@+id/sendEmail"
                 android:layout_width = "262dp"
+                android:layout_marginLeft="20dp"
                 android:layout_height="1dip"
                 android:gravity="center"
                 android:layout_centerVertical ="true"
@@ -163,7 +164,7 @@
                 android:textColor="@color/accent_white"
                 android:textStyle="bold"
                 android:clickable = "true"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="23dp"
                 android:background="#0297A7"
                 android:layout_centerInParent="true"/>
 
