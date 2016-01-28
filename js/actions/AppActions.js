@@ -29,6 +29,7 @@
 
 import i18next from 'i18next/lib'
 import { DIALOG, OPEN_MENU, LANGUAGE, LANTERN } from '../constants/AppConstants'
+import { asyncSaveSettings } from './BackendActions'
 
 /* MainNav functions */
 export function asyncOpenMenu(status) {
@@ -61,17 +62,14 @@ export function asyncSetLanguage(name) {
   return (dispatch) => {
     return new Promise((resolve, reject) => {
       i18next.changeLanguage(name, (err, t) => {
-        if (!err) {
-          return dispatch(setLanguage(name))
+        if (err) {
+          // defaults to en
+          return dispatch(asyncSaveSettings({Language: 'en'}))
         }
-        reject(err)
+        return dispatch(asyncSaveSettings({Language: name}))
       })
     })
   }
-}
-
-export function setLanguage(name) {
-  return { type: LANGUAGE, name }
 }
 
 /* Settings Modal functions */

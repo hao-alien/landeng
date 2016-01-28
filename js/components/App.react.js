@@ -52,9 +52,6 @@ class App extends Component {
     };
   }
 
-  send()  {
-    this.props.dispatch(backend.asyncSendMessage({text: 'something'}));
-  }
   render() {
     return (
       <div className="wrapper">
@@ -63,7 +60,7 @@ class App extends Component {
         </div>
         <LanternStatus />
         <section id="top_sheet">
-          <img className="logo" src="/img/lantern_logo.svg" onClick={this.send.bind(this)}/>
+          <img className="logo" src="/img/lantern_logo.svg" />
         </section>
         { this.props.children }
       </div>

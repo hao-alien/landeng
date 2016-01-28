@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import Checkbox from 'material-ui/lib/checkbox'
 import Divider from 'material-ui/lib/divider'
-import { asyncSendMessage } from '../../actions/BackendActions'
+import { asyncSaveSettings } from '../../actions/BackendActions'
 import IllustratedDialog from './IllustratedDialog.react'
 
 class Settings extends React.Component {
@@ -14,7 +14,7 @@ class Settings extends React.Component {
   saveSettings(input) {
     const { Settings: settings } = this.props.data
     settings[input.target.name] = input.target.checked
-    this.props.dispatch(asyncSendMessage(settings))
+    this.props.dispatch(asyncSaveSettings(settings))
   }
 
   render() {

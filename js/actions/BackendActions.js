@@ -1,34 +1,33 @@
 /* eslint-disable no-use-before-define */
 
 import assignToEmpty from '../utils/assign'
-import {BACKEND_STATUS_CHANGED, BACKEND_MESSAGE_RECEIVED, BACKEND_MESSAGE_SENDING, BACKEND_MESSAGE_SENT, BACKEND_MESSAGE_FAILED_TO_SEND} from '../constants/BackendConstants'
+import * as constants from '../constants/BackendConstants'
 
 let ws = null
 
 export function connected(status) {
   ws = status.ws
-  return {type: BACKEND_STATUS_CHANGED, status: {connected: true}}
+  return {type: constants.BACKEND_STATUS_CHANGED, status: {connected: true}}
 }
-export function gone(status) {
+export function gone() {
   ws = null
-  return {type: BACKEND_STATUS_CHANGED, status: {connected: false}}
+  return {type: constants.BACKEND_STATUS_CHANGED, status: {connected: false}}
 }
-export function message(status) {
-      return {type: BACKEND_MESSAGE_RECEIVED, status: status}
+export function message(msg) {
+  return {type: constants.BACKEND_MESSAGE_RECEIVED, status: msg}
 }
-export function asyncSendMessage(status) {
+export function asyncSaveSettings(settings) {
   return (dispatch) => {
     if (!ws) {
-      return dispatch({type: BACKEND_MESSAGE_FAILED_TO_SEND, status: "invalid WebSocket"})
+      return dispatch({type: constants.BACKEND_SAVE_SETTINGS_FAILED, status: "no WebSocket available"})
     }
-    dispatch({type: BACKEND_MESSAGE_SENDING, status: status})
-    let data = {Type: 'Settings', Message: status}
-    return ws.send(JSON.stringify(data), (error) => {
-      if (!error) {
-        return dispatch({type: BACKEND_MESSAGE_SENT, status: status})
-      } else {
-        return dispatch({type: BACKEND_MESSAGE_FAILED_TO_SEND, status: error})
-      }
-    })
+    dispatch({type: constants.BACKEND_SAVE_SETTINGS, status: settings})
+    let data = {Type: 'Settings', Message: settings}
+    try {
+      ws.send(JSON.stringify(data))
+    } catch (error) {
+      return dispatch({type: constants.BACKEND_SAVE_SETTINGS_FAILED, status: error})
+    }
+    return dispatch({type: constants.BACKEND_SETTINGS_SAVED, status: settings})
   }
 }
