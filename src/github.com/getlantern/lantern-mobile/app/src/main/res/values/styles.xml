@@ -20,6 +20,12 @@
         <item name="android:windowNoTitle">true</item> 
     </style>
 
+    <style name="Theme.NoActionBar" parent="Theme.AppCompat">
+        <item name="android:windowNoTitle">true</item> 
+        <item name="android:windowActionBarOverlay">true</item>
+    </style>
+
+
     <style name="BackgroundImageView">
         <item name="android:scaleType">fitCenter</item>
         <item name="android:background">@drawable/desktop_graphic</item>
