@@ -6,6 +6,7 @@
     <string name="drawer_close">Drawer Close</string>
     <string name="default_fragment">Default Fragment</string>
     <string name="receive_lantern">Receive Lantern desktop by email</string>
+    <string name="service_connected">Lantern connected</string>
     <string name="email_hint">Email</string>
     <string name="send_button">Send</string>
     <string name="on_text">On</string>

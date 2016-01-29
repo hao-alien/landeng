@@ -2,6 +2,9 @@ package org.getlantern.lantern.activity;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.NotificationManager;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -39,6 +42,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.NotificationCompat;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -62,6 +66,9 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
     private final static int REQUEST_VPN = 7777;
     private SharedPreferences mPrefs = null;
     private BroadcastReceiver mReceiver;
+    private NotificationManager notifier;
+    private final NotificationCompat.Builder mNotificationBuilder = new NotificationCompat.Builder(this);
+    private static final int NOTIFICATION_ID = 10002;
 
     private Context context;
     private UI LanternUI;
@@ -85,6 +92,8 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
 
         context = getApplicationContext();
         mPrefs = Utils.getSharedPrefs(context);
+        notifier = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+        setupNotifications();
 
 
         LanternUI = new UI(this, mPrefs);
@@ -180,6 +189,31 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
         }
     }
 
+    private void setupNotifications() {
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, LanternMainActivity.class)
+                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP),
+                0);
+
+        mNotificationBuilder
+            .setSmallIcon(R.drawable.status_icon)
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setContentTitle(getText(R.string.app_name))
+            .setWhen(System.currentTimeMillis())
+            .setContentIntent(pendingIntent)
+            .setOngoing(true);
+    }
+
+    public void showStatusIcon() {
+        if (notifier != null) {
+            mNotificationBuilder
+                .setTicker(getText(R.string.service_connected))
+                .setContentText(getText(R.string.service_connected));
+            notifier.notify(NOTIFICATION_ID, mNotificationBuilder.build());
+        }
+    }
+
     @Override
     public boolean handleMessage(Message message) {
         if (message != null) {
@@ -255,7 +289,9 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
     }
 
     private void sendIntentToService() {
-        startService(new Intent(this, Service.class));
+        Intent intent = new Intent(this, Service.class);
+        startService(intent);
+        showStatusIcon();
     }
 
     public void restart(final Context context, final Intent intent) {
@@ -276,6 +312,7 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
     public void stopLantern() {
         Service.IsRunning = false;
         Utils.clearPreferences(this);
+        notifier.cancel(NOTIFICATION_ID);
     }
 
     @Override
