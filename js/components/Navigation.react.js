@@ -4,24 +4,15 @@
  * This component is the navigation left bar, contain code that link to all the pages.
  */
 
-import { asyncDialog, asyncOpenMenu } from '../actions/AppActions'
-
 import React from 'react'
 import { connect } from 'react-redux'
+import { translate } from 'react-i18next/lib';
 import LeftNav from 'material-ui/lib/left-nav'
 import MenuItem from 'material-ui/lib/menus/menu-item'
 import FlatButton from 'material-ui/lib/raised-button'
 
 import ThemeManager from 'material-ui/lib/styles/theme-manager'
 import darkTheme from 'material-ui/lib/styles/raw-themes/dark-raw-theme'
-
-import PlansDialog from './dialogs/Plans.react'
-import WelcomeToProDialog from './dialogs/WelcomeToPro.react'
-import MobileDialog from './dialogs/Mobile.react'
-import LanguageDialog from './dialogs/Language.react'
-import ShareDialog from './dialogs/Share.react'
-import SettingsDialog from './dialogs/Settings.react'
-import AboutDialog from './dialogs/About.react'
 
 import NavigationIcon from 'material-ui/lib/svg-icons/navigation/menu'
 import IconInfo from 'material-ui/lib/svg-icons/action/info'
@@ -33,60 +24,69 @@ import IconTranslate from 'material-ui/lib/svg-icons/action/translate'
 import IconFace from 'material-ui/lib/svg-icons/image/tag-faces'
 import IconClose from 'material-ui/lib/svg-icons/navigation/close'
 
+import { asyncDialog, asyncOpenMenu } from '../actions/AppActions'
 import styles from '../constants/Styles'
 import * as dialogs from '../constants/Dialogs'
 
+import PlansDialog from './dialogs/Plans.react'
+import WelcomeToProDialog from './dialogs/WelcomeToPro.react'
+import MobileDialog from './dialogs/Mobile.react'
+import LanguageDialog from './dialogs/Language.react'
+import ShareDialog from './dialogs/Share.react'
+import SettingsDialog from './dialogs/Settings.react'
+import AboutDialog from './dialogs/About.react'
+
 const menuItems = [
   {
-    title: 'Lantern',
+    title: 'nav.lantern',
     name: 'lantern',
     icon: <NavigationIcon />,
     dialog: null,
   },
   {
-    title: 'Lantern PRO Plans',
+    title: 'nav.plans',
     name: 'plans',
     icon: <IconCreditCard />,
     dialog: dialogs.PLANS_DIALOG,
   },
   {
-    title: 'Lantern PRO Sign in',
+    title: 'nav.signin',
     name: 'signin',
     icon: <IconInfo />,
     dialog: dialogs.SIGNIN_DIALOG,
   },
   {
-    title: 'Get Mobile Version',
+    title: 'nav.mobile',
     name: 'mobile',
     icon: <IconPhone />,
     dialog: dialogs.MOBILE_DIALOG,
   },
   {
-    title: 'Language',
+    title: 'nav.language',
     name: 'language',
     icon: <IconTranslate />,
     dialog: dialogs.LANGUAGE_DIALOG,
   },
   {
-    title: 'Share',
+    title: 'nav.share',
     name: 'share',
     icon: <IconShare />,
     dialog: dialogs.SHARE_DIALOG,
   },
   {
-    title: 'Settings',
+    title: 'nav.settings',
     name: 'settings',
     icon: <IconSettings />,
     dialog: dialogs.SETTINGS_DIALOG,
   },
   {
-    title: 'About',
+    title: 'nav.about',
     name: 'about',
     icon: <IconInfo />,
     dialog: dialogs.ABOUT_DIALOG,
   },
   {
-    title: 'Exit',
+    title: 'nav.exit',
     name: 'exit',
     icon: <IconClose />,
     dialog: null,
@@ -123,7 +123,7 @@ class MainNav extends React.Component {
     return (
       <div key={i} className="menuTitle" onClick={this._exit}>
         <div className="menuItem__icon">{item.icon}</div>
-        <div className="menuItem__text"><span>{item.title}</span></div>
+        <div className="menuItem__text"><span>{this.props.t(item.title)}</span></div>
       </div>
     )
   }
@@ -155,7 +155,7 @@ class MainNav extends React.Component {
     return (
       <div className="menuItem">
         <div className="menuItem__icon">{item.icon}</div>
-        <div className="menuItem__text"><span>{item.title}</span></div>
+        <div className="menuItem__text"><span>{this.props.t(item.title)}</span></div>
       </div>
     )
   }
@@ -210,6 +210,7 @@ class MainNav extends React.Component {
 MainNav.propTypes = {
   data: React.PropTypes.object,
   dispatch: React.PropTypes.func,
+  t: React.PropTypes.func,
 }
 
 MainNav.childContextTypes = { muiTheme: React.PropTypes.object }
@@ -219,10 +220,10 @@ MainNav.childContextTypes = { muiTheme: React.PropTypes.object }
 // Which props do we want to inject, given the global state?
 function select(state) {
   return {
-    data: state.homeReducer,
+    data: state.home,
   }
 }
 
 
 // Wrap the component to inject dispatch and state into it
-export default connect(select)(MainNav)
+export default translate(['translation'])(connect(select)(MainNav))

@@ -3,27 +3,32 @@ const languages = [
   {
     title: 'English',
     name: 'english',
-    lang: 'EN',
+    lang: 'en',
   },
   {
     title: 'Español',
     name: 'spanish',
-    lang: 'ES',
+    lang: 'es',
   },
   {
     title: 'Frainçais',
     name: 'french',
-    lang: 'FR',
+    lang: 'fr',
   },
   {
     title: 'Türk',
     name: 'Turkish',
-    lang: 'TK',
+    lang: 'tk',
+  },
+  {
+    title: '简体中文',
+    name: 'Japanese',
+    lang: 'zh-CN',
   },
   {
     title: '日本語',
     name: 'Japanese',
-    lang: 'JP',
+    lang: 'jp',
   },
 ]
 

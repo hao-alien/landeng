@@ -1,10 +1,10 @@
 /*
  * Home Screen for Free Users
- * This is the first thing users see of our App
  */
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { translate } from 'react-i18next/lib';
 import RaisedButton from 'material-ui/lib/raised-button'
 
 import TimeLeftPro from '../TimeLeftPro.react'
@@ -15,7 +15,6 @@ class ScreenPro extends Component {
     this.state = {
       errorMail: '',
     }
-    this._emailValidation = this._emailValidation.bind(this)
     this.getCode = this.getCode.bind(this)
   }
 
@@ -23,30 +22,21 @@ class ScreenPro extends Component {
 
   }
 
-  _emailValidation() {
-    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    if (re.test( this.refs.email.getValue() )) {
-      this.setState({ errorMail: '' })
-    } else {
-      this.setState({ errorMail: 'Write a valid email address' })
-    }
-  }
-
-
   render() {
     const { user } = this.props.data
+    const { t } = this.props
     return (
       <div>
         <section id="middle_sheet">
-          <h2>Get Free Months</h2>
-          <p>Invite friends and you will both get a free month of Lantern Pro when they Sing up!</p>
+          <h2>{t('pro.get_months_headline')}</h2>
+          <p>{t('pro.get_months_p')}</p>
           <div id="referral_code">
-            <p>Your referral code</p>
+            <p>{t('pro.referral_code')}</p>
             <span>133742</span>
           </div>
           <div id="invite_pro">
-            <span><RaisedButton label="Email Invite" /></span>
-            <span><RaisedButton label="Share on social" /></span>
+            <span><RaisedButton label={t('pro.invite')} /></span>
+            <span><RaisedButton label={t('pro.share')} /></span>
           </div>
         </section>
         <section id="bottom_sheet">
@@ -58,6 +48,7 @@ class ScreenPro extends Component {
 }
 
 ScreenPro.propTypes = {
+  t: React.PropTypes.func,
   dispatch: React.PropTypes.func,
   data: React.PropTypes.object,
 }
@@ -67,10 +58,10 @@ ScreenPro.propTypes = {
 // Which props do we want to inject, given the global state?
 function select(state) {
   return {
-    data: state.homeReducer,
+    data: state.home,
   }
 }
 
 
 // Wrap the component to inject dispatch and state into it
-export default connect(select)(ScreenPro)
+export default translate(['translation'])(connect(select)(ScreenPro))

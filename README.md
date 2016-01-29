@@ -47,3 +47,7 @@ See the [`css` folder README](css/README.md) for more information about the Post
 All files that are `import`ed/`require`d somewhere get compiled into one big file at build time. (`build/bundle.js`) Webpack automatically optimizes your JavaScript with `UglifyJS`, so you don't have to worry about that.
 
 See the [`js` folder README](js/README.md) for more information about the JS structure.
+
+## I18n
+
+All translation files are under `locale/<locale>.json`. Run `gen-locale.sh` to regenerate the template file from JS code. It will *NOT* override existing translations.

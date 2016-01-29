@@ -27,7 +27,9 @@
 // It makes more sense to have the asnyc actions before the non-async ones
 /* eslint-disable no-use-before-define */
 
-import { SETTINGS, DIALOG, OPEN_MENU, LANGUAGE, LANTERN } from '../constants/AppConstants'
+import i18next from 'i18next/lib'
+import { DIALOG, OPEN_MENU, LANGUAGE, LANTERN } from '../constants/AppConstants'
+import { asyncSaveSettings } from './BackendActions'
 
 /* MainNav functions */
 export function asyncOpenMenu(status) {
@@ -58,23 +60,16 @@ export function noDialog() {
 /* Language Modal functions */
 export function asyncSetLanguage(name) {
   return (dispatch) => {
-    return dispatch(setLanguage(name))
+    return new Promise((resolve, reject) => {
+      i18next.changeLanguage(name, (err, t) => {
+        if (err) {
+          // defaults to en
+          return dispatch(asyncSaveSettings({Language: 'en'}))
+        }
+        return dispatch(asyncSaveSettings({Language: name}))
+      })
+    })
   }
-}
-
-export function setLanguage(name) {
-  return { type: LANGUAGE, name }
-}
-
-/* Settings Modal functions */
-export function asyncSettings(obj) {
-  return (dispatch) => {
-    return dispatch(setSettings(obj))
-  }
-}
-
-export function setSettings(obj) {
-  return { type: SETTINGS, obj }
 }
 
 /* Settings Modal functions */

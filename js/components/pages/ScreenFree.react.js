@@ -1,15 +1,18 @@
 /*
  * Home Screen for Free Users
- * This is the first thing users see of our App
  */
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { translate } from 'react-i18next/lib';
 import TextField from 'material-ui/lib/text-field'
 import RaisedButton from 'material-ui/lib/raised-button'
 import IconEmail from 'material-ui/lib/svg-icons/communication/email'
 
 import styles from '../../constants/Styles'
+import { asyncDialog } from '../../actions/AppActions'
+import { asyncCreateReferralCode } from '../../actions/ProAPIActions'
+import {PLANS_DIALOG} from '../../constants/Dialogs'
 
 class ScreenFree extends Component {
   constructor(props) {
@@ -22,47 +25,62 @@ class ScreenFree extends Component {
   }
 
   getCode() {
-
-  }
-
-  _emailValidation() {
-    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    if (re.test( this.refs.email.getValue() )) {
-      this.setState({ errorMail: '' })
-    } else {
-      this.setState({ errorMail: 'Write a valid email address' })
+    if (this._emailValidation()){
+      this.props.dispatch(asyncCreateReferralCode({
+        email: this.refs.email.getValue()
+      }))
     }
   }
 
+  upgrade() {
+    this.props.dispatch(asyncDialog({
+      open: true,
+      dialog: PLANS_DIALOG,
+    }))
+  }
+
+  _emailValidation() {
+    const { t } = this.props
+    const re = /^(([^<>()[\]\\.,;:\s@']+(\.[^<>()[\]\\.,;:\s@']+)*)|('.+'))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    if (re.test( this.refs.email.getValue() )) {
+      this.setState({ errorMail: '' })
+      return true
+    } else {
+      this.setState({ errorMail: t('free.use_valid_email') })
+      return false
+    }
+  }
 
   render() {
+    const { t } = this.props
     return (
       <div>
-        <section id="middle_sheet">
-          <h2>Upgrade to LanternPRO</h2>
+        <section id='middle_sheet'>
+          <h2>{t('free.upgrade_headline')}</h2>
           <ul>
-            <li>Faster connection Speed</li>
-            <li>Smarter Servers</li>
-            <li>Stronger Blocking Resistance</li>
-            <li>Starting at $4.99/month</li>
+            <li>{t('free.li1')}</li>
+            <li>{t('free.li2')}</li>
+            <li>{t('free.li3')}</li>
+            <li>{t('free.li4')}</li>
           </ul>
-          <div id="get_pro">
-            <RaisedButton label="Upgrade To PRO" />
+          <div id='get_pro'>
+            <RaisedButton label={t('free.upgrade_button')} onTouchTap={this.upgrade.bind(this)} />
           </div>
         </section>
-        <section id="bottom_sheet">
-          <h3>Get Free Months</h3>
-          <p>Enter your email to receive a code to share with your friends and get a free month of PRO when they sign up</p>
-          <div id="get_code">
-            <IconEmail style={styles.iconStyles} color="white" />
+        <section id='bottom_sheet'>
+          <h3>{t('free.get_months_headline')}</h3>
+          <p>{t('free.get_months_p')}</p>
+          <div id='get_code'>
+            <IconEmail id='icon_mail' style={styles.iconStyles} color='white' />
             <TextField
-              hintText="Enter your email address"
-              floatingLabelText="Email"
-              errorText={this.state.errorMail}
+              type='email'
+              hintText={t('free.enter_email')}
+              floatingLabelText={t('free.email')}
+              errorText={this.state.errorMail || t(this.props.data.error.message)}
               onBlur={this._emailValidation}
-              ref="email" />
+              ref='email' />
             <br />
-            <RaisedButton label="Get Code" onTouchTap={this.getCode} />
+            <RaisedButton label={t('free.get_code')} onTouchTap={this.getCode} />
           </div>
         </section>
       </div>
@@ -71,6 +89,7 @@ class ScreenFree extends Component {
 }
 
 ScreenFree.propTypes = {
+  t: React.PropTypes.func,
   dispatch: React.PropTypes.func,
   data: React.PropTypes.object,
 }
@@ -80,10 +99,10 @@ ScreenFree.propTypes = {
 // Which props do we want to inject, given the global state?
 function select(state) {
   return {
-    data: state,
+    data: state.pro,
   }
 }
 
 
 // Wrap the component to inject dispatch and state into it
-export default connect(select)(ScreenFree)
+export default translate(['translation'])(connect(select)(ScreenFree))
