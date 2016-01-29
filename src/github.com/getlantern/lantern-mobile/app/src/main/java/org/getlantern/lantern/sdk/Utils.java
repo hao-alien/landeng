@@ -18,7 +18,6 @@ import android.widget.EditText;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
  
-
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
