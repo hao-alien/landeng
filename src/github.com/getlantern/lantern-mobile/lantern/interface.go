@@ -2,12 +2,14 @@ package client
 
 import (
 	"github.com/getlantern/appdir"
+	"github.com/getlantern/flashlight/config"
 	"github.com/getlantern/flashlight/lantern"
 	"github.com/getlantern/flashlight/logging"
 	"github.com/getlantern/flashlight/settings"
 	"github.com/getlantern/golog"
 	"github.com/getlantern/lantern-mobile/lantern/interceptor"
 	"github.com/getlantern/lantern-mobile/lantern/protected"
+
 	proclient "github.com/getlantern/pro-server-client/go-client"
 )
 
@@ -52,51 +54,50 @@ func Configure(provider Provider) error {
 }
 
 // Start creates a new client at the given address.
-func Start(provider Provider) {
-
-	log.Debugf("About to configure Lantern")
-	l := lantern.New(appSettings.HttpAddr)
-
-	if provider.VpnMode() {
-		dnsServer := provider.GetDnsServer()
-		protected.Configure(provider, dnsServer, true)
-	}
-
-	androidProps := map[string]string{
-		"androidDevice":     provider.Device(),
-		"androidModel":      provider.Model(),
-		"androidSdkVersion": provider.Version(),
-	}
-	logging.ConfigureAndroid(androidProps)
+func Start(provider Provider) error {
 
 	go func() {
-		err := l.Start(false, true, false,
-			true, nil)
+
+		log.Debugf("About to configure Lantern")
+
+		if provider.VpnMode() {
+			dnsServer := provider.GetDnsServer()
+			protected.Configure(provider, dnsServer, true)
+		}
+
+		androidProps := map[string]string{
+			"androidDevice":     provider.Device(),
+			"androidModel":      provider.Model(),
+			"androidSdkVersion": provider.Version(),
+		}
+		logging.ConfigureAndroid(androidProps)
+
+		cfgFn := func(cfg *config.Config) {
+
+		}
+
+		l, err := lantern.Start(false, true, false,
+			true, cfgFn)
 
 		if err != nil {
 			log.Fatalf("Could not start Lantern")
 		}
-	}()
 
-	if !provider.VpnMode() {
-		return
-	}
-
-	i, err := interceptor.Do(l.Client,
-		appSettings.SocksAddr, appSettings.HttpAddr,
-		provider.Notice)
-
-	if err != nil {
-		log.Errorf("Error starting interceptor: %v", err)
-	} else {
-		lantern.AddExitFunc(func() {
-			if i != nil {
-				i.Stop()
+		if provider.VpnMode() {
+			i, err = interceptor.Do(l.Client, appSettings.SocksAddr, appSettings.HttpAddr, provider.Notice)
+			if err != nil {
+				log.Errorf("Error starting interceptor: %v", err)
+			} else {
+				lantern.AddExitFunc(func() {
+					if i != nil {
+						i.Stop()
+					}
+				})
 			}
-		})
-	}
-
-	provider.AfterStart(lantern.GetVersion())
+		}
+		provider.AfterStart(lantern.GetVersion())
+	}()
+	return nil
 }
 
 func ReferralCode(email string) string {
