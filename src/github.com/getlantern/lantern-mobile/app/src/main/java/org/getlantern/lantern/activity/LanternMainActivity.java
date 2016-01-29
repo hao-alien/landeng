@@ -38,6 +38,7 @@ import android.view.MenuItem;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.support.v7.app.AppCompatActivity;
 
 import java.io.File;
@@ -74,6 +75,7 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+        setTheme(R.style.NoActionBar);
         setContentView(R.layout.activity_lantern_main);
 
         // we want to use the ActionBar from the AppCompat
@@ -82,6 +84,8 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }  
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
 
         context = getApplicationContext();
         mPrefs = Utils.getSharedPrefs(context);
@@ -309,7 +313,7 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
             if (action.equals(Intent.ACTION_SHUTDOWN)) {
                 Utils.clearPreferences(context);
             } else if (action.equals(Intent.ACTION_USER_PRESENT)) {
-                //restart(context, intent);
+                restart(context, intent);
             }
         }
     }
