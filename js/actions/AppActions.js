@@ -28,7 +28,7 @@
 /* eslint-disable no-use-before-define */
 
 import i18next from 'i18next/lib'
-import { DIALOG, OPEN_MENU, LANGUAGE, LANTERN } from '../constants/AppConstants'
+import { DIALOG, OPEN_MENU, LANTERN } from '../constants/AppConstants'
 import { asyncSaveSettings } from './BackendActions'
 
 /* MainNav functions */
@@ -60,8 +60,8 @@ export function noDialog() {
 /* Language Modal functions */
 export function asyncSetLanguage(name) {
   return (dispatch) => {
-    return new Promise((resolve, reject) => {
-      i18next.changeLanguage(name, (err, t) => {
+    return new Promise(() => {
+      i18next.changeLanguage(name, (err) => {
         if (err) {
           // defaults to en
           return dispatch(asyncSaveSettings({Language: 'en'}))

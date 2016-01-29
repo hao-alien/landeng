@@ -6,7 +6,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { translate } from 'react-i18next/lib';
+import { translate } from 'react-i18next/lib'
 import LeftNav from 'material-ui/lib/left-nav'
 import MenuItem from 'material-ui/lib/menus/menu-item'
 import FlatButton from 'material-ui/lib/raised-button'

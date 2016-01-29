@@ -28,7 +28,7 @@ if ('serviceWorker' in navigator) {
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import { Router, Route, IndexRoute, Redirect } from 'react-router'
+import { Router, Route, Redirect } from 'react-router'
 import { createStore, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
 import createHistory from 'history/lib/createBrowserHistory'

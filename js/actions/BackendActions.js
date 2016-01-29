@@ -1,6 +1,5 @@
 /* eslint-disable no-use-before-define */
 
-import assignToEmpty from '../utils/assign'
 import * as constants from '../constants/BackendConstants'
 
 let ws = null
@@ -19,10 +18,10 @@ export function message(msg) {
 export function asyncSaveSettings(settings) {
   return (dispatch) => {
     if (!ws) {
-      return dispatch({type: constants.BACKEND_SAVE_SETTINGS_FAILED, status: "no WebSocket available"})
+      return dispatch({type: constants.BACKEND_SAVE_SETTINGS_FAILED, status: 'no WebSocket available'})
     }
     dispatch({type: constants.BACKEND_SAVE_SETTINGS, status: settings})
-    let data = {Type: 'Settings', Message: settings}
+    const data = {Type: 'Settings', Message: settings}
     try {
       ws.send(JSON.stringify(data))
     } catch (error) {
@@ -35,10 +34,10 @@ export function asyncSaveSettings(settings) {
 export function asyncSaveUser(user) {
   return (dispatch) => {
     if (!ws) {
-      return dispatch({type: constants.BACKEND_SAVE_USER_FAILED, status: "no WebSocket available"})
+      return dispatch({type: constants.BACKEND_SAVE_USER_FAILED, status: 'no WebSocket available'})
     }
     dispatch({type: constants.BACKEND_SAVE_USER, status: user})
-    let data = {Type: 'User', Message: user}
+    const data = {Type: 'User', Message: user}
     try {
       ws.send(JSON.stringify(data))
     } catch (error) {

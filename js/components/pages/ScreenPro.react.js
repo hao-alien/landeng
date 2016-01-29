@@ -4,7 +4,7 @@
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { translate } from 'react-i18next/lib';
+import { translate } from 'react-i18next/lib'
 import RaisedButton from 'material-ui/lib/raised-button'
 
 import TimeLeftPro from '../TimeLeftPro.react'
