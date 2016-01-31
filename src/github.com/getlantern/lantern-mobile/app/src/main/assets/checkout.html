@@ -1,51 +1,49 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-		<title>Lantern Pro Checkout</title>
-		<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.js"></script>
-      	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-<script type="text/javascript">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <title>Lantern Pro Checkout</title>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+        <script type="text/javascript">
 $(function() {
-var handler;
+    var handler;
 
-function processCharge(token) {
-	// Use the token to create the charge with a server-side script.
-	// You can access the token ID with `token.id`
-	console.log(token);
-	alert(token.id);
-}
+    function processCharge(token) {
+        // Use the token to create the charge with a server-side script.
+        // You can access the token ID with `token.id`
+        console.log(token);
+        alert(token.id);
+    }
 
-function loadCheckout() {
-	handler = StripeCheckout.configure({
-		key: 'pk_test_4MSPZvz9QtXGWEKdODmzV9ql',
-		name: 'Lantern Pro',
-		image: 'https://raw.githubusercontent.com/getlantern/lantern/lantern-mobile/src/github.com/getlantern/lantern-mobile/app/src/main/res/drawable-mdpi/lantern_icon.png',
-		description: "One-time contribution",
-		currency: "USD",
-		locale: 'auto',
-		alipay: true,
-		token: processCharge
-	});
+    function loadCheckout() {
+        handler = StripeCheckout.configure({
+            key: 'pk_test_4MSPZvz9QtXGWEKdODmzV9ql',
+            name: 'Lantern Pro',
+            image: '/img/lantern_icon.png',
+            description: "Premium Lantern membership",
+            currency: "USD",
+            locale: 'auto',
+            alipay: true,
+            token: processCharge
+        });
 
-	handler.open({
-		name: 'Lantern Pro',
-		description: 'Lantern Pro Subscription',
-		email: "test@test.com",
-		amount: 5988
-	});
-}
+        handler.open({
+            name: 'Lantern Pro',
+            description: 'Lantern Pro Subscription',
+            email: "test@test.com",
+            amount: 5988
+        });
+    }
 
-var s = document.createElement("script");
-s.async = true;
-s.onload = loadCheckout;
-s.src = "https://checkout.stripe.com/checkout.js";
-document.body.appendChild(s);
+    var s = document.createElement("script");
+    s.async = true;
+    s.onload = loadCheckout;
+    s.src = "https://checkout.stripe.com/checkout.js";
+    document.body.appendChild(s);
 
 });
-			</script>
-</head>
-<body>
-	<form></form>
-	</body>
+        </script>
+
+    </head>
 </html>
