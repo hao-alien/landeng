@@ -30,6 +30,9 @@ const styles = {
     top: '6px',
     left: '15px',
   },
+  menuItem: {
+    fontSize: '13pt',
+  },
 }
 
 export default styles

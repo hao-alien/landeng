@@ -7,7 +7,8 @@ import ScreenPro from './ScreenPro.react'
 class HomePage extends Component {
   render() {
     const { Pro: isPro } = this.props.data
-    return <div>{ isPro ? <ScreenPro /> : <ScreenFree /> }</div>
+    // return <div>{ isPro ? <ScreenPro /> : <ScreenFree /> }</div>
+    return <div>{ isPro ? <ScreenFree /> : <ScreenPro /> }</div>
   }
 }
 

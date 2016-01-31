@@ -35,8 +35,19 @@ class ScreenPro extends Component {
             <span>133742</span>
           </div>
           <div id="invite_pro">
-            <span><RaisedButton label={t('pro.invite')} /></span>
-            <span><RaisedButton label={t('pro.share')} /></span>
+            <span className="invite__button">
+              <RaisedButton
+                label={t('pro.invite')}
+                className="button__yellow"
+              />
+            </span>
+            <span className="invite__button">
+              <RaisedButton
+                label={t('pro.share')}
+                backgroundColor="#FDE800"
+                className="button__yellow"
+              />
+            </span>
           </div>
         </section>
         <section id="bottom_sheet">

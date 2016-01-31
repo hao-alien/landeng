@@ -56,7 +56,7 @@ class TimeLeftPro extends React.Component {
     return (
       <div>
         <div className="timeleft--copy">
-          <p>Time Left on your LanterPRO account</p>
+          <p>Time Left on your Lantern PRO account</p>
         </div>
         <div id="countdown">
           <ProgressCircle percent={this.state.months} reference="months" />

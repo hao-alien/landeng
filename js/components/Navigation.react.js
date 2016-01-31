@@ -113,17 +113,21 @@ class MainNav extends React.Component {
 
   getMenuItem(item, i, menuItemAction) {
     return (
-      <MenuItem key={i} onTouchTap={menuItemAction}>
+      <MenuItem
+        key={i}
+        onTouchTap={menuItemAction}
+        style={styles.menuItem}>
         {this.renderMenuItem(item)}
       </MenuItem>
     )
   }
 
   getMenuTitle(item, i) {
+    const { Pro: isPro } = this.props.data
     return (
       <div key={i} className="menuTitle" onClick={this._exit}>
         <div className="menuItem__icon">{item.icon}</div>
-        <div className="menuItem__text"><span>{this.props.t(item.title)}</span></div>
+        <div className="menuItem__text"><span>{isPro ? 'Lantern PRO' : 'Lantern'}</span></div>
       </div>
     )
   }
@@ -184,11 +188,11 @@ class MainNav extends React.Component {
   }
 
   render() {
-    const { dialog, openMenu } = this.props.data
+    const { dialog, openMenu, Pro: isPro } = this.props.data
     return (
       <div>
         <FlatButton
-          label="Lantern"
+          label={ isPro ? 'Lantern PRO' : 'Lantern' }
           labelPosition="after"
           className="toggleMenuButton"
           style={styles.toggleMenuButton}

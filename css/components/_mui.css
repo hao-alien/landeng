@@ -1,0 +1,4 @@
+.button__yellow {
+  min-width: $button-yellow-min-width;
+  background-color: $button-yellow-background !important;
+}

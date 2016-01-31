@@ -27,7 +27,7 @@
 		font-weight: 400;
 		font-size: $header-line-font-size;
     margin: 0;
-		padding: 22px 0;
+		padding: 22px 0 0 0;
 	}
 	ul{
     width: 350px;
@@ -35,7 +35,7 @@
 		padding: 0;
 		li{
 			font-family: $font-roboto;
-			font-weight: 400;
+			font-weight: 500;
 			font-size: 22px;
 			list-style: none;
       line-height: 40px;
@@ -53,7 +53,7 @@
 		text-align: center;
 	}
   #get_pro{
-    margin: 20px auto;
+    margin: 20px auto 0 auto;
     text-align: center;
 		span{
 			margin: 10px;
@@ -62,22 +62,22 @@
 	#invite_pro{
     margin: 20px auto 60px auto;
     text-align: center;
-		span{
+		.invite__button{
 			margin: 10px;
 		}
   }
 	#referral_code{
 		margin: 0 auto;
-		padding: 10px 0 30px 0;
+		padding: 10px 0 0 0;
 		text-align: center;
 		text-transform: uppercase;
 		p{
-			font-size: 14px;
+			font-size: $font-size-referal-code-paragraph;
 			margin: 0; padding: 0;
 		}
 		span{
 			margin: 0; padding: 0;
-			font-size: 20px;
+			font-size: $font-size-referal-code;
 			color: #005f63;
 		}
 	}
@@ -86,7 +86,7 @@
 #bottom_sheet{
 	overflow: auto;
   background-color: $bottom-sheet-bg;
-  padding: 10px;
+  padding: 0;
   margin: 0;
   h3{
     font-family: $font-roboto;
@@ -104,10 +104,9 @@
     font-weight: 400;
     text-align: center;
     font-size : 14px;
-    line-height : 20px;
     opacity : 0.87;
     margin: 0;
-    padding: 10px 0 0 0;
+    padding: 0 0 0 0;
   }
   #get_code{
     margin: 10px 0 20px 0;
@@ -122,7 +121,7 @@
   }
   #countdown{
     margin: 0 auto;
-    padding: 0 0 20px 0;
+    padding: 0 0 0 0;
     width: 540px;
     text-align: center;
   }

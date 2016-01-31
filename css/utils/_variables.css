@@ -14,6 +14,10 @@ $link-color: #00BCD4;
 $dialog-top-bar-color: #00BCD4;
 $dialog-header-color: #00BCD4;
 
+/** Buttons */
+$button-yellow-background: #FDE800;
+$button-yellow-min-width: 180px;
+
 $header-line-color: $white;
 $header-line-font-size: 45px;
 
@@ -29,9 +33,9 @@ $checkout-total-price-color: #24BCD3;
 
 
 /*** Progress Circle */
-$progress-circle-width: 110px;
-$progress-circle-middle: 55px;
-$progress-circle-center: 95px;
+$progress-circle-width: 90px;
+$progress-circle-middle: 45px;
+$progress-circle-center: 75px;
 $progress-circle-border: 50%;
 $progress-circle-chart-bg: #00828E;
 $progress-circle-label: #4CCFE0;
