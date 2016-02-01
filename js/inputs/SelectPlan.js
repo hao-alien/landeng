@@ -1,6 +1,7 @@
 import React from 'react'
 import RaisedButton from 'material-ui/lib/raised-button'
 import StripeCheckout from 'react-stripe-checkout'
+import styles from '../constants/Styles'
 
 let STRIPE_PUB_KEY = 'pk_test_4MSPZvz9QtXGWEKdODmzV9ql'
 
@@ -30,9 +31,18 @@ class SelectPlan extends React.Component {
           // showLoadingDialog
           stripeKey={STRIPE_PUB_KEY}>
           <div className="plans_input">
-            {this.props.bestValue ?
-              <RaisedButton label="Select" secondary />
-              : <RaisedButton label="Select" primary />
+            {
+              this.props.bestValue ?
+                <RaisedButton
+                  label="Select"
+                  className="button__yellow"
+                  labelStyle={styles.buttonYellow}
+                />
+              : <RaisedButton
+                  label="Select"
+                  className="button__blue"
+                  labelStyle={styles.buttonBlue}
+                />
             }
             </div>
           </StripeCheckout>

@@ -26,7 +26,9 @@ class PlansDialog extends React.Component {
         title="Lantern PRO Plans"
         icon = {this.props.icon}>
         <div id="plans_header">
-          <div id="plans_header_icon"></div>
+          <div id="plans_header_icon">
+            <img src="/img/lantern_logo.svg" />
+          </div>
           <div id="plans_header_info">
             <ul>
               <li>Faster Connection Speed</li>

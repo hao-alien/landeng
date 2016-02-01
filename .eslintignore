@@ -7,4 +7,5 @@ build
 # Ignore config stuff
 server.*.js
 *config.js
+mock-backend.js
 serviceworker.js

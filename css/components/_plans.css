@@ -3,12 +3,18 @@
   height: 200px;
   overflow: auto;
   #plans_header_icon{
-    width: 40%;
+    width: 35%;
     height: 200px;
     float:left;
+    text-align: center;
+    img{
+      width: 112px;
+      height: 112px;
+      margin: 20px 0 0 0;
+    }
   }
   #plans_header_info{
-    width: 60%;
+    width: 65%;
     height: 200px;
     float:left;
     ul{
@@ -16,11 +22,15 @@
       padding: 0;
       li{
         font-family: $font-roboto;
-        font-weight: 400;
+        font-weight: $font-weight-medium;
         font-size : 22px;
         line-height : 31px;
         list-style: none;
         color: $white;
+        background: url('/img/check_mark.svg') no-repeat;
+  			background-size: 30px;
+  			background-position: 10px;
+        padding: 0 0 0 50px;
       }
     }
   }
@@ -33,26 +43,28 @@
   .plan{
     width: 49%;
     margin: auto;
-    padding: 20px 0 10px 110px;
+    padding: 20px 0 53px 110px;
     position: relative;
     font-family: $font-roboto;
     h3{
-      font-weight: 400;
+      font-weight: $font-weight-medium;
       font-size: 20px;
       color: $black;
       opacity: 0.87;
       margin: 0;
       padding: 20px 0 10px 0;
     }
-    span{
+    .plans_price{
       padding: 0;
       margin: 0;
       font-size: 30px;
+      font-weight: $font-weight-medium;
     }
     p{
       padding: 0;
       margin: 0;
       font-size: 18px;
+      font-weight: $font-weight-regular;
     }
     .plans_bestvalue_badge{
       position: absolute;
@@ -65,7 +77,9 @@
       width: 102%;
     }
     .plans_input{
-      margin: 20px 0 0 0;
+      position: relative;
+      top: 20px;
+      right: 30px;
     }
     &:last-child{
       border-left: 1px solid #757575;

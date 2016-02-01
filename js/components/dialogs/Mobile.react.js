@@ -44,7 +44,12 @@ class MobileDialog extends React.Component {
           </div>
         </div>
         <div id="mobile_input">
-          <RaisedButton label="Send Mobile Version" onTouchTap={this._emailValidation} />
+          <RaisedButton
+            label="Send Mobile Version"
+            className="button__blue"
+            labelStyle={styles.buttonBlue}
+            onTouchTap={this._emailValidation}
+          />
         </div>
       </IllustratedDialog>
     )

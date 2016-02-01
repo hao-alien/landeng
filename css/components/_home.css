@@ -24,7 +24,7 @@
 		text-align: center;
 		color: $header-line-color;
 		font-family: $font-roboto;
-		font-weight: 400;
+		font-weight: $font-weight-regular;
 		font-size: $header-line-font-size;
     margin: 0;
 		padding: 22px 0 0 0;
@@ -35,7 +35,7 @@
 		padding: 0;
 		li{
 			font-family: $font-roboto;
-			font-weight: 500;
+			font-weight: $font-weight-medium;
 			font-size: 22px;
 			list-style: none;
       line-height: 40px;
@@ -43,6 +43,9 @@
 			color: $white;
 			padding: 0 0 0 50px;
 			margin: 0;
+			background: url('/img/check_mark.svg') no-repeat;
+			background-size: 30px;
+			background-position: 10px;
 		}
 	}
 	p{
@@ -55,9 +58,6 @@
   #get_pro{
     margin: 20px auto 0 auto;
     text-align: center;
-		span{
-			margin: 10px;
-		}
   }
 	#invite_pro{
     margin: 20px auto 60px auto;
@@ -90,7 +90,7 @@
   margin: 0;
   h3{
     font-family: $font-roboto;
-    font-weight: 400;
+    font-weight: $font-weight-medium;
     font-size: 34px;
     letter-spacing: 0.34px;
     color: $white;
@@ -100,17 +100,36 @@
   }
   p{
     font-family: $font-roboto;
-    color: $white;
-    font-weight: 400;
-    text-align: center;
+    font-weight: $font-weight-medium;
     font-size : 14px;
+    text-align: center;
+    color: $white;
     opacity : 0.87;
     margin: 0;
     padding: 0 0 0 0;
   }
   #get_code{
-    margin: 10px 0 20px 0;
-    text-align: center;
+		width: 470px;
+		margin: 0 auto;
+		.get_code__block{
+			float: left;
+			margin: 0;
+			padding: 0;
+			text-align: center;
+			.get_code__icon{
+				float: left;
+				margin: 40px 10px 0 10px;
+				svg{
+					margin: 0 !important
+				}
+			}
+			.get_code__input{
+				float: left;
+			}
+			&:last-child{
+				margin: 30px 0 0 20px;
+			}
+		}
   }
   .timeleft--copy{
     clear: both;

@@ -7,6 +7,11 @@ $font-size-referal-code: 22pt;
 
 $font-size-menu-item: 13pt;
 
+$font-weight-light: 300;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-bold: 700;
+
 $white: #fff;
 $black: #000;
 $gray: #666;
@@ -17,6 +22,11 @@ $dialog-header-color: #00BCD4;
 /** Buttons */
 $button-yellow-background: #FDE800;
 $button-yellow-min-width: 180px;
+
+$button-blue-background: #00BCD4;
+$button-blue-min-width: 180px;
+
+$button-small-min-width: 150px;
 
 $header-line-color: $white;
 $header-line-font-size: 45px;

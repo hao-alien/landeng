@@ -8,7 +8,12 @@ class HomePage extends Component {
   render() {
     const { Pro: isPro } = this.props.data
     // return <div>{ isPro ? <ScreenPro /> : <ScreenFree /> }</div>
-    return <div>{ isPro ? <ScreenFree /> : <ScreenPro /> }</div>
+    if (isPro) {
+      document.title = 'Lantern PRO'
+    } else {
+      document.title = 'Lantern'
+    }
+    return <div>{ isPro ? <ScreenPro /> : <ScreenFree /> }</div>
   }
 }
 

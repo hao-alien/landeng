@@ -42,11 +42,13 @@ class ScreenFree extends Component {
   _emailValidation() {
     const { t } = this.props
     const re = /^(([^<>()[\]\\.,;:\s@']+(\.[^<>()[\]\\.,;:\s@']+)*)|('.+'))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    const state = false
+    let state = false
     if (re.test( this.refs.email.getValue() )) {
       this.setState({ errorMail: '' })
+      state = true
     } else {
       this.setState({ errorMail: t('free.use_valid_email') })
+      state = false
     }
     return state
   }
@@ -64,23 +66,41 @@ class ScreenFree extends Component {
             <li>{t('free.li4')}</li>
           </ul>
           <div id="get_pro">
-            <RaisedButton label={t('free.upgrade_button')} onTouchTap={this.upgrade.bind(this)} />
+            <RaisedButton
+              label={t('free.upgrade_button')}
+              className="button__yellow"
+              labelStyle={styles.buttonYellow}
+              onTouchTap={this.upgrade.bind(this)}
+            />
           </div>
         </section>
         <section id="bottom_sheet">
           <h3>{t('free.get_months_headline')}</h3>
           <p>{t('free.get_months_p')}</p>
           <div id="get_code">
-            <IconEmail id="icon_mail" style={styles.iconStyles} color="white" />
-            <TextField
-              type="email"
-              hintText={t('free.enter_email')}
-              floatingLabelText={t('free.email')}
-              errorText={this.state.errorMail || t(this.props.data.error.message)}
-              onBlur={this._emailValidation}
-              ref="email" />
-            <br />
-            <RaisedButton label={t('free.get_code')} onTouchTap={this.getCode} />
+            <div className="get_code__block">
+              <div className="get_code__icon">
+                <IconEmail id="icon_mail" style={styles.iconStyles} color="white" />
+              </div>
+              <div className="get_code__input">
+                <TextField
+                  type="email"
+                  hintText={t('free.enter_email')}
+                  floatingLabelText={t('free.email')}
+                  errorText={this.state.errorMail || t(this.props.data.error.message)}
+                  onBlur={this._emailValidation}
+                  ref="email"
+                />
+              </div>
+            </div>
+            <div className="get_code__block button__small__div">
+              <RaisedButton
+                label={t('free.get_code')}
+                className="button__blue button__small"
+                labelStyle={styles.buttonBlueSmall}
+                onTouchTap={this.getCode}
+              />
+            </div>
           </div>
         </section>
       </div>
