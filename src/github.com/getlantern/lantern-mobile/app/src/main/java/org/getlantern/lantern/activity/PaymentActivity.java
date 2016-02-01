@@ -10,6 +10,11 @@ import android.view.View;
 import android.view.LayoutInflater;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.webkit.ConsoleMessage;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.webkit.WebChromeClient;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -43,27 +48,41 @@ import org.getlantern.lantern.R;
 import org.getlantern.lantern.sdk.Utils;
  
 
-public class PaymentActivity extends FragmentActivity {
+public class PaymentActivity extends FragmentActivity implements View.OnClickListener {
 
     private static final String TAG = "PaymentActivity";
     private static final String publishableApiKey = "pk_test_4MSPZvz9QtXGWEKdODmzV9ql";
+    private static final String mCheckoutUrl = "file:///android_asset/checkout.html";
 
-    private Context context;
+    private Context mContext;
     private SharedPreferences mPrefs = null;
 
     private ProgressDialogFragment progressFragment;
-    private Button checkoutBtn;
+    private Button checkoutBtn, cardBtn, alipayBtn;
     private PaymentFormFragment paymentForm;
-
     private TextView chargeAmount;
+
+    private View cardView;
+    private WebView mWebView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.checkout);
 
-        context = getApplicationContext();
-        mPrefs = Utils.getSharedPrefs(context);
+        mContext = this.getApplicationContext();
+
+        cardBtn = (Button)findViewById(R.id.cardBtn);
+        alipayBtn = (Button)findViewById(R.id.alipayBtn);
+        cardBtn.setOnClickListener(this);
+        alipayBtn.setOnClickListener(this);
+
+        cardView = (View)findViewById(R.id.cardview);
+        mWebView = (WebView)findViewById(R.id.webview);
+
+        mPrefs = Utils.getSharedPrefs(mContext);
+
+        loadWebView();
 
         Intent intent = getIntent();
 
@@ -81,16 +100,85 @@ public class PaymentActivity extends FragmentActivity {
         });
 
         progressFragment = ProgressDialogFragment.newInstance(R.string.progressMessage);
-		ImageView backBtn = (ImageView)findViewById(R.id.paymentAvatar);
-		backBtn.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Log.d(TAG, "Back button pressed");
-				finish();
-			}
-		});
+		
+        ImageView backBtn = (ImageView)findViewById(R.id.paymentAvatar);
+        backBtn.setOnClickListener(this);
     }
+
+    @Override
+    public void onClick(View v) {
+        Log.d(TAG, "onclick called...");
+        switch (v.getId()) {
+            case R.id.alipayBtn:
+                Log.d(TAG, "Alipay button pressed");
+                cardView.setVisibility(View.GONE);
+                mWebView.setVisibility(View.VISIBLE); 
+                return;
+            case R.id.cardBtn:
+                Log.d(TAG, "Card button pressed");
+                mWebView.setVisibility(View.GONE);
+                cardView.setVisibility(View.VISIBLE);
+                return;
+            case R.id.paymentAvatar:
+                Log.d(TAG, "Back button pressed");
+                finish();
+            default:
+                // Nothing to do
+        }
+    }
+
+    // loads Stripe checkout inside of a WebView 
+    // for Alipay users
+    public void loadWebView() {
+
+        mWebView.clearCache(true);
+
+        WebSettings mWebSettings = mWebView.getSettings();
+        mWebSettings.setJavaScriptEnabled(true);
+        mWebSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+        mWebSettings.setSupportMultipleWindows(true);
+        mWebView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
+        mWebView.setWebChromeClient(new MyWebChromeClient(mContext));
+        mWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {    
+                // don't load the checkout page in the browser
+                view.loadUrl(url);    
+                return false;
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+            }
+        });
+        mWebView.loadUrl(mCheckoutUrl);
+    }
+
+    private class MyWebChromeClient extends WebChromeClient {
+        private Context mContext;
+
+        public MyWebChromeClient(Context context) {
+            super();
+            this.mContext = context;
+        }
+
+        @Override
+        public boolean onConsoleMessage (ConsoleMessage consoleMessage) {
+            Log.d(TAG, "Got a new console message: " + consoleMessage);
+            return true;
+        }
+
+        @Override
+        public boolean onJsAlert(WebView view, String url, String message, final android.webkit.JsResult result)  
+        {
+            Log.d("alert", message);
+            Toast.makeText(mContext, message, 3000).show();
+            result.confirm();
+            return true;
+        }; 
+    }
+
 
 	public void submitCard() {
 		// TODO: replace with your own test key
