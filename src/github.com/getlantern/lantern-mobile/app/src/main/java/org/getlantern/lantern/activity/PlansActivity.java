@@ -69,65 +69,11 @@ public class PlansActivity extends Activity {
 
     }
 
-	private class MyWebChromeClient extends WebChromeClient {
-		private Context mContext;
-
-        public MyWebChromeClient(Context context) {
-        	this.mContext = context;
-			super();
-		}
-		
-		@Override
-		public boolean onConsoleMessage (ConsoleMessage consoleMessage) {
-			Log.d(TAG, "Got a new console message: " + consoleMessage);
-			return true;
-		}
-
-		@Override
-		public boolean onJsAlert(WebView view, String url, String message, final android.webkit.JsResult result)  
-		{
-			Log.d("alert", message);
-			Toast.makeText(context, message, 3000).show();
-			result.confirm();
-			return true;
-		}; 
-	}
-
-
-	public void loadWebView() {
-
-		final Context mContext = this.getApplicationContext();
-
-        final WebView mWebView = new WebView();
-        mWebView.clearCache(true);
-
-		WebSettings mWebSettings = mWebView.getSettings();
-		mWebSettings.setJavaScriptEnabled(true);
-		mWebSettings.setJavaScriptCanOpenWindowsAutomatically(true);
-		mWebView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_OVERLAY);
-       	mWebView.setWebChromeClient(new MyWebChromeClient(getApplicationContext()));
-
-		mWebView.loadUrl(mCheckoutUrl);
-
-		AlertDialog.Builder alert = new AlertDialog.Builder(this); 
-		alert.setView(mWebView);
-		alert.setNegativeButton("Close", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int id) {
-				dialog.dismiss();
-			}
-		});
-		alert.show();
-	}
-
     public void selectPlan(View view) {
 		Log.d(TAG, "Plan selected...");
-        if (useWebView) {
-            loadWebView();
-        } else {
-            intent.putExtra("AMOUNT_TO_CHARGE", (String)view.getTag());
-            startActivity(intent);
-        }
+        Intent intent = new Intent(this, PaymentActivity.class);
+        intent.putExtra("AMOUNT_TO_CHARGE", (String)view.getTag());
+        startActivity(intent);
     }
 
 }  
