@@ -43,8 +43,12 @@ $(function() {
     s.src = "https://checkout.stripe.com/checkout.js";
     document.body.appendChild(s);
 
-});
+    // Close Checkout on page navigation
+    $(window).on('popstate', function() {
+        handler.close();
+    });
 
+});
         </script>
     </head>
 </html>
