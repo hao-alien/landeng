@@ -24,7 +24,8 @@ import IconTranslate from 'material-ui/lib/svg-icons/action/translate'
 import IconFace from 'material-ui/lib/svg-icons/image/tag-faces'
 import IconClose from 'material-ui/lib/svg-icons/navigation/close'
 
-import { asyncDialog, asyncOpenMenu } from '../actions/AppActions'
+import { asyncDialog, asyncOpenMenu, asyncLanternStatus } from '../actions/AppActions'
+
 import styles from '../constants/Styles'
 import * as dialogs from '../constants/Dialogs'
 
@@ -104,7 +105,7 @@ class MainNav extends React.Component {
     this.getMenuTitle = this.getMenuTitle.bind(this)
     this._handleToggle = this._handleToggle.bind(this)
     this._openDialog = this._openDialog.bind(this)
-    this._exit = this._exit.bind(this)
+    this._disconnectLantern = this._disconnectLantern.bind(this)
   }
 
   getChildContext() {
@@ -125,7 +126,7 @@ class MainNav extends React.Component {
   getMenuTitle(item, i) {
     const { Pro: isPro } = this.props.data
     return (
-      <div key={i} className="menuTitle" onClick={this._exit}>
+      <div key={i} className="menuTitle" onClick={this._handleToggle}>
         <div className="menuItem__icon">{item.icon}</div>
         <div className="menuItem__text"><span>{isPro ? 'Lantern PRO' : 'Lantern'}</span></div>
       </div>
@@ -133,12 +134,14 @@ class MainNav extends React.Component {
   }
 
   addMenuItem(item, i) {
-    const menuItemAction = (item.name === 'exit') ? this._exit : this._openDialog.bind(null, item)
+    const menuItemAction = (item.name === 'exit') ? this._disconnectLantern : this._openDialog.bind(null, item)
     return (item.name !== 'lantern') ? this.getMenuItem(item, i, menuItemAction) : this.getMenuTitle(item, i)
   }
 
-  _exit() {
-    this.props.dispatch(asyncOpenMenu(false))
+  _disconnectLantern() {
+    const { lantern } = this.props.data
+    const status = (lantern.status === 'off') ? 'on' : 'off'
+    this.props.dispatch(asyncLanternStatus({status}))
   }
 
   _handleToggle() {
