@@ -13,7 +13,7 @@ class HomePage extends Component {
     } else {
       document.title = 'Lantern'
     }
-    return <div>{ isPro ? <ScreenPro /> : <ScreenFree /> }</div>
+    return <div>{ !isPro ? <ScreenPro /> : <ScreenFree /> }</div>
   }
 }
 

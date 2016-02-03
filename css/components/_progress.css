@@ -79,3 +79,40 @@
     }
   }
 }
+
+@media screen and (max-height: 638px) {
+  .progress-pie-chart {
+    width: $progress-circle-width-small;
+    height: $progress-circle-width-small;
+  }
+  .ppc-progress {
+    left: calc($progress-circle-border - $progress-circle-middle-small);
+    top: calc($progress-circle-border - $progress-circle-middle-small);
+    width: $progress-circle-width-small;
+    height: $progress-circle-width-small;
+    clip: rect(0, $progress-circle-width-small, $progress-circle-width-small, $progress-circle-middle-small);
+    .ppc-progress-fill {
+      left: calc($progress-circle-border - $progress-circle-middle-small);
+      top: calc($progress-circle-border - $progress-circle-middle-small);
+      width: $progress-circle-width-small;
+      height: $progress-circle-width-small;
+      clip: rect(0, $progress-circle-middle-small, $progress-circle-width-small, 0);
+    }
+  }
+  .gt-50{
+    .ppc-progress {
+      clip: rect(0, $progress-circle-middle-small, $progress-circle-width-small, 0);
+      .ppc-progress-fill {
+        clip: rect(0, $progress-circle-width-small, $progress-circle-width-small, $progress-circle-middle-small);
+      }
+    }
+  }
+
+  .ppc-percents {
+    left: calc($progress-circle-border - $progress-circle-center-small/2);
+    top: calc($progress-circle-border - $progress-circle-center-small/2);
+    width: $progress-circle-center-small;
+    height: $progress-circle-center-small;
+  }
+
+}

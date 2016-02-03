@@ -153,9 +153,10 @@
     }
   }
   #countdown{
+    overflow: hidden;
     margin: 0 auto;
     padding: 0 0 0 0;
-    width: 540px;
+    width: 577px;
     text-align: center;
   }
 }
@@ -179,6 +180,9 @@
           width: 250px;
         }
       }
+    }
+    #countdown{
+      width: 457px;
     }
 	}
 }

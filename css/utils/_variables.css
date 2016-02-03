@@ -43,9 +43,15 @@ $checkout-total-price-color: #24BCD3;
 
 
 /*** Progress Circle */
-$progress-circle-width: 90px;
-$progress-circle-middle: 45px;
-$progress-circle-center: 75px;
+
+$progress-circle-width: 120px;
+$progress-circle-middle: 60px;
+$progress-circle-center: 100px;
 $progress-circle-border: 50%;
 $progress-circle-chart-bg: #00828E;
 $progress-circle-label: #4CCFE0;
+
+/*** Progress Circle Small */
+$progress-circle-width-small: 90px;
+$progress-circle-middle-small: 45px;
+$progress-circle-center-small: 75px;
