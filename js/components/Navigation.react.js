@@ -22,6 +22,7 @@ import IconCreditCard from 'material-ui/lib/svg-icons/action/credit-card'
 import IconSettings from 'material-ui/lib/svg-icons/action/settings'
 import IconTranslate from 'material-ui/lib/svg-icons/action/translate'
 import IconFace from 'material-ui/lib/svg-icons/image/tag-faces'
+import IconPerson from 'material-ui/lib/svg-icons/social/person'
 import IconClose from 'material-ui/lib/svg-icons/navigation/close'
 
 import { asyncDialog, asyncOpenMenu, asyncLanternStatus } from '../actions/AppActions'
@@ -33,6 +34,7 @@ import PlansDialog from './dialogs/Plans.react'
 import WelcomeToProDialog from './dialogs/WelcomeToPro.react'
 import MobileDialog from './dialogs/Mobile.react'
 import LanguageDialog from './dialogs/Language.react'
+import SignInDialog from './dialogs/SignIn.react'
 import ShareDialog from './dialogs/Share.react'
 import SettingsDialog from './dialogs/Settings.react'
 import AboutDialog from './dialogs/About.react'
@@ -53,7 +55,7 @@ const menuItems = [
   {
     title: 'nav.signin',
     name: 'signin',
-    icon: <IconInfo />,
+    icon: <IconPerson />,
     dialog: dialogs.SIGNIN_DIALOG,
   },
   {
@@ -174,7 +176,7 @@ class MainNav extends React.Component {
     case dialogs.WELCOME_TO_PRO_DIALOG:
       return <WelcomeToProDialog icon={<IconFace color="white" />} />
     case dialogs.SIGNIN_DIALOG:
-      return null
+      return <SignInDialog icon={<IconPerson color="white" />} />
     case dialogs.MOBILE_DIALOG:
       return <MobileDialog icon={<IconPhone color="white" />} />
     case dialogs.LANGUAGE_DIALOG:
