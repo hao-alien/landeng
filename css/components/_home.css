@@ -1,3 +1,6 @@
+.overflow {
+  overflow: hidden;
+}
 .wrapper {
   background-color: #FEFEFE;
   color: #222222;
@@ -118,10 +121,10 @@
     padding: 0 0 0 0;
   }
   #get_code{
-    width: 470px;
+    width: 350px;
     margin: 0 auto;
     .get_code__block{
-      float: left;
+      clear: both;
       margin: 0;
       padding: 0;
       text-align: center;
@@ -133,6 +136,8 @@
         }
       }
       .get_code__input{
+        height: 90px;
+        width: 300px;
         float: left;
       }
       &:last-child{
@@ -160,4 +165,20 @@
   height: auto;
   display: table-cell;
   vertical-align: middle;
+}
+
+@media screen and (max-height: 638px) {
+	#bottom_sheet {
+    #get_code{
+      width: 470px;
+      overflow: hidden;;
+      .get_code__block{
+        clear: none;
+        float: left;
+        .get_code__input{
+          width: 250px;
+        }
+      }
+    }
+	}
 }

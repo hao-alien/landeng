@@ -45,10 +45,17 @@ class App extends Component {
     const topSheet = document.getElementById('top_sheet')
     const middleSheet = document.getElementById('middle_sheet')
     const bottomSheet = document.getElementById('bottom_sheet')
-
-    topSheet.style.height = `${windowHeight * 0.21}px`
-    middleSheet.style.height = `${windowHeight * 0.5}px`
-    bottomSheet.style.height = `${(windowHeight * 0.29) + 2}px`
+    if (windowHeight > 550 ) {
+      topSheet.style.height = `${windowHeight * 0.21}px`
+      middleSheet.style.height = `${windowHeight * 0.5}px`
+      bottomSheet.style.height = `${(windowHeight * 0.29) + 2}px`
+      document.body.className = 'overflow'
+    } else {
+      topSheet.style.height = '180px'
+      middleSheet.style.height = '425px'
+      bottomSheet.style.height = '245px'
+      document.body.className = ''
+    }
     // console.log(windowHeight, { top: topSheet.style.height, middle: middleSheet.style.height, bottom: bottomSheet.style.height })
   }
 
