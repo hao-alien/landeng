@@ -1,29 +1,20 @@
 import React from 'react'
-import TextField from 'material-ui/lib/text-field'
 import RaisedButton from 'material-ui/lib/raised-button'
 import IconEmail from 'material-ui/lib/svg-icons/communication/email'
+import { translate } from 'react-i18next/lib';
 import IllustratedDialog from './IllustratedDialog.react'
 import styles from '../../constants/Styles'
+import EmailField from '../../inputs/EmailField'
 
 class MobileDialog extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      errorText: '',
-    }
-    this._emailValidation = this._emailValidation.bind(this)
-  }
-
-  _emailValidation() {
-    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    if (re.test( this.refs.email.getValue() )) {
-      this.setState({ errorText: '' })
-    } else {
-      this.setState({ errorText: 'Write a valid email address' })
+  sendMail() {
+    let mail = this._input.getValue()
+    if (mail) {
+      // TODO
     }
   }
-
   render() {
+    const { t } = this.props
     return (
       <IllustratedDialog
         title="Get Mobile Version"
@@ -35,12 +26,13 @@ class MobileDialog extends React.Component {
             <IconEmail style={styles.iconStyles} />
           </div>
           <div className="input_inline_text">
-            <TextField
-              hintText="Enter your email address"
-              floatingLabelText="Email"
+            <EmailField
               style={styles.textInputInline}
-              errorText={this.state.errorText}
-              ref="email" />
+              hintText={t('input.enter_email')}
+              floatingLabelText={t('input.email')}
+              errorMail = {t('input.use_valid_email')}
+              errorText = {t(this.props.error)}
+              ref={(c) => this._input = c} />
           </div>
         </div>
         <div id="mobile_input">
@@ -48,7 +40,7 @@ class MobileDialog extends React.Component {
             label="Send Mobile Version"
             className="button__blue"
             labelStyle={styles.buttonBlue}
-            onTouchTap={this._emailValidation}
+            onTouchTap={this.sendMail.bind(this)}
           />
         </div>
       </IllustratedDialog>
@@ -59,4 +51,4 @@ MobileDialog.propTypes = {
   icon: React.PropTypes.object,
 }
 
-export default MobileDialog
+export default translate(['translation'])(MobileDialog)
