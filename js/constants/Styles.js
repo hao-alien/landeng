@@ -10,6 +10,11 @@ const styles = {
     marginRight: 24,
     color: '#fff',
   },
+  dialogCloseButton: {
+    marginRight: -16,
+    marginLeft: 'auto',
+    fill: '#fff',
+  },
   modalContentStyle: {
     width: '650px',
   },

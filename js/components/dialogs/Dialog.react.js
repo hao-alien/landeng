@@ -31,9 +31,8 @@ class LanternDialog extends React.Component {
         <div className="dialog__title__icon">{icon}</div>
         <div className="dialog__title__text"><span>{title}</span></div>
         <div className="dialog__title__close">
-          <IconButton iconStyle={{
-            marginRight: -16,
-            marginLeft: 'auto'}}
+          <IconButton
+            iconStyle={styles.dialogCloseButton}
             onTouchTap={this.handleClose}>
             <IconClose />
           </IconButton>
