@@ -1,14 +1,14 @@
 import React from 'react'
 import RaisedButton from 'material-ui/lib/raised-button'
 import IconEmail from 'material-ui/lib/svg-icons/communication/email'
-import { translate } from 'react-i18next/lib';
+import { translate } from 'react-i18next/lib'
 import IllustratedDialog from './IllustratedDialog.react'
 import styles from '../../constants/Styles'
 import EmailField from '../../inputs/EmailField'
 
 class MobileDialog extends React.Component {
   sendMail() {
-    let mail = this._input.getValue()
+    const mail = this._input.getValue()
     if (mail) {
       // TODO
     }
@@ -47,8 +47,11 @@ class MobileDialog extends React.Component {
     )
   }
 }
+
 MobileDialog.propTypes = {
   icon: React.PropTypes.object,
+  t: React.PropTypes.func,
+  error: React.PropTypes.string,
 }
 
 export default translate(['translation'])(MobileDialog)
