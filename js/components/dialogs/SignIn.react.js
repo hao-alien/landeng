@@ -1,5 +1,6 @@
 import React from 'react'
 import RaisedButton from 'material-ui/lib/raised-button'
+import FlatButton from 'material-ui/lib/flat-button';
 import IconEmail from 'material-ui/lib/svg-icons/communication/email'
 import { translate } from 'react-i18next/lib'
 import IllustratedDialog from './IllustratedDialog.react'
@@ -19,8 +20,8 @@ class SignInDialog extends React.Component {
       <IllustratedDialog
         title="Lantern PRO Sign In"
         icon = {this.props.icon}
-        illustration = "mobile.svg">
-        <div className="input_inline">
+        illustration="sign-in-modal.svg">
+        <div id="signin_input" className="input_inline">
           <div className="input_inline_icon">
             <IconEmail style={styles.iconStyles} />
           </div>
@@ -34,17 +35,18 @@ class SignInDialog extends React.Component {
               ref={(c) => this._input = c} />
           </div>
         </div>
-        <ul>
+        <ul id="signin_list">
           <li>Enter the email associated with your Lantern PRO account and we will sent you a link</li>
           <li>Click the link to autorize this device to use your Lantern PRO account</li>
         </ul>
-        <div id="mobile_input">
+        <div id="signin_button">
           <RaisedButton
-            label="Send Mobile Version"
+            label="Send Link"
             className="button__blue"
             labelStyle={styles.buttonBlue}
             onTouchTap={this.sendMail.bind(this)}
           />
+        <FlatButton label="Go Pro Now" labelStyle={styles.linkButtonStyle} />
         </div>
       </IllustratedDialog>
     )

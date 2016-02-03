@@ -1,4 +1,5 @@
 #mobile_input{
+  clear: both;
   width: 200px;
-  margin: 30px auto 20px auto;
+  margin: 0 auto;
 }

@@ -1,10 +1,14 @@
 const fontWeightRegular = 400
 const fontWeightMedium = 500
 const fontWeightBold = 700
+const dialogTopBarColor = '#00BCD4'
 
 const styles = {
   textInputInline: {
     width: '100%',
+  },
+  linkButtonStyle: {
+    color: dialogTopBarColor,
   },
   iconStyles: {
     marginRight: 24,

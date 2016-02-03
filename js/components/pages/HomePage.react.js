@@ -7,7 +7,6 @@ import ScreenPro from './ScreenPro.react'
 class HomePage extends Component {
   render() {
     const { Pro: isPro } = this.props.data
-    // return <div>{ isPro ? <ScreenPro /> : <ScreenFree /> }</div>
     if (isPro) {
       document.title = 'Lantern PRO'
     } else {
