@@ -26,7 +26,7 @@
   "nav.share": "Share",
   "nav.settings": "Settings",
   "nav.about": "About",
-  "nav.exit": "Exit",
+  "nav.exit": "Disconnect",
 
   "err.internal_error": "Internal error",
   "err.bad_input": "Bad input",

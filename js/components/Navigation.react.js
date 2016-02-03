@@ -201,11 +201,16 @@ class MainNav extends React.Component {
           style={styles.toggleMenuButton}
           labelStyle={styles.toggleMenuLabel}
           onTouchTap={this._handleToggle}
-        >
+          >
             <NavigationIcon style={styles.toggleMenuIcon} />
         </FlatButton>
-        <LeftNav open={openMenu}>
-          {menuItems.map(this.addMenuItem)}
+        <LeftNav
+          open={openMenu}
+          docked={false}
+          overlayStyle={styles.overlayStyle}
+          onRequestChange={this._handleToggle}
+          >
+            {menuItems.map(this.addMenuItem)}
         </LeftNav>
         {this.renderDialog(dialog.dialog)}
       </div>

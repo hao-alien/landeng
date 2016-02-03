@@ -51,6 +51,9 @@ const styles = {
     opacity: 0.54,
     lineHeight: '32px',
   },
+  overlayStyle: {
+    backgroundColor: 'transparent',
+  },
 }
 
 export default styles
