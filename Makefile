@@ -55,6 +55,7 @@ GRADLE := $(LANTERN_MOBILE_DIR)/gradlew
 LANTERN_MOBILE_LIBRARY := libflashlight.aar
 DOCKER_MOBILE_IMAGE_TAG := lantern-mobile-builder
 LOGGLY_TOKEN_MOBILE := d730c074-1f0a-415d-8d71-1ebf1d8bd736
+ANDROID_MAIN_ACTIVITY := LanternMainActivity
 
 FIRETWEET_MAIN_DIR ?= ../firetweet/firetweet/src/main/
 
@@ -63,7 +64,6 @@ LANTERN_YAML_PATH := installer-resources/lantern.yaml
 
 define pkg_variables
 $(eval PACKAGE := $(shell aapt dump badging $(APK_FILE)|awk -F" " '/package/ {print $$2}'|awk -F"'" '/name=/ {print $$2}'))
-$(eval MAIN_ACTIVITY := $(shell aapt dump badging $(APK_FILE)|awk -F" " '/launchable-activity/ {print $$2}'|awk -F"'" '/name=/ {print $$2}' | grep MainActivity))
 endef
 
 .PHONY: packages clean docker
@@ -564,7 +564,6 @@ android-uninstall: $(APK_FILE)
 android-run:
 	$(call pkg_variables)
 	echo $(PACKAGE)
-	echo $(MAIN_ACTIVITY)
 	adb shell am start -n $(PACKAGE)/$(MAIN_ACTIVITY)
 	adb logcat | grep `adb shell ps | grep org.getlantern.lantern | cut -c10-15`
 

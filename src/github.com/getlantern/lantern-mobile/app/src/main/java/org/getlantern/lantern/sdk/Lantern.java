@@ -108,6 +108,7 @@ public class Lantern extends Client.Provider.Stub {
         Log.d(TAG, "About to stop Lantern..");
         try {
             Client.Stop();
+            Thread.sleep(200);
             if (mThread != null) {
                 mThread.interrupt();
             }

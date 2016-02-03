@@ -264,7 +264,7 @@ func RunServerProxy(cfg *config.Config) {
 // exit tells the application to exit, optionally supplying an error that caused
 // the exit.
 func Exit(err error) {
-	defer func() { exitCh <- err }()
+	/*defer func() { exitCh <- err }()
 	log.Errorf("Exit called with error: %v", err)
 	for {
 		select {
@@ -275,7 +275,7 @@ func Exit(err error) {
 			log.Debugf("No exit func remaining, exit now")
 			return
 		}
-	}
+	}*/
 }
 
 func Start(showui bool, android bool, clearProxySettings bool, startup bool, cfgFn func(cfgFn *config.Config)) (*Lantern, error) {

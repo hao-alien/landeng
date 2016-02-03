@@ -233,19 +233,17 @@ func Do(client *client.Client,
 		return nil, err
 	}
 
-	go defaultClient.monitor()
-	go defaultClient.connsCleaner()
-
 	return &defaultClient, nil
 }
 
 func (i *Interceptor) closeAll() {
-	i.connsLock.Lock()
 	for _, conn := range i.conns {
 		if conn != nil {
 			i.closeConn(conn)
 		}
 	}
+
+	i.connsLock.Lock()
 	i.connsCount = 0
 	i.conns = make(map[string]*InterceptedConn)
 	i.connsLock.Unlock()
@@ -255,15 +253,12 @@ func (i *Interceptor) connsCleaner() {
 	stop := false
 	for {
 		t := time.Now()
-		i.connsLock.Lock()
 		m := i.conns
 		for _, conn := range m {
 			if conn != nil && t.Sub(conn.t) > 20*time.Second {
 				i.closeConn(conn)
-				i.connsCount--
 			}
 		}
-		i.connsLock.Unlock()
 
 		i.mu.Lock()
 		clientGone := i.clientGone
@@ -281,6 +276,7 @@ func (i *Interceptor) connsCleaner() {
 
 func (i *Interceptor) closeConn(conn *InterceptedConn) {
 	log.Debugf("Closing a connection with id: %s", conn.id)
+	i.connsLock.Lock()
 	if conn.Conn != nil {
 		conn.Conn.Close()
 	}
@@ -289,6 +285,8 @@ func (i *Interceptor) closeConn(conn *InterceptedConn) {
 	}
 	i.conns[conn.id] = nil
 	i.connsCount--
+	i.connsLock.Unlock()
+
 	i.releaseClientConn(conn)
 }
 

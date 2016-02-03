@@ -55,7 +55,7 @@ import org.getlantern.lantern.vpn.LanternVpn;
 import org.getlantern.lantern.R;
 
 
-public class LanternMainActivity extends AppCompatActivity implements Handler.Callback {
+public class LanternMainActivity extends Activity implements Handler.Callback {
 
     private static final String TAG = "LanternMainActivity";
     private static final String PREFS_NAME = "LanternPrefs";
@@ -76,13 +76,6 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
         StrictMode.setThreadPolicy(policy);
 
         setContentView(R.layout.activity_lantern_main);
-
-        // we want to use the ActionBar from the AppCompat
-        // support library, but with our custom design
-        // we hide the default action bar
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        }  
 
         context = getApplicationContext();
         mPrefs = Utils.getSharedPrefs(context);
@@ -157,7 +150,6 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         try {
             if (mReceiver != null) {
                 unregisterReceiver(mReceiver);
@@ -166,6 +158,8 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
         } catch (Exception e) {
 
         }
+        super.onDestroy();
+
     }
 
     // quitLantern is the side menu option and cleanyl exits the app
@@ -271,8 +265,8 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
     }
 
     public void stopLantern() {
-        Service.IsRunning = false;
         Utils.clearPreferences(this);
+        Service.IsRunning = false;
     }
 
     @Override
