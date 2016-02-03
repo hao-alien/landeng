@@ -11,10 +11,9 @@ import LeftNav from 'material-ui/lib/left-nav'
 import MenuItem from 'material-ui/lib/menus/menu-item'
 import FlatButton from 'material-ui/lib/raised-button'
 
-import ThemeManager from 'material-ui/lib/styles/theme-manager'
-import darkTheme from 'material-ui/lib/styles/raw-themes/dark-raw-theme'
+import { asyncDialog, asyncOpenMenu, asyncLanternStatus } from '../actions/AppActions'
 
-import NavigationIcon from 'material-ui/lib/svg-icons/navigation/menu'
+import IconNavigation from 'material-ui/lib/svg-icons/navigation/menu'
 import IconInfo from 'material-ui/lib/svg-icons/action/info'
 import IconShare from 'material-ui/lib/svg-icons/social/share'
 import IconPhone from 'material-ui/lib/svg-icons/hardware/phone-android'
@@ -25,11 +24,11 @@ import IconFace from 'material-ui/lib/svg-icons/image/tag-faces'
 import IconPerson from 'material-ui/lib/svg-icons/social/person'
 import IconClose from 'material-ui/lib/svg-icons/navigation/close'
 
-import { asyncDialog, asyncOpenMenu, asyncLanternStatus } from '../actions/AppActions'
-
+import ThemeManager from 'material-ui/lib/styles/theme-manager'
+import darkTheme from 'material-ui/lib/styles/raw-themes/dark-raw-theme'
 import styles from '../constants/Styles'
-import * as dialogs from '../constants/Dialogs'
 
+import * as dialogs from '../constants/Dialogs'
 import PlansDialog from './dialogs/Plans.react'
 import WelcomeToProDialog from './dialogs/WelcomeToPro.react'
 import MobileDialog from './dialogs/Mobile.react'
@@ -43,7 +42,7 @@ const menuItems = [
   {
     title: 'nav.lantern',
     name: 'lantern',
-    icon: <NavigationIcon />,
+    icon: <IconNavigation />,
     dialog: null,
   },
   {
@@ -204,7 +203,7 @@ class MainNav extends React.Component {
           labelStyle={styles.toggleMenuLabel}
           onTouchTap={this._handleToggle}
           >
-            <NavigationIcon style={styles.toggleMenuIcon} />
+            <IconNavigation style={styles.toggleMenuIcon} />
         </FlatButton>
         <LeftNav
           open={openMenu}

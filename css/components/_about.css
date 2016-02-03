@@ -1,27 +1,27 @@
 #about{
-	text-align: center;
-	padding: 20px 0;
-	h1{
-		font-family: $font-roboto;
-		font-size: 20px;
-		color: $gray;
-	}
-	p{
-		font-family: $font-roboto;
-		font-size: 14px;
-		color: $gray;
-	}
-	a{
-		color: $link-color;
-		text-decoration: none;
-		text-transform: uppercase;
-		display: block;
-		margin: 10px 0;
-		&:hover{
-			text-decoration: underline;;
-		}
-	}
-	.about_logo{
-		width: 185px;
-	}
+  text-align: center;
+  padding: 20px 0;
+  h1{
+    font-family: $font-roboto;
+    font-size: 20px;
+    color: $gray;
+  }
+  p{
+    font-family: $font-roboto;
+    font-size: 14px;
+    color: $gray;
+  }
+  a{
+    color: $link-color;
+    text-decoration: none;
+    text-transform: uppercase;
+    display: block;
+    margin: 10px 0;
+    &:hover{
+      text-decoration: underline;;
+    }
+  }
+  .about_logo{
+    width: 185px;
+  }
 }

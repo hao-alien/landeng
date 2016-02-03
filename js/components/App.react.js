@@ -48,7 +48,7 @@ class App extends Component {
 
     topSheet.style.height = `${windowHeight * 0.21}px`
     middleSheet.style.height = `${windowHeight * 0.5}px`
-    bottomSheet.style.height = `${(windowHeight * 0.29) + 1}px`
+    bottomSheet.style.height = `${(windowHeight * 0.29) + 2}px`
     // console.log(windowHeight, { top: topSheet.style.height, middle: middleSheet.style.height, bottom: bottomSheet.style.height })
   }
 
