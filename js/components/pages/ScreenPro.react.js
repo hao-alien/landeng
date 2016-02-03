@@ -28,30 +28,34 @@ class ScreenPro extends Component {
     return (
       <div>
         <section id="middle_sheet">
-          <h2>{t('pro.get_months_headline')}</h2>
-          <p>{t('pro.get_months_p')}</p>
-          <div id="referral_code">
-            <p>{t('pro.referral_code')}</p>
-            <span>133742</span>
-          </div>
-          <div id="invite_pro">
-            <span className="invite__button">
-              <RaisedButton
-                label={t('pro.invite')}
-                className="button__yellow"
-              />
-            </span>
-            <span className="invite__button">
-              <RaisedButton
-                label={t('pro.share')}
-                backgroundColor="#FDE800"
-                className="button__yellow"
-              />
-            </span>
+          <div className="sheet__container">
+            <h2>{t('pro.get_months_headline')}</h2>
+            <p>{t('pro.get_months_p')}</p>
+            <div id="referral_code">
+              <p>{t('pro.referral_code')}</p>
+              <span>133742</span>
+            </div>
+            <div id="invite_pro">
+              <span className="invite__button">
+                <RaisedButton
+                  label={t('pro.invite')}
+                  className="button__yellow"
+                />
+              </span>
+              <span className="invite__button">
+                <RaisedButton
+                  label={t('pro.share')}
+                  backgroundColor="#FDE800"
+                  className="button__yellow"
+                />
+              </span>
+            </div>
           </div>
         </section>
         <section id="bottom_sheet">
-          <TimeLeftPro deadline={user.deadline} />
+          <div className="sheet__container">
+            <TimeLeftPro deadline={user.deadline} />
+          </div>
         </section>
       </div>
     )

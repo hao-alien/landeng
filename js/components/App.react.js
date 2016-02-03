@@ -21,8 +21,26 @@ import * as backend from '../actions/BackendActions'
 injectTapEventPlugin()
 
 class App extends Component {
+  constructor(props) {
+    super(props)
+    this.fitSheetsToScreen = this.fitSheetsToScreen.bind(this)
+  }
+
   componentDidMount() {
     this.initWebsocket()
+    this.fitSheetsToScreen()
+    window.onresize = (e) => {
+      e.preventDefault()
+      this.fitSheetsToScreen()
+    }
+  }
+
+  componentWillUnmount() {
+    this.closing = true
+    this.ws.close()
+  }
+
+  fitSheetsToScreen() {
     const windowHeight = window.innerHeight
     const topSheet = document.getElementById('top_sheet')
     const middleSheet = document.getElementById('middle_sheet')
@@ -30,14 +48,8 @@ class App extends Component {
 
     topSheet.style.height = `${windowHeight * 0.21}px`
     middleSheet.style.height = `${windowHeight * 0.5}px`
-    bottomSheet.style.height = `${windowHeight * 0.29}px`
-
-    console.log(windowHeight, { top: topSheet.style.height, middle: middleSheet.style.height, bottom: bottomSheet.style.height })
-  }
-
-  componentWillUnmount() {
-    this.closing = true
-    this.ws.close()
+    bottomSheet.style.height = `${(windowHeight * 0.29) + 1}px`
+    // console.log(windowHeight, { top: topSheet.style.height, middle: middleSheet.style.height, bottom: bottomSheet.style.height })
   }
 
   initWebsocket() {
@@ -70,7 +82,9 @@ class App extends Component {
         </div>
         <LanternStatus />
         <section id="top_sheet">
-          <img className="logo" src="/img/lantern_logo.svg" />
+          <div className="sheet__container">
+            <img className="logo" src="/img/lantern_logo.svg" />
+          </div>
         </section>
         { this.props.children }
       </div>

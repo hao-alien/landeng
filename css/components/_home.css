@@ -11,12 +11,14 @@
 }
 
 #top_sheet{
-  padding: 30px 0 20px 0;
   margin: 0;
+	display:table;
+	width: 100%;
 	position: relative;
 	box-shadow: 0 2px 2px 0 rgba(0,0,0,0.3);
 	z-index: 1;
 }
+
 #middle_sheet{
 	background-image: url('/img/backgrounds/background-middle-screen.svg');
 	background-repeat: repeat;
@@ -24,8 +26,9 @@
 	background-color: $middle-sheet-bg;
 	position: relative;
 	box-shadow: 0 2px 2px 0 rgba(0,0,0,0.3);
-  padding: 10px;
+	width: 100%;
   margin: 0;
+	display:table;
 	h2 {
 		text-align: center;
 		color: $header-line-color;
@@ -33,7 +36,6 @@
 		font-weight: $font-weight-regular;
 		font-size: $header-line-font-size;
     margin: 0;
-		padding: 22px 0 0 0;
 	}
 	ul{
     width: 350px;
@@ -66,7 +68,7 @@
     text-align: center;
   }
 	#invite_pro{
-    margin: 20px auto 60px auto;
+    margin: 20px auto 0 auto;
     text-align: center;
 		.invite__button{
 			margin: 10px;
@@ -94,6 +96,8 @@
   background-color: $bottom-sheet-bg;
   padding: 0;
   margin: 0;
+	width: 100%;
+	display:table;
   h3{
     font-family: $font-roboto;
     font-weight: $font-weight-medium;
@@ -101,7 +105,6 @@
     letter-spacing: 0.34px;
     color: $white;
     margin: 0;
-    padding: 24px 0 0 0;
     text-align: center;
   }
   p{
@@ -150,4 +153,11 @@
     width: 540px;
     text-align: center;
   }
+}
+
+.sheet__container {
+	width: 100%;
+	height: auto;
+	display: table-cell;
+	vertical-align: middle;
 }
