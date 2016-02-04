@@ -1,0 +1,11 @@
+.DS_Store
+node_modules
+
+# Ignore build folder
+build
+
+# Ignore config stuff
+server.*.js
+*config.js
+mock-backend.js
+serviceworker.js

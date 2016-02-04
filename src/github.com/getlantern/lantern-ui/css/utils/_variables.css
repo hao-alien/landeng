@@ -1,0 +1,57 @@
+/*This file contains all application-wide CSS variables.*/
+
+$font-roboto: 'Roboto', 'Helvetica Neue Light', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+$font-size-paragraph: 22pt;
+$font-size-referal-code-paragraph: 16pt;
+$font-size-referal-code: 22pt;
+
+$font-size-menu-item: 13pt;
+
+$font-weight-light: 300;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-bold: 700;
+
+$white: #fff;
+$black: #000;
+$gray: #666;
+$link-color: #00BCD4;
+$dialog-top-bar-color: #00BCD4;
+$dialog-header-color: #00BCD4;
+
+/** Buttons */
+$button-yellow-background: #FDE800;
+$button-yellow-min-width: 180px;
+
+$button-blue-background: #00BCD4;
+$button-blue-min-width: 180px;
+
+$button-small-min-width: 150px;
+
+$header-line-color: $white;
+$header-line-font-size: 45px;
+
+/*** Middle Sheet */
+$middle-sheet-bg: #00BCD4;
+
+/*** Bottom Sheet */
+$bottom-sheet-bg: #0097A7;
+
+/*** Dialogs **/
+/* Checkout */
+$checkout-total-price-color: #24BCD3;
+
+
+/*** Progress Circle */
+
+$progress-circle-width: 120px;
+$progress-circle-middle: 60px;
+$progress-circle-center: 100px;
+$progress-circle-border: 50%;
+$progress-circle-chart-bg: #00828E;
+$progress-circle-label: #4CCFE0;
+
+/*** Progress Circle Small */
+$progress-circle-width-small: 90px;
+$progress-circle-middle-small: 45px;
+$progress-circle-center-small: 75px;

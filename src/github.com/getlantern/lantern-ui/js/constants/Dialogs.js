@@ -1,0 +1,8 @@
+export const PLANS_DIALOG = Symbol('PLANS_DIALOG')
+export const SIGNIN_DIALOG = Symbol('SIGNIN_DIALOG')
+export const MOBILE_DIALOG = Symbol('MOBILE_DIALOG')
+export const LANGUAGE_DIALOG = Symbol('LANGUAGE_DIALOG')
+export const SETTINGS_DIALOG = Symbol('SETTINGS_DIALOG')
+export const SHARE_DIALOG = Symbol('SHARE_DIALOG')
+export const ABOUT_DIALOG = Symbol('ABOUT_DIALOG')
+export const WELCOME_TO_PRO_DIALOG = Symbol('WELCOME_TO_PRO_DIALOG')
