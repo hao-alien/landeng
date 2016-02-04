@@ -39,6 +39,7 @@ import android.view.MenuItem;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.support.v7.app.AppCompatActivity;
 
 import java.io.File;
@@ -71,6 +72,15 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+		// The Action Bar is a window feature. The feature must be requested
+		// before setting a content view. Normally this is set automatically
+		// by your Activity's theme in your manifest. The provided system
+		// theme Theme.WithActionBar enables this for you. Use it as you would
+		// use Theme.NoTitleBar. You can add an Action Bar to your own themes
+		// by adding the element <item name="android:windowActionBar">true</item>
+		// to your style definition.
+		//getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -256,7 +266,7 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
     }
 
     public void restart(final Context context, final Intent intent) {
-        if (LanternUI.useVpn()) {
+        if (Service.IsRunning) {
             Log.d(TAG, "Restarting Lantern...");
             Service.IsRunning = false;
 
@@ -309,7 +319,10 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
                 // abruptly closed, we want to clear user preferences
                 Utils.clearPreferences(context);
             } else if (action.equals(Intent.ACTION_USER_PRESENT)) {
-                //restart(context, intent);
+                // sometimes when the phone goes to sleep for an extended
+                // period of time, it's necessary to trigger a quick
+                // restart. this provides a more seamless experience
+                restart(context, intent);
             } else if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
                 // whenever a user disconnects from Wifi and Lantern is running
                 NetworkInfo networkInfo =
