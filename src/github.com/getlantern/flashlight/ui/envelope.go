@@ -1,11 +1,11 @@
 package ui
 
 type EnvelopeType struct {
-	Type string
+	Type string `yaml: "type"`
 }
 
 // Envelope is a struct that wraps messages and associates them with a type.
 type Envelope struct {
-	EnvelopeType
-	Message interface{}
+	EnvelopeType `yaml: "type"`
+	Message      interface{} `yaml: "message"`
 }

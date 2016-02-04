@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	messageType = `Settings`
+	messageType = `settings`
 )
 
 var (
@@ -30,14 +30,15 @@ var (
 
 // Settings is a struct of all settings unique to this particular Lantern instance.
 type Settings struct {
-	Version      string
-	BuildDate    string
-	RevisionDate string
-	AutoReport   bool
-	AutoLaunch   bool
-	ProxyAll     bool
+	// TODO: make tag work by update to latest yaml.v1
+	Version      string `yaml: "version"`
+	BuildDate    string `yaml: "buildDate"`
+	RevisionDate string `yaml: "revisionDate"`
+	AutoReport   bool   `yaml: "autoReport"`
+	AutoLaunch   bool   `yaml: "autoLaunch"`
+	ProxyAll     bool   `yaml: "proxyAll"`
 
-	sync.RWMutex
+	sync.RWMutex `yaml: "-"`
 }
 
 // Load loads the initial settings at startup, either from disk or using defaults.
@@ -135,7 +136,7 @@ func start(baseSettings *Settings) error {
 func read() {
 	log.Tracef("Reading settings messages!!")
 	for message := range service.In {
-		log.Tracef("Read settings message!! %q", message)
+		log.Tracef("Read settings message!! %+v", message)
 		msg := (message).(map[string]interface{})
 
 		if autoReport, ok := msg["autoReport"].(bool); ok {
