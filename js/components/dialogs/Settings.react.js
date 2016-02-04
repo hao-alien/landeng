@@ -12,13 +12,13 @@ class Settings extends React.Component {
   }
 
   saveSettings(input) {
-    const { Settings: settings } = this.props.data
+    const { settings: settings } = this.props.data
     settings[input.target.name] = input.target.checked
     this.props.dispatch(asyncSaveSettings(settings))
   }
 
   render() {
-    const { Settings: settings } = this.props.data
+    const { settings: settings } = this.props.data
     return (
       <IllustratedDialog
         title="Settings Options"
@@ -27,27 +27,27 @@ class Settings extends React.Component {
         <div id="settings_body">
           <div className="settings_option">
             <Checkbox
-              name="AutoLaunch"
+              name="autoLaunch"
               labelPosition="left"
-              defaultChecked={settings.AutoLaunch}
+              defaultChecked={settings.autoLaunch}
               onCheck={this.saveSettings}
               label="Run Lantern on System Start"/>
           </div>
           <Divider />
           <div className="settings_option">
             <Checkbox
-              name="ProxyAll"
+              name="proxyAll"
               labelPosition="left"
-              defaultChecked={settings.ProxyAll}
+              defaultChecked={settings.proxyAll}
               onCheck={this.saveSettings}
               label="Proxy all traffic"/>
           </div>
           <Divider />
           <div className="settings_option">
             <Checkbox
-              name="AutoReport"
+              name="autoReport"
               labelPosition="left"
-              defaultChecked={settings.AutoReport}
+              defaultChecked={settings.autoReport}
               onCheck={this.saveSettings}
               label="Securelly report usage statistics to contribute to Lantern"/>
           </div>

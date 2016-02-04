@@ -28,7 +28,7 @@ class Language extends React.Component {
 
   addLangItem(item, i) {
     /* Render the Languages from 'js/constants/Languages' */
-    const { Language: language } = this.props.data
+    const { language: language } = this.props.data
     let selected = false
     if ( item.lang === language ) {
       selected = true
@@ -76,7 +76,7 @@ Language.propTypes = {
 // Which props do we want to inject, given the global state?
 function select(state) {
   return {
-    data: state.backend.Settings,
+    data: state.backend.settings,
   }
 }
 

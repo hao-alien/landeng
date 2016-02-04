@@ -64,9 +64,9 @@ export function asyncSetLanguage(name) {
       i18next.changeLanguage(name, (err) => {
         if (err) {
           // defaults to en
-          return dispatch(asyncSaveSettings({Language: 'en'}))
+          return dispatch(asyncSaveSettings({language: 'en'}))
         }
-        return dispatch(asyncSaveSettings({Language: name}))
+        return dispatch(asyncSaveSettings({language: name}))
       })
     })
   }
