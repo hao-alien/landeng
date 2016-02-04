@@ -43,6 +43,9 @@ var (
 	// use buffered channel to avoid blocking the caller of 'addExitFunc'
 	// the number 10 is arbitrary
 	chExitFuncs = make(chan func(), 10)
+
+	// whether current runtime target is android
+	isAndroid = runtime.GOOS == "android"
 )
 
 type Lantern struct {
@@ -72,7 +75,7 @@ func init() {
 
 	rand.Seed(time.Now().UnixNano())
 
-	if runtime.GOOS != "android" {
+	if !isAndroid {
 		settings.Load(version, revisionDate, buildDate)
 	}
 }
@@ -129,8 +132,8 @@ func configureDesktop(cfg *config.Config, clearProxySettings bool, showui bool) 
 }
 
 // runClientProxy runs the client-side (get mode) proxy.
-func (self *Lantern) RunClientProxy(cfg *config.Config, android bool, clearProxySettings bool, showui bool, startup bool) {
-	if !android {
+func (self *Lantern) RunClientProxy(cfg *config.Config, clearProxySettings bool, showui bool, startup bool) {
+	if !isAndroid {
 		configureDesktop(cfg, clearProxySettings, showui)
 	}
 
@@ -168,7 +171,7 @@ func (self *Lantern) RunClientProxy(cfg *config.Config, android bool, clearProxy
 
 	AddExitFunc(func() { doneCfg <- true })
 
-	if !android {
+	if !isAndroid {
 		// watchDirectAddrs will spawn a goroutine that will add any site that is
 		// directly accesible to the PAC file.
 		pac.WatchDirectAddrs()
@@ -176,7 +179,7 @@ func (self *Lantern) RunClientProxy(cfg *config.Config, android bool, clearProxy
 
 	go func() {
 		err := self.Client.ListenAndServe(func() {
-			if !android {
+			if !isAndroid {
 				pac.PacOn()
 				AddExitFunc(pac.PacOff)
 			}
@@ -187,7 +190,7 @@ func (self *Lantern) RunClientProxy(cfg *config.Config, android bool, clearProxy
 			// set up with at least an initial bootstrap config (on first run) to
 			// complete successfully.
 			config.StartPolling()
-			if !android {
+			if !isAndroid {
 				if showui && !startup {
 					// Launch a browser window with Lantern but only after the pac
 					// URL and the proxy server are all up and running to avoid
@@ -264,7 +267,15 @@ func RunServerProxy(cfg *config.Config) {
 // exit tells the application to exit, optionally supplying an error that caused
 // the exit.
 func Exit(err error) {
-	/*defer func() { exitCh <- err }()
+
+	if isAndroid {
+		// we only really 'exit' in Android when the
+		// app is closed; otherwise, Lantern just stays running
+		// with the background service its attached to
+		return
+	}
+
+	defer func() { exitCh <- err }()
 	log.Errorf("Exit called with error: %v", err)
 	for {
 		select {
@@ -275,14 +286,14 @@ func Exit(err error) {
 			log.Debugf("No exit func remaining, exit now")
 			return
 		}
-	}*/
+	}
 }
 
-func Start(showui bool, android bool, clearProxySettings bool, startup bool, cfgFn func(cfgFn *config.Config)) (*Lantern, error) {
+func Start(showui bool, clearProxySettings bool, startup bool, cfgFn func(cfgFn *config.Config)) (*Lantern, error) {
 
 	lantern := &Lantern{}
 
-	if !android {
+	if !isAndroid {
 		if err := logging.Init(); err != nil {
 			return nil, err
 		}
@@ -296,14 +307,14 @@ func Start(showui bool, android bool, clearProxySettings bool, startup bool, cfg
 		}
 	})
 
-	if !android {
+	if !isAndroid {
 		AddExitFunc(quitSystray)
 		AddExitFunc(settings.Save)
 		i18nInit()
 
 	}
 
-	if !android && showui {
+	if !isAndroid && showui {
 		if err := configureSystemTray(); err != nil {
 			return nil, err
 		}
@@ -316,8 +327,7 @@ func Start(showui bool, android bool, clearProxySettings bool, startup bool, cfg
 	log.Debug("Running proxy")
 	if lantern.config.IsDownstream() {
 		// This will open a proxy on the address and port given by -addr
-		lantern.RunClientProxy(lantern.config, android,
-			clearProxySettings, showui, startup)
+		lantern.RunClientProxy(lantern.config, clearProxySettings, showui, startup)
 	} else {
 		RunServerProxy(lantern.config)
 	}
@@ -347,7 +357,9 @@ func (self *Lantern) ProcessConfig(f func(*config.Config)) *config.Config {
 	}()
 
 	log.Debugf("Processed config")
-	f(cfg)
+	if f != nil {
+		f(cfg)
+	}
 	return cfg
 }
 
