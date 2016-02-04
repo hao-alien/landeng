@@ -136,8 +136,7 @@ all: binaries
 docker-genassets: require-npm
 	@source setenv.bash && \
 	LANTERN_UI="src/github.com/getlantern/lantern-ui" && \
-	APP="$$LANTERN_UI/app" && \
-	DIST="$$LANTERN_UI/dist" && \
+	DIST="$$LANTERN_UI/build" && \
 	if [[ ! -d $$DIST ]]; then \
 		UPDATE_DIST=true; \
 	fi && \
@@ -146,8 +145,7 @@ docker-genassets: require-npm
 	if [ "$$UPDATE_DIST" ]; then \
 			cd $$LANTERN_UI && \
 			npm install && \
-			rm -Rf dist && \
-			gulp build && \
+			npm run build && \
 			cd -; \
 	fi && \
 	\
