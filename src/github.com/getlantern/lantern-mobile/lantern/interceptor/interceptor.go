@@ -249,31 +249,6 @@ func (i *Interceptor) closeAll() {
 	i.connsLock.Unlock()
 }
 
-func (i *Interceptor) connsCleaner() {
-	stop := false
-	for {
-		t := time.Now()
-		m := i.conns
-		for _, conn := range m {
-			if conn != nil && t.Sub(conn.t) > 20*time.Second {
-				i.closeConn(conn)
-			}
-		}
-
-		i.mu.Lock()
-		clientGone := i.clientGone
-		i.mu.Unlock()
-		if !clientGone {
-			stop = true
-		}
-
-		if stop {
-			break
-		}
-		time.Sleep(10 * time.Second)
-	}
-}
-
 func (i *Interceptor) closeConn(conn *InterceptedConn) {
 	log.Debugf("Closing a connection with id: %s", conn.id)
 	i.connsLock.Lock()
@@ -328,43 +303,6 @@ func (i *Interceptor) releaseClientConn(ic *InterceptedConn) {
 	ic.Conn = nil
 	ic.localConn = nil
 	i.clientConnPool.Put(ic.v)
-}
-
-// monitor is used to send periodic updates about the current
-// interceptor (such as traffic stats) and to watch for connection
-// failures. If we exceed a certain threshold of failures, we stop
-// the interceptor and disable the service
-func (i *Interceptor) monitor() {
-
-	updatesTimer := time.NewTimer(15 * time.Second)
-	defer updatesTimer.Stop()
-L:
-	for {
-		select {
-		case <-updatesTimer.C:
-			i.mu.Lock()
-			clientGone := i.clientGone
-			i.mu.Unlock()
-			if clientGone {
-				break L
-			}
-
-			count := i.getConnsCount()
-			statsMsg := fmt.Sprintf("Number of open connections: %d", count)
-			log.Debug(statsMsg)
-			i.sendAlert(statsMsg, false)
-			updatesTimer.Reset(statsInterval)
-		case err := <-i.errCh:
-			log.Debugf("New error: %v", err)
-			i.totalErrCount += 1
-			if i.totalErrCount > maxErrCount {
-				log.Errorf("Total errors: %d %v", i.totalErrCount, ErrTooManyFailures)
-				i.sendAlert(ErrTooManyFailures.Error(), true)
-				i.Stop()
-				break L
-			}
-		}
-	}
 }
 
 // Stop closes the SOCKS listener and stats service
