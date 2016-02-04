@@ -1,0 +1,188 @@
+.overflow {
+  overflow: hidden;
+}
+.wrapper {
+  background-color: #FEFEFE;
+  color: #222222;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+#main_nav{
+  position: absolute;
+  z-index: 2;
+}
+
+#top_sheet{
+  margin: 0;
+  display:table;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.3);
+  z-index: 1;
+}
+
+#middle_sheet{
+  background-image: url('/img/backgrounds/background-middle-screen.svg');
+  background-repeat: repeat;
+  background-size: cover;
+  background-color: $middle-sheet-bg;
+  position: relative;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.3);
+  width: 100%;
+  margin: 0;
+  display:table;
+  h2 {
+    text-align: center;
+    color: $header-line-color;
+    font-family: $font-roboto;
+    font-weight: $font-weight-regular;
+    font-size: $header-line-font-size;
+    margin: 0;
+  }
+  ul{
+    width: 350px;
+    margin: 0 auto;
+    padding: 0;
+    li{
+      font-family: $font-roboto;
+      font-weight: $font-weight-medium;
+      font-size: 22px;
+      list-style: none;
+      line-height: 40px;
+      letter-spacing: 0.22px;
+      color: $white;
+      padding: 0 0 0 50px;
+      margin: 0;
+      background: url('/img/check_mark.svg') no-repeat;
+      background-size: 30px;
+      background-position: 10px;
+    }
+  }
+  p{
+    font-family: $font-roboto;
+    font-size: $font-size-paragraph;
+    font-weight: 200;
+    color: $white;
+    text-align: center;
+  }
+  #get_pro{
+    margin: 20px auto 0 auto;
+    text-align: center;
+  }
+  #invite_pro{
+    margin: 20px auto 0 auto;
+    text-align: center;
+    .invite__button{
+      margin: 10px;
+    }
+  }
+  #referral_code{
+    margin: 0 auto;
+    padding: 10px 0 0 0;
+    text-align: center;
+    text-transform: uppercase;
+    p{
+      font-size: $font-size-referal-code-paragraph;
+      margin: 0; padding: 0;
+    }
+    span{
+      margin: 0; padding: 0;
+      font-size: $font-size-referal-code;
+      color: #005f63;
+    }
+  }
+}
+
+#bottom_sheet{
+  overflow: auto;
+  background-color: $bottom-sheet-bg;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  display:table;
+  h3{
+    font-family: $font-roboto;
+    font-weight: $font-weight-medium;
+    font-size: 34px;
+    letter-spacing: 0.34px;
+    color: $white;
+    margin: 0;
+    text-align: center;
+  }
+  p{
+    font-family: $font-roboto;
+    font-weight: $font-weight-medium;
+    font-size : 14px;
+    text-align: center;
+    color: $white;
+    opacity : 0.87;
+    margin: 0;
+    padding: 0 0 0 0;
+  }
+  #get_code{
+    width: 350px;
+    margin: 0 auto;
+    .get_code__block{
+      clear: both;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      .get_code__icon{
+        float: left;
+        margin: 40px 10px 0 10px;
+        svg{
+          margin: 0 !important
+        }
+      }
+      .get_code__input{
+        height: 90px;
+        width: 300px;
+        float: left;
+      }
+      &:last-child{
+        margin: 30px 0 0 20px;
+      }
+    }
+  }
+  .timeleft--copy{
+    clear: both;
+    p{
+      padding: 10px 0 20px 0;
+      margin: 0 auto;
+    }
+  }
+  #countdown{
+    overflow: hidden;
+    margin: 0 auto;
+    padding: 0 0 0 0;
+    width: 577px;
+    text-align: center;
+  }
+}
+
+.sheet__container {
+  width: 100%;
+  height: auto;
+  display: table-cell;
+  vertical-align: middle;
+}
+
+@media screen and (max-height: 638px) {
+	#bottom_sheet {
+    #get_code{
+      width: 470px;
+      overflow: hidden;;
+      .get_code__block{
+        clear: none;
+        float: left;
+        .get_code__input{
+          width: 250px;
+        }
+      }
+    }
+    #countdown{
+      width: 457px;
+    }
+	}
+}

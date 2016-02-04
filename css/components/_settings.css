@@ -1,0 +1,8 @@
+#settings_body{
+  width: 60%;
+  margin: 0 auto;
+  padding: 20px 0s;
+  .settings_option{
+    margin: 10px auto;
+  }
+}

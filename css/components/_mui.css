@@ -1,0 +1,17 @@
+.button__yellow {
+  min-width: $button-yellow-min-width;
+  background-color: $button-yellow-background !important;
+}
+
+.button__blue {
+  min-width: $button-blue-min-width;
+  background-color: $button-blue-background !important;
+}
+
+.button__small{
+  min-width: $button-small-min-width;
+}
+
+.button__small__div > div {
+  height : 32px !important;
+}

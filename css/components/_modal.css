@@ -1,0 +1,72 @@
+.dialog__title{
+  background-color: $dialog-top-bar-color;
+  font-family: $font-roboto;
+  font-weight: 400 !important;
+  font-size: 20px !important;
+  color : $white !important;
+  padding: 17px 0 11px 15px;
+  margin: 0 !important;
+  overflow: auto;
+  .dialog__title__icon{
+    float: left;
+  }
+  .dialog__title__text{
+    float: left;
+    padding: 0 0 0 15px;
+  }
+  .dialog__title__close{
+    position: absolute;;
+    right: 5px;
+    top: 5px;
+    button{
+      margin: 0 !important;
+      padding: 0 !important;
+      svg{
+        margin: 0 !important;
+      }
+    }
+  }
+}
+
+.dialog_body {
+  clear: both;
+  margin: 0;
+  padding: 0 !important;
+  max-height: 100%;
+  .illustrated_header {
+    width: 100%;
+    height: 200px;
+    overflow: auto;
+    background-color: $dialog-header-color;
+    display: block;
+    img {
+      height: 80%;
+      width: 100%;
+      margin: auto;
+    }
+  }
+  .illustrated_body {
+    width: 100%;
+    h4, p, a {
+      margin: 0 40px;
+      padding: 20px 0 0 0;
+      text-align: center;
+    }
+  }
+}
+
+.input_inline{
+  width: 100%;
+  clear: both;
+  margin: 0 !important;
+  padding: 0 25px !important;
+  .input_inline_icon{
+    float: left;
+    padding-top: 40px;
+  }
+  .input_inline_text{
+    height: 90px;
+    float: left;
+    width: 90%;
+  }
+}

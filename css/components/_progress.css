@@ -1,0 +1,118 @@
+.progress {
+  position: relative;
+  float: left;
+  margin: 0px 12px;
+}
+
+.progress-pie-chart {
+  width: $progress-circle-width;
+  height: $progress-circle-width;
+  border-radius: $progress-circle-border;
+  background-color: $progress-circle-chart-bg;
+  position: relative;
+  &.gt-50 {
+    background-color: $progress-circle-chart-bg;
+  }
+}
+
+.ppc-progress {
+  content: "";
+  position: absolute;
+  border-radius: $progress-circle-border;
+  left: calc($progress-circle-border - $progress-circle-middle);
+  top: calc($progress-circle-border - $progress-circle-middle);
+  width: $progress-circle-width;
+  height: $progress-circle-width;
+  clip: rect(0, $progress-circle-width, $progress-circle-width, $progress-circle-middle);
+  .ppc-progress-fill {
+    content: "";
+    position: absolute;
+    border-radius: $progress-circle-border;
+    left: calc($progress-circle-border - $progress-circle-middle);
+    top: calc($progress-circle-border - $progress-circle-middle);
+    width: $progress-circle-width;
+    height: $progress-circle-width;
+    clip: rect(0, $progress-circle-middle, $progress-circle-width, 0);
+    background: $middle-sheet-bg;
+    transition: all 1s ease;
+    transform: rotate(0deg);
+  }
+}
+.gt-50{
+  .ppc-progress {
+    clip: rect(0, $progress-circle-middle, $progress-circle-width, 0);
+    .ppc-progress-fill {
+      clip: rect(0, $progress-circle-width, $progress-circle-width, $progress-circle-middle);
+      background: $middle-sheet-bg;
+    }
+  }
+}
+
+.ppc-percents {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  left: calc($progress-circle-border - $progress-circle-center/2);
+  top: calc($progress-circle-border - $progress-circle-center/2);
+  width: $progress-circle-center;
+  height: $progress-circle-center;
+  background: $bottom-sheet-bg;
+  text-align: center;
+  display: table;
+  font-family: $font-roboto;
+  .pcc-percents-wrapper {
+    display: table-cell;
+    vertical-align: middle;
+    color: $progress-circle-label;
+    span {
+      display: block;
+      &.ppc-percent{
+        margin: 0; padding: 0;
+        font-size: 42px;
+      }
+      &.ppc-label{
+        position: relative;
+        top: -6px;
+        font-size: 12px;
+        text-transform: capitalize;
+      }
+    }
+  }
+}
+
+@media screen and (max-height: 638px) {
+  .progress-pie-chart {
+    width: $progress-circle-width-small;
+    height: $progress-circle-width-small;
+  }
+  .ppc-progress {
+    left: calc($progress-circle-border - $progress-circle-middle-small);
+    top: calc($progress-circle-border - $progress-circle-middle-small);
+    width: $progress-circle-width-small;
+    height: $progress-circle-width-small;
+    clip: rect(0, $progress-circle-width-small, $progress-circle-width-small, $progress-circle-middle-small);
+    .ppc-progress-fill {
+      left: calc($progress-circle-border - $progress-circle-middle-small);
+      top: calc($progress-circle-border - $progress-circle-middle-small);
+      width: $progress-circle-width-small;
+      height: $progress-circle-width-small;
+      clip: rect(0, $progress-circle-middle-small, $progress-circle-width-small, 0);
+    }
+  }
+  .gt-50{
+    .ppc-progress {
+      clip: rect(0, $progress-circle-middle-small, $progress-circle-width-small, 0);
+      .ppc-progress-fill {
+        clip: rect(0, $progress-circle-width-small, $progress-circle-width-small, $progress-circle-middle-small);
+      }
+    }
+  }
+
+  .ppc-percents {
+    left: calc($progress-circle-border - $progress-circle-center-small/2);
+    top: calc($progress-circle-border - $progress-circle-center-small/2);
+    width: $progress-circle-center-small;
+    height: $progress-circle-center-small;
+  }
+
+}
