@@ -73,15 +73,6 @@ public class LanternMainActivity extends Activity implements Handler.Callback {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-		// The Action Bar is a window feature. The feature must be requested
-		// before setting a content view. Normally this is set automatically
-		// by your Activity's theme in your manifest. The provided system
-		// theme Theme.WithActionBar enables this for you. Use it as you would
-		// use Theme.NoTitleBar. You can add an Action Bar to your own themes
-		// by adding the element <item name="android:windowActionBar">true</item>
-		// to your style definition.
-		//getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
-
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
@@ -90,9 +81,7 @@ public class LanternMainActivity extends Activity implements Handler.Callback {
         context = getApplicationContext();
         mPrefs = Utils.getSharedPrefs(context);
 
-
         LanternUI = new UI(this, mPrefs);
-
 
         // the ACTION_SHUTDOWN intent is broadcast when the phone is
         // about to be shutdown. We register a receiver to make sure we
