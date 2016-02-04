@@ -74,7 +74,7 @@ func Load(version, revisionDate, buildDate string) {
 	// application flow, but tests might call Load twice, for example, which we
 	// want to allow.
 	once.Do(func() {
-		err := start(settings)
+		err := start()
 		if err != nil {
 			log.Errorf("Unable to register settings service: %q", err)
 			return
@@ -120,14 +120,14 @@ func SetAutoLaunch(auto bool) {
 }
 
 // start the settings service that synchronizes Lantern's configuration with every UI client
-func start(baseSettings *Settings) error {
+func start() error {
 	var err error
 
 	helloFn := func(write func(interface{}) error) error {
-		log.Debugf("Sending Lantern settings to new client")
 		settings.Lock()
 		defer settings.Unlock()
-		return write(baseSettings)
+		log.Debugf("Sending Lantern settings to new client: %+v", settings)
+		return write(settings)
 	}
 	service, err = ui.Register(messageType, nil, helloFn)
 	return err
@@ -138,12 +138,13 @@ func read() {
 	for message := range service.In {
 		log.Tracef("Read settings message!! %+v", message)
 		msg := (message).(map[string]interface{})
-
 		if autoReport, ok := msg["autoReport"].(bool); ok {
 			SetAutoReport(autoReport)
-		} else if proxyAll, ok := msg["proxyAll"].(bool); ok {
+		}
+		if proxyAll, ok := msg["proxyAll"].(bool); ok {
 			SetProxyAll(proxyAll)
-		} else if autoLaunch, ok := msg["autoLaunch"].(bool); ok {
+		}
+		if autoLaunch, ok := msg["autoLaunch"].(bool); ok {
 			SetAutoLaunch(autoLaunch)
 		}
 	}
