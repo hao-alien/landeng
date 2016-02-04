@@ -21,7 +21,7 @@ export function asyncSaveSettings(settings) {
       return dispatch({type: constants.BACKEND_SAVE_SETTINGS_FAILED, status: 'no WebSocket available'})
     }
     dispatch({type: constants.BACKEND_SAVE_SETTINGS, status: settings})
-    const data = {Type: 'Settings', Message: settings}
+    const data = {type: 'settings', message: settings}
     try {
       ws.send(JSON.stringify(data))
     } catch (error) {
@@ -37,7 +37,7 @@ export function asyncSaveUser(user) {
       return dispatch({type: constants.BACKEND_SAVE_USER_FAILED, status: 'no WebSocket available'})
     }
     dispatch({type: constants.BACKEND_SAVE_USER, status: user})
-    const data = {Type: 'User', Message: user}
+    const data = {type: 'user', message: user}
     try {
       ws.send(JSON.stringify(data))
     } catch (error) {
