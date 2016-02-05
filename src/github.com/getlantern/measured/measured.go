@@ -100,7 +100,10 @@ var (
 	chStop       = make(chan interface{})
 
 	// atomic
-	running uint32
+	running     uint32
+	errorList   []*Error
+	latencyList []*Latency
+	trafficList []*Traffic
 )
 
 // DialFunc is the type of function measured can wrap
