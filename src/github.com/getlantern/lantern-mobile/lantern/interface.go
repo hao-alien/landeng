@@ -101,7 +101,7 @@ func Start(provider Provider) error {
 	return nil
 }
 
-func NewProUser(email, token, plan string) error {
+func NewProUser(email, token, plan string) {
 	u := proclient.User{
 		Email: email,
 	}
@@ -116,12 +116,10 @@ func NewProUser(email, token, plan string) error {
 		purchase.Plan = proclient.PlanLanternPro1Y
 	}
 
-	u, err := proClient.PurchaseUserCreate(u, purchase)
+	_, err := proClient.PurchaseUserCreate(u, purchase)
 	if err != nil {
 		log.Errorf("Could not create new Pro user: %v", err)
-		return err
 	}
-	return nil
 }
 
 func ReferralCode(email string) string {
