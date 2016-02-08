@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.os.Looper;
+import android.net.ConnectivityManager;
 import android.util.Log;
 import android.view.View;               
 import android.view.View.OnClickListener;
@@ -176,5 +177,15 @@ public class Utils {
         if (mPrefs != null) {
             mPrefs.edit().remove(PREF_USE_VPN).commit();
         }
+    }
+
+    // isNetworkAvailable checks whether or not we are connected to
+    // the Internet; if no connection is available, the toggle
+    // switch is inactive
+    public static boolean isNetworkAvailable(final Context context) {
+        final ConnectivityManager connectivityManager = 
+            ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
+        return connectivityManager.getActiveNetworkInfo() != null && 
+            connectivityManager.getActiveNetworkInfo().isConnectedOrConnecting();
     }
 }

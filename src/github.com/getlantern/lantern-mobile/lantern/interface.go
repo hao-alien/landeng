@@ -143,5 +143,5 @@ func ReferralCode(email string) string {
 }
 
 func Stop() {
-	go lantern.Exit(nil)
+	lantern.Exit(nil)
 }
