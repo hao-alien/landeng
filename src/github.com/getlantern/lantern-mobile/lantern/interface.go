@@ -9,6 +9,7 @@ import (
 	"github.com/getlantern/golog"
 	"github.com/getlantern/lantern-mobile/lantern/interceptor"
 	"github.com/getlantern/lantern-mobile/lantern/protected"
+	"github.com/stripe/stripe-go"
 
 	proclient "github.com/getlantern/pro-server-client/go-client"
 )
@@ -97,6 +98,29 @@ func Start(provider Provider) error {
 		}
 		provider.AfterStart(lantern.GetVersion())
 	}()
+	return nil
+}
+
+func NewProUser(email, token, plan string) error {
+	u := proclient.User{
+		Email: email,
+	}
+	purchase := proclient.Purchase{
+		IdempotencyKey: stripe.NewIdempotencyKey(),
+		StripeToken:    token,
+		StripeEmail:    email,
+	}
+	if plan == "year" {
+		purchase.Plan = proclient.PlanLanternPro1Y
+	} else {
+		purchase.Plan = proclient.PlanLanternPro1Y
+	}
+
+	u, err := proClient.PurchaseUserCreate(u, purchase)
+	if err != nil {
+		log.Errorf("Could not create new Pro user: %v", err)
+		return err
+	}
 	return nil
 }
 

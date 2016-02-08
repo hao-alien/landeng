@@ -42,7 +42,15 @@
         <activity
             android:name=".activity.WelcomeActivity"
             android:launchMode="singleTask"
-            android:noHistory="true" />
+            android:noHistory="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"></action>
+                <category android:name="android.intent.category.DEFAULT"></category>
+                <category android:name="android.intent.category.BROWSABLE"></category>
+                <data android:scheme="lantern" android:host="pro"></data>
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".activity.InviteActivity"
