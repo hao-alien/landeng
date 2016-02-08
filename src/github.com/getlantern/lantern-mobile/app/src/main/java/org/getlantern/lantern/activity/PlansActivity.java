@@ -27,6 +27,9 @@ import android.net.Uri;
 import android.net.http.SslError;
 import android.webkit.SslErrorHandler;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 import org.getlantern.lantern.activity.PaymentActivity;
 import org.getlantern.lantern.activity.CheckoutActivity;
 import org.getlantern.lantern.R;
@@ -34,8 +37,14 @@ import org.getlantern.lantern.R;
 public class PlansActivity extends Activity {
 
     private static final String TAG = "PlansActivity";
-	private static final String mCheckoutUrl = "file:///android_asset/checkout.html";
-    private static final boolean useWebView = true;
+    private static final String mCheckoutUrl = "https://s3.amazonaws.com/lantern-android/checkout.html?amount=%d";
+    private static final boolean useAlipay = true;
+
+    private static final NumberFormat currencyFormatter = 
+        NumberFormat.getCurrencyInstance(new Locale("en", "US"));
+
+    private static final Integer monthCost = 799;
+    private static final Integer yearCost = 499 * 12;
 
     private Button getCodeBtn, monthBtn, yearBtn;
     private TextView featuresList;
@@ -46,9 +55,10 @@ public class PlansActivity extends Activity {
         setContentView(R.layout.pro_plans);
 
         monthBtn = (Button)findViewById(R.id.month_btn);
-        monthBtn.setTag("$7.99");
+        monthBtn.setTag(monthCost);
+
         yearBtn = (Button)findViewById(R.id.year_btn); 
-        yearBtn.setTag("$59.88");
+        yearBtn.setTag(yearCost);
 
         ImageView backBtn = (ImageView)findViewById(R.id.plansAvatar);
 
@@ -71,9 +81,18 @@ public class PlansActivity extends Activity {
 
     public void selectPlan(View view) {
 		Log.d(TAG, "Plan selected...");
-        Intent intent = new Intent(this, PaymentActivity.class);
-        intent.putExtra("AMOUNT_TO_CHARGE", (String)view.getTag());
+        Intent intent;
+        Integer amount = (Integer)view.getTag();
+        if (useAlipay) {
+            Log.d(TAG, "Chinese user detected; opening Alipay by default");
+            intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(String.format(mCheckoutUrl, amount)));
+        } else {
+            intent = new Intent(this, PaymentActivity.class);
+            String amountStr = currencyFormatter.format(amount / 100.0);
+            intent.putExtra("AMOUNT_TO_CHARGE_STR", amountStr);
+            intent.putExtra("AMOUNT_TO_CHARGE", (Integer)amount);
+        }
         startActivity(intent);
     }
-
 }  

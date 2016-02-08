@@ -1,54 +1,60 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-        <title>Lantern Pro Checkout</title>
-        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.js"></script>
-        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-        <script type="text/javascript">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<title>Lantern Pro Checkout</title>
+		<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.js"></script>
+        <script type="text/javascript" src="https://checkout.stripe.com/checkout.js">
+        <script type="text/javascript" src="js/lantern-pro-js-client.min.js"></script>
+      	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+</head>
+<body>
+	</body>
+    <script type="text/javascript">
+    $(document).ready(function() {
 
-$(function() {
-    var handler;
+        var QueryString = function () {
+            // This function is anonymous, is executed immediately and 
+            // the return value is assigned to QueryString!
+            var query_string = {};
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i=0;i<vars.length;i++) {
+                var pair = vars[i].split("=");
+                // If first entry with this name
+                if (typeof query_string[pair[0]] === "undefined") {
+                    query_string[pair[0]] = decodeURIComponent(pair[1]);
+                    // If second entry with this name
+                } else if (typeof query_string[pair[0]] === "string") {
+                    var arr = [ query_string[pair[0]],decodeURIComponent(pair[1]) ];
+                    query_string[pair[0]] = arr;
+                    // If third or later entry with this name
+                } else {
+                    query_string[pair[0]].push(decodeURIComponent(pair[1]));
+                }
+            } 
+            return query_string;
+        }();
 
-    function processCharge(token) {
-        // Use the token to create the charge with a server-side script.
-        // You can access the token ID with `token.id`
-        console.log(token);
-        alert(token.id);
-    }
-
-    function loadCheckout() {
-        handler = StripeCheckout.configure({
+        StripeCheckout.open({
             key: 'pk_test_4MSPZvz9QtXGWEKdODmzV9ql',
-            name: 'Lantern Pro',
-            image: '/img/lantern_icon.png',
-            description: "Premium Lantern membership",
-            currency: "USD",
+            image: 'http://lantern-desktop-ui.s3-website-us-east-1.amazonaws.com/img/lantern_logo.svg',
+            amount:      QueryString.amount ? QueryString.amount : 799,
+            currency:    'usd',
+            description: 'Lantern Pro',
             locale: 'auto',
             alipay: true,
-            token: processCharge
+            token: function(token) {
+                var args = {
+                    stripeToken: token.id,
+                    stripeEmail: token.email,
+                };
+                var url = 'lantern://pro?' + $.param(args);
+                // on successful payment, redirect user
+                // back to Lantern Pro app
+                window.location = url;
+            }
         });
-
-        handler.open({
-            name: 'Lantern Pro',
-            description: 'Lantern Pro Subscription',
-            email: "test@test.com",
-            amount: 5988
-        });
-    }
-
-    var s = document.createElement("script");
-    s.async = true;
-    s.onload = loadCheckout;
-    s.src = "https://checkout.stripe.com/checkout.js";
-    document.body.appendChild(s);
-
-    // Close Checkout on page navigation
-    $(window).on('popstate', function() {
-        handler.close();
     });
-
-});
-        </script>
-    </head>
-</html>
+    </script>
+</html>   

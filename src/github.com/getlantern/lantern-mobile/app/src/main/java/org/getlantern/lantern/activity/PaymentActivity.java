@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -36,6 +37,7 @@ import com.stripe.exception.InvalidRequestException;
 import com.stripe.model.Charge;
 import com.stripe.android.model.Token;
 
+import java.io.File;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -52,7 +54,7 @@ public class PaymentActivity extends FragmentActivity implements View.OnClickLis
 
     private static final String TAG = "PaymentActivity";
     private static final String publishableApiKey = "pk_test_4MSPZvz9QtXGWEKdODmzV9ql";
-    private static final String mCheckoutUrl = "file:///android_asset/checkout.html";
+    private static final String mCheckoutUrl = "https://s3.amazonaws.com/lantern-android/checkout.html?amount=%d";
 
     private Context mContext;
     private SharedPreferences mPrefs = null;
@@ -60,7 +62,8 @@ public class PaymentActivity extends FragmentActivity implements View.OnClickLis
     private ProgressDialogFragment progressFragment;
     private Button checkoutBtn, cardBtn, alipayBtn;
     private PaymentFormFragment paymentForm;
-    private TextView chargeAmount;
+    private int chargeAmount;
+    private TextView chargeAmountView;
 
     private View cardView;
     private WebView mWebView;
@@ -82,12 +85,12 @@ public class PaymentActivity extends FragmentActivity implements View.OnClickLis
 
         mPrefs = Utils.getSharedPrefs(mContext);
 
-        loadWebView();
-
         Intent intent = getIntent();
 
-        chargeAmount = (TextView)findViewById(R.id.amount_to_charge);
-        chargeAmount.setText(intent.getStringExtra("AMOUNT_TO_CHARGE"));
+        chargeAmount = intent.getIntExtra("AMOUNT_TO_CHARGE", 799);
+        chargeAmountView = (TextView)findViewById(R.id.amount_to_charge);
+        chargeAmountView.setText(intent.getStringExtra("AMOUNT_TO_CHARGE_STR"));
+
 
         paymentForm = (PaymentFormFragment)getSupportFragmentManager().findFragmentById(R.id.payment_form);
 
@@ -111,13 +114,17 @@ public class PaymentActivity extends FragmentActivity implements View.OnClickLis
         switch (v.getId()) {
             case R.id.alipayBtn:
                 Log.d(TAG, "Alipay button pressed");
-                cardView.setVisibility(View.GONE);
-                mWebView.setVisibility(View.VISIBLE); 
+                /*loadWebView();
+                cardView.setVisibility(View.INVISIBLE);
+                mWebView.setVisibility(View.VISIBLE);*/
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(String.format(mCheckoutUrl, chargeAmount)));
+                startActivity(intent);
                 return;
             case R.id.cardBtn:
                 Log.d(TAG, "Card button pressed");
-                mWebView.setVisibility(View.GONE);
-                cardView.setVisibility(View.VISIBLE);
+                //cardView.setVisibility(View.VISIBLE);
+                //mWebView.setVisibility(View.INVISIBLE);
                 return;
             case R.id.paymentAvatar:
                 Log.d(TAG, "Back button pressed");
@@ -142,7 +149,7 @@ public class PaymentActivity extends FragmentActivity implements View.OnClickLis
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {    
-                // don't load the checkout page in the browser
+                // load the checkout page in the browser
                 view.loadUrl(url);    
                 return false;
             }
@@ -152,7 +159,7 @@ public class PaymentActivity extends FragmentActivity implements View.OnClickLis
                 super.onPageFinished(view, url);
             }
         });
-        mWebView.loadUrl(mCheckoutUrl);
+        mWebView.loadUrl(String.format(mCheckoutUrl, chargeAmount));
     }
 
     private class MyWebChromeClient extends WebChromeClient {
@@ -165,7 +172,8 @@ public class PaymentActivity extends FragmentActivity implements View.OnClickLis
 
         @Override
         public boolean onConsoleMessage (ConsoleMessage consoleMessage) {
-            Log.d(TAG, "Got a new console message: " + consoleMessage);
+            Log.d(TAG, "Got a new console message: " 
+                    + consoleMessage.message());
             return true;
         }
 

@@ -1,19 +1,27 @@
 package org.getlantern.lantern.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;                          
 
 import org.getlantern.lantern.activity.InviteActivity;
+import org.getlantern.lantern.sdk.Utils;
 import org.getlantern.lantern.R;
+
+import go.client.*;
 
 public class WelcomeActivity extends Activity {
     private static final String TAG = "WelcomeActivity";
 
+    private Context mContext;
+    private SharedPreferences mPrefs = null;
     private MediaPlayer mMediaPlayer;
 
     @Override
@@ -22,7 +30,26 @@ public class WelcomeActivity extends Activity {
 
         setContentView(R.layout.pro_welcome);
 
-        playWelcomeSound();
+        mContext = this.getApplicationContext();
+        mPrefs = Utils.getSharedPrefs(mContext);
+
+        Uri data = getIntent().getData();
+        if (data != null) {
+            String stripeToken = data.getQueryParameter("stripeToken");
+            String stripeEmail = data.getQueryParameter("stripeEmail");  
+
+            Log.d(TAG, "Stripe token is " + stripeToken +
+                    "; email is " + stripeEmail);
+
+                Client.NewProUser(
+                        stripeEmail,
+                        stripeToken,
+                        "year"
+                );
+
+                mPrefs.edit().putBoolean("proUser", true).commit();
+                playWelcomeSound();
+        }
     }
 
     public void inviteFriends(View view) {
