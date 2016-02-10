@@ -148,7 +148,6 @@ docker-genassets: require-npm
 			npm run build && \
 			cd -; \
 	fi && \
-	\
 	rm -f bin/tarfs bin/rsrc && \
 	go install github.com/getlantern/tarfs/tarfs && \
 	echo "// +build !stub" > $$DEST && \
