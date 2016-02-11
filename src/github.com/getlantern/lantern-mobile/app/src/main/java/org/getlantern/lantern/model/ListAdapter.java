@@ -16,6 +16,7 @@ class ListAdapter extends BaseAdapter {
 
     private Context mContext;
     private ArrayList<NavItem> mNavItems;
+
     private int mLayout;
 
     public ListAdapter(Context context, ArrayList<NavItem> navItems, int layout) {

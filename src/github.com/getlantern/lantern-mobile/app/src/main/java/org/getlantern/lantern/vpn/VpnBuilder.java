@@ -32,6 +32,13 @@ import org.getlantern.lantern.R;
 
 import org.getlantern.lantern.android.vpn.Tun2Socks;
 
+/**
+ * <p>This code is largely based on Shadowsocks code from
+ * <a href="https://github.com/andforce/SmartZPN/tree/master/app/src/main/java/org/zarroboogs/smartzpn">here</a>.</p>
+ *
+ * <p>The tun2socks code came from
+ * <a href="https://github.com/ambrop72/badvpn/tree/master/tun2socks">here</a>.</p>
+ */
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class VpnBuilder extends VpnService {
 
@@ -93,20 +100,12 @@ public class VpnBuilder extends VpnService {
     }
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    public synchronized void configure(final Map settings) throws Exception {
-
+    public synchronized void configure(final String socksAddr) throws Exception {
         vpnThread = new Thread() {
             public void run() {
                 createBuilder();
 
-                String socksAddr = "127.0.0.1:9131";
                 String udpgwAddr = "127.0.0.1:7300";
-                if (settings != null &&
-                    settings.get("socksaddr") != null &&
-                    settings.get("udpgwaddr") != null) {
-                    socksAddr = (String)settings.get("socksaddr");
-                    udpgwAddr = (String)settings.get("udpgwaddr");
-                }
 
                 Tun2Socks.Start(
                         mInterface,
@@ -132,20 +131,6 @@ public class VpnBuilder extends VpnService {
             vpnThread.interrupt();
         }
         vpnThread = null;
-    }
-
-    public void restart(final Map settings) throws Exception {
-        close();
-        Handler mHandler = new Handler();
-        mHandler.postDelayed(new Runnable () {
-            public void run () {
-                try {
-                    configure(settings);
-                } catch (Exception e) {
-                    Log.e(TAG, "Could not call configure again!" + e.getMessage());
-                }
-            }
-        }, 2000);
     }
 
     public static String getDnsResolver(Context context)

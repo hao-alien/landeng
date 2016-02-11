@@ -19,51 +19,31 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/garyburd/redigo/redis"
 	"github.com/getlantern/golog"
 	"github.com/getlantern/keyman"
 	"github.com/getlantern/tlsdialer"
 	"github.com/getlantern/yaml"
 
-	"github.com/getlantern/flashlight/client/chained"
+	"github.com/getlantern/flashlight/client"
 )
 
 const (
 	numberOfWorkers = 50
 	ftVersionFile   = `https://raw.githubusercontent.com/firetweet/downloads/master/version.txt`
-	// KEYS[1]: '<region>:srvq'
-	// KEYS[2]: '<region>:bakedin'
-	// KEYS[3]: '<region>:bakedin-names'
-	// KEYS[4]: 'srvcount'
-	// KEYS[5]: '<region>:srvreqq'
-	// ARGV[1]: unix timestamp in seconds
-	fetchscript = `
-	local cfg = redis.call("rpop", KEYS[1])
-	if not cfg then
-	return "<no-servers-in-srvq>"
-	end
-	redis.call("lpush", KEYS[2], ARGV[1] .. "|" .. cfg)
-	local begin = string.find(cfg, "|")
-	local end_ = string.find(cfg, "|", begin + 1)
-	local name = string.sub(cfg, begin+1, end_-1)
-	redis.call("sadd", KEYS[3], name)
-	local serial = redis.call("incr", KEYS[4])
-	redis.call("lpush", KEYS[5], serial)
-	return cfg
-	`
+	defaultDeviceID = "555"
 )
 
 var (
-	help            = flag.Bool("help", false, "Get usage help")
-	fetchcfg        = flag.Bool("fetchcfg", false, "Fetch a chained fallback server and embed in resulting config")
-	userRegion      = flag.String("region", "", "Region must be one of 'sea' for Southeast Asia (currently, only China) or 'etc' (default) for anywhere else.")
-	masqueradesFile = flag.String("masquerades", "", "Path to file containing list of pasquerades to use, with one space-separated 'ip domain' pair per line (e.g. masquerades.txt)")
-	blacklistFile   = flag.String("blacklist", "", "Path to file containing list of blacklisted domains, which will be excluded from the configuration even if present in the masquerades file (e.g. blacklist.txt)")
-	proxiedSitesDir = flag.String("proxiedsites", "proxiedsites", "Path to directory containing proxied site lists, which will be combined and proxied by Lantern")
-	minFreq         = flag.Float64("minfreq", 3.0, "Minimum frequency (percentage) for including CA cert in list of trusted certs, defaults to 3.0%")
+	help                = flag.Bool("help", false, "Get usage help")
+	masqueradesInFile   = flag.String("masquerades", "", "Path to file containing list of pasquerades to use, with one space-separated 'ip domain' pair per line (e.g. masquerades.txt)")
+	masqueradesOutFile  = flag.String("masquerades-out", "", "Path, if any, to write the go-formatted masquerades configuration.")
+	blacklistFile       = flag.String("blacklist", "", "Path to file containing list of blacklisted domains, which will be excluded from the configuration even if present in the masquerades file (e.g. blacklist.txt)")
+	proxiedSitesDir     = flag.String("proxiedsites", "proxiedsites", "Path to directory containing proxied site lists, which will be combined and proxied by Lantern")
+	proxiedSitesOutFile = flag.String("proxiedsites-out", "", "Path, if any, to write the go-formatted proxied sites configuration.")
+	minFreq             = flag.Float64("minfreq", 3.0, "Minimum frequency (percentage) for including CA cert in list of trusted certs, defaults to 3.0%")
 
-	// Note - you can get the content for the fallbacksFile from https://lanternctrl1-2.appspot.com/listfallbacks
-	fallbacksFile = flag.String("fallbacks", "fallbacks.yaml", "File containing json array of fallback information")
+	fallbacksFile    = flag.String("fallbacks", "fallbacks.yaml", "File containing yaml dict of fallback information")
+	fallbacksOutFile = flag.String("fallbacks-out", "", "Path, if any, to write the go-formatted fallback configuration.")
 )
 
 var (
@@ -107,20 +87,12 @@ func main() {
 	log.Debugf("Using all %d cores on machine", numcores)
 	runtime.GOMAXPROCS(numcores)
 
-	if *fetchcfg {
-		fetchFallbacks()
-	} else {
-		loadFallbacks()
-	}
-
 	loadMasquerades()
 	loadProxiedSitesList()
 	loadBlacklist()
+	loadFallbacks()
 	loadFtVersion()
 
-	masqueradesTmpl := loadTemplate("masquerades.go.tmpl")
-	proxiedSitesTmpl := loadTemplate("proxiedsites.go.tmpl")
-	fallbacksTmpl := loadTemplate("fallbacks.go.tmpl")
 	yamlTmpl := loadTemplate("cloud.yaml.tmpl")
 
 	go feedMasquerades()
@@ -129,32 +101,42 @@ func main() {
 	generateTemplate(model, yamlTmpl, "cloud.yaml")
 	model = buildModel(cas, masqs, true)
 	generateTemplate(model, yamlTmpl, "lantern.yaml")
-	generateTemplate(model, masqueradesTmpl, "../config/masquerades.go")
-	_, err := run("gofmt", "-w", "../config/masquerades.go")
-	if err != nil {
-		log.Fatalf("Unable to format masquerades.go: %s", err)
+	var err error
+	if *masqueradesOutFile != "" {
+		masqueradesTmpl := loadTemplate("masquerades.go.tmpl")
+		generateTemplate(model, masqueradesTmpl, *masqueradesOutFile)
+		_, err = run("gofmt", "-w", *masqueradesOutFile)
+		if err != nil {
+			log.Fatalf("Unable to format %s: %s", *masqueradesOutFile, err)
+		}
 	}
-	generateTemplate(model, proxiedSitesTmpl, "../config/proxiedsites.go")
-	_, err = run("gofmt", "-w", "../config/proxiedsites.go")
-	if err != nil {
-		log.Fatalf("Unable to format proxiedsites.go: %s", err)
+	if *proxiedSitesOutFile != "" {
+		proxiedSitesTmpl := loadTemplate(*proxiedSitesOutFile)
+		generateTemplate(model, proxiedSitesTmpl, *proxiedSitesOutFile)
+		_, err = run("gofmt", "-w", *proxiedSitesOutFile)
+		if err != nil {
+			log.Fatalf("Unable to format %s: %s", *proxiedSitesOutFile, err)
+		}
 	}
-	generateTemplate(model, fallbacksTmpl, "../config/fallbacks.go")
-	_, err = run("gofmt", "-w", "../config/fallbacks.go")
-	if err != nil {
-		log.Fatalf("Unable to format fallbacks.go: %s", err)
+	if *fallbacksOutFile != "" {
+		fallbacksTmpl := loadTemplate(*fallbacksOutFile)
+		generateTemplate(model, fallbacksTmpl, *fallbacksOutFile)
+		_, err = run("gofmt", "-w", *fallbacksOutFile)
+		if err != nil {
+			log.Fatalf("Unable to format %s: %s", *fallbacksOutFile, err)
+		}
 	}
 }
 
 func loadMasquerades() {
-	if *masqueradesFile == "" {
+	if *masqueradesInFile == "" {
 		log.Error("Please specify a masquerades file")
 		flag.Usage()
 		os.Exit(2)
 	}
-	bytes, err := ioutil.ReadFile(*masqueradesFile)
+	bytes, err := ioutil.ReadFile(*masqueradesInFile)
 	if err != nil {
-		log.Fatalf("Unable to read masquerades file at %s: %s", *masqueradesFile, err)
+		log.Fatalf("Unable to read masquerades file at %s: %s", *masqueradesInFile, err)
 	}
 	masquerades = strings.Split(string(bytes), "\n")
 }
@@ -241,61 +223,8 @@ func loadFallbacks() {
 	}
 	err = yaml.Unmarshal(fallbacksBytes, &fallbacks)
 	if err != nil {
-		log.Fatalf("Unable to unmarshal json from %v: %v", *fallbacksFile, err)
+		log.Fatalf("Unable to unmarshal yaml from %v: %v", *fallbacksFile, err)
 	}
-}
-
-func fetchFallbacks() {
-	c, err := redis.DialURL(os.Getenv("REDIS_URL"))
-	if err != nil {
-		log.Fatalf("You need a REDIS_URL env variable.  Get the value at https://github.com/getlantern/too-many-secrets/blob/master/lantern_aws/config_server.yaml#L2")
-	}
-
-	if *userRegion == "" {
-		var region string
-		reply, err := redis.Values(c.Do("MGET", "default-user-region"))
-		if err != nil {
-			log.Fatalf("Could not get default user region: %v", err)
-		}
-		if _, err := redis.Scan(reply, &region); err != nil {
-			log.Fatalf("Could not get default user region: %v", err)
-		}
-		*userRegion = region
-	}
-	log.Debugf("Fetching fallbacks from user region: %s", *userRegion)
-
-	prepend := func(s string) string { return *userRegion + s }
-
-	args := []interface{}{
-		prepend(":srvq"),
-		prepend(":bakedin"),
-		prepend(":bakedin-names"),
-		"srvcount",
-		prepend(":srvreqq"),
-		int64(time.Now().Unix()),
-	}
-
-	reply, err := redis.NewScript(1, fetchscript).Do(c, args...)
-	if err != nil {
-		log.Fatalf("Could not execute LUA script: %v", err)
-	}
-
-	var dest []struct {
-		Fallbacks string
-	}
-
-	if err := redis.ScanSlice([]interface{}{reply}, &dest); err != nil {
-		log.Fatalf("Could not execute script: %v", err)
-	}
-
-	strs := strings.Split(dest[0].Fallbacks, "|")
-
-	err = yaml.Unmarshal([]byte(strs[2]), &fallbacks)
-	if err != nil {
-		log.Fatalf("Unable to unmarshal json from %v: %v", *fallbacksFile, err)
-	}
-
-	log.Debugf("Got fallbacks: %v", fallbacks)
 }
 
 func loadTemplate(name string) string {
@@ -431,7 +360,7 @@ func buildModel(cas map[string]*castat, masquerades []*masquerade, useFallbacks 
 			fb["cert"] = strings.Replace(cert, "\n", "\\n", -1)
 
 			info := f
-			dialer, err := info.Dialer()
+			dialer, err := info.Dialer(defaultDeviceID)
 			if err != nil {
 				log.Debugf("Skipping fallback %v because of error building dialer: %v", f.Addr, err)
 				continue

@@ -1,10 +1,11 @@
 # lantern [![Travis CI Status](https://travis-ci.org/getlantern/lantern.svg?branch=valencia)](https://travis-ci.org/getlantern/lantern)&nbsp;[![Coverage Status](https://coveralls.io/repos/getlantern/lantern/badge.png?branch=valencia)](https://coveralls.io/r/getlantern/lantern)&nbsp;[![ProjectTalk](http://www.projecttalk.io/images/gh_badge-3e578a9f437f841de7446bab9a49d103.svg?vsn=d)] (http://www.projecttalk.io/boards/getlantern%2Flantern?utm_campaign=gh-badge&utm_medium=badge&utm_source=github)
 
-**If you're looking for Lantern binaries, you can find all of them at the following links:**
+**If you're looking for Lantern installers, you can find all of them at the following links:**
 - [Windows XP SP 3 and above](https://raw.githubusercontent.com/getlantern/lantern-binaries/master/lantern-installer-beta.exe)
 - [OSX 10.8 and above](https://raw.githubusercontent.com/getlantern/lantern-binaries/master/lantern-installer-beta.dmg)
 - [Ubuntu 14.04 32 bit](https://raw.githubusercontent.com/getlantern/lantern-binaries/master/lantern-installer-beta-32-bit.deb)
 - [Ubuntu 14.04 64 bit](https://raw.githubusercontent.com/getlantern/lantern-binaries/master/lantern-installer-beta-64-bit.deb)
+- [Arch Linux](https://aur.archlinux.org/packages/lantern)
 
 **If you're looking for help, please visit below user forums:**
 
@@ -14,7 +15,7 @@
 
 ### Requisites
 
-* [Go 1.4.x](https://golang.org/dl/).
+* [Go 1.6rc1 or higher](https://golang.org/dl/).
 * [Docker](https://www.docker.com/).
 * [GNU Make](https://www.gnu.org/software/make/)
 * An OSX or Linux host.
@@ -36,6 +37,15 @@ docker-machine rm default
 docker-machine create --driver virtualbox --virtualbox-cpu-count 2 --virtualbox-memory 4096 default
 ```
 
+### Migrating from boot2docker
+
+If you already have a boot2docker vm that you want to use with the new
+docker-toolbox, you can migrate it with this command:
+
+```bash
+docker-machine create -d virtualbox --virtualbox-import-boot2docker-vm boot2docker-vm default
+```
+
 ### Building the docker image
 
 In order to build the docker image open a terminal, `cd` into the
@@ -49,6 +59,15 @@ make docker
 This will take a while, be patient, you only need to do this once.
 
 ## Building Lantern binaries
+
+### Building for Development
+
+During development, you can build a lantern that includes race detection with
+the below.  Note - this currently only works using Go 1.5 (not 1.6rc1).
+
+```sh
+make lantern
+```
 
 ### Building for Linux
 
@@ -242,62 +261,128 @@ VERSION=2.0.0-beta5 GH_TOKEN=$GITHUB_TOKEN make release
 You can provide a different directory by passing the `LANTERN_BINARIES_PATH`
 env variable.
 
-## Other tasks
+## Mobile
 
-### Creating the Android embeddable library
+### Mobile Prerequisites
 
-In order to build the Android ARM library that can be embedded in applications,
-Lantern is using `gomobile`. This simplifies the process notably.
+Building the mobile library and app requires the following:
 
-Currently, as Go 1.5 is not stable, a specific git revision is used within an
-isolated Docker image.
+1. Install Java JDK 7 or 8
+2. Install Go 1.6rc1 or higher
+3. Install [Android SDK Tools](http://developer.android.com/sdk/index.html#Other)
+4. Install NDK(http://developer.android.com/ndk/downloads/index.html)
 
-To build a development library (takes shorter time):
+Make sure to set these environment variables before trying to build any Android
+components (replace the paths based on wherever you've installed the Android
+SDK and NDK).
+
+```bash
+export ANDROID_HOME=/opt/adt-bundle-mac-x86_64-20130917/sdk
+export PATH=$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools:$PATH
+export NDK_HOME=/opt/android-ndk-r10e
+export PATH=$NDK_HOME:$PATH
+```
+
+### Go Android Library
+
+The core Lantern functionality can be packaged into a native Android library
+with:
 
 ```
 make android-lib
 ```
 
-To build the final version for Firetweet:
+### Java Android SDK
+
+The Java-based Android SDK allows easy embedding of Lantern functionality in 3rd
+party Android apps such as Manoto TV. The SDK can be built with:
 
 ```
-make android-lib-dist
+make android-sdk
 ```
 
-If you pass the `FIRETWEET_MAIN_DIR` env variable to `make android-lib`, the
-generated bindings and library will be copied into it:
+### Lantern Mobile Testbed
+
+This simple Android application provides a way to test the Android SDK. It can
+be built with:
 
 ```
-FIRETWEET_MAIN_DIR=/path/to/firetweet/src/main make android-lib
+make android-testbed
 ```
 
-You can also override this environment variable if you want to use the
-[Flashlight Android Tester](https://github.com/getlantern/lantern-mobile-single-app-example) app.
+### Lantern Mobile App
 
-#### Creating the Android library without docker
+To build the full lantern mobile app:
 
-1. Install Java JDK 7 or 8
-2. Install [Android SDK Tools](http://developer.android.com/sdk/index.html#Other)
-3. Install NDK(http://developer.android.com/ndk/downloads/index.html)
-4. Install lantern's [fork of gomobile](https://github.com/getlantern/mobile)
-
-Useful environment variables (replace the paths based on wherever you've
-installed the Android SDK and NDK).
-
-```bash
-export ANDROID_HOME=/opt/adt-bundle-mac-x86_64-20130917/sdk
-export PATH=$ANDROID_HOME/tools:$PATH
-export NDK_HOME=/opt/android-ndk-r10e
-export PATH=$NDK_HOME:$PATH
 ```
-)
-
-Then to build the library:
-
-```bash
-make android-lib-local
+make android-debug
 ```
 
+To install on the default device:
+
+```
+make android-install
+```
+
+### Android Tips
+#### Uninstall for All Users
+If you use `adb` to install and debug an app to your Android device during
+development and then subsequently build a signed APK and try to install it on
+that same device, you may receive an unhelpful error saying "App Not Installed".
+This typically means that you tried to install the same app but signed with a
+different key.  The solution is to uninstall the app first, but **you have to
+uninstall it for all users**. You can do this by selecting "Uninstall for all
+users" from:
+
+```
+Settings -> Apps -> [Pick the App] -> Hamburger Menu (...) -> Uninstall for all users.
+```
+
+If you forget to do this and just uninstall normally, you'll still encounter the
+error. To fix this, you'll have to run the app with `adb` again and then
+uninstall for all users.
+
+#### Getting HTTP Connections to Use Proxy
+
+In android, programmatic access to HTTP resources typically uses the
+`HttpURLConnection` class.  You can tell it to use a proxy by setting some
+system properties:
+
+```java
+System.setProperty("http.proxyHost", host);
+System.setProperty("http.proxyPort", port);
+System.setProperty("https.proxyHost", host);
+System.setProperty("https.proxyPort", port);
+```
+
+You can disable proxying by clearing those properties:
+
+```java
+System.clearProperty("http.proxyHost");
+System.clearProperty("http.proxyPort");
+System.clearProperty("https.proxyHost");
+System.clearProperty("https.proxyPort");
+```
+
+However, there is one big caveat - **`HttpURLConnection` uses keep-alives to
+reuse existing TCP connections**. These TCP connections will still be using the
+old proxy settings. This has several implications:
+
+**Set the proxy settings as early in the application's lifecycle as possible**,
+ideally before any `HttpURLConnection`s have been opened.
+
+**Don't expect the settings to take effect immediately** if some
+`HttpURLConnection`s have already been opened.
+
+**Disable keep-alives if you need to**, which you can do like this:
+
+```java
+HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+// Need to force closing so that old connections (with old proxy settings) don't get reused.
+urlConnection.setRequestProperty("Connection", "close");
+```
+
+## Other
 ### Generating assets
 
 ```sh

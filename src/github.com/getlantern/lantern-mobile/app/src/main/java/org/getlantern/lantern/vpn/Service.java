@@ -14,20 +14,14 @@ import org.getlantern.lantern.sdk.Utils;
 
 import java.util.Map;
 
+import go.lantern.Lantern;
+
 public class Service extends VpnBuilder implements Runnable {
 
     private static final String TAG = "VpnService";
     public static boolean IsRunning = false;
 
-    private String mSessionName = "LanternVpn";
-
-    private Handler mHandler;
-    private LanternVpn lantern;
     private Thread mThread = null;
-
-    public Service() {
-        mHandler = new Handler();
-    }
 
     @Override
     public void onCreate() {
@@ -48,12 +42,21 @@ public class Service extends VpnBuilder implements Runnable {
     public synchronized void run() {
         try {
             Log.d(TAG, "Loading Lantern library");
-            final Service service = this;
-            lantern = new LanternVpn(this);
-            lantern.Start();
-
-            Thread.sleep(1000*2);
-            service.configure(lantern.getSettings());
+            Lantern.ProtectConnections(getDnsResolver(getApplicationContext()), new Lantern.SocketProtector.Stub() {
+                // Protect is used to exclude a socket specified by fileDescriptor
+                // from the VPN connection. Once protected, the underlying connection
+                // is bound to the VPN device and won't be forwarded
+                @Override
+                public void Protect(long fileDescriptor) throws Exception {
+                    if (!protect((int) fileDescriptor)) {
+                        throw new Exception("protect socket failed");
+                    }
+                }
+            });
+            int startTimeoutMillis = 60000;
+            String analyticsTrackingID = "UA-21815217-14";
+            Lantern.StartResult result = org.lantern.mobilesdk.Lantern.enable(getApplicationContext(), startTimeoutMillis, analyticsTrackingID);
+            configure(result.getSOCKS5Addr());
 
             while (IsRunning) {
                 // sleep to avoid busy looping
@@ -74,9 +77,8 @@ public class Service extends VpnBuilder implements Runnable {
         try {
             super.close();
             Log.d(TAG, "Closing VPN interface..");
-            lantern.Stop();
         } catch (Exception e) {
-            
+
         }
 
         stopSelf();

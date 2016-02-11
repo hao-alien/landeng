@@ -4,80 +4,99 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"net/http/httputil"
 	"reflect"
-	"runtime"
 	"sync"
 	"time"
 
+	"github.com/armon/go-socks5"
 	"github.com/getlantern/balancer"
-	"github.com/getlantern/flashlight/autoupdate"
-	clientconfig "github.com/getlantern/flashlight/client/config"
-	"github.com/getlantern/flashlight/config"
-	"github.com/getlantern/flashlight/logging"
-	"github.com/getlantern/flashlight/pac"
-	"github.com/getlantern/flashlight/proxiedsites"
-	"github.com/getlantern/flashlight/settings"
-	"github.com/getlantern/flashlight/statreporter"
-	"github.com/getlantern/flashlight/statserver"
-	"github.com/getlantern/flashlight/util"
-	"github.com/getlantern/fronted"
+	"github.com/getlantern/eventual"
 	"github.com/getlantern/golog"
 )
 
 var (
-	log      = golog.LoggerFor("flashlight.client")
-	cfgMutex sync.Mutex
+	log = golog.LoggerFor("flashlight.client")
+
+	addr      = eventual.NewValue()
+	socksAddr = eventual.NewValue()
 )
 
 // Client is an HTTP proxy that accepts connections from local programs and
 // proxies these via remote flashlight servers.
 type Client struct {
-	// Addr: listen address in form of host:port
-	Addr string
-
 	// ReadTimeout: (optional) timeout for read ops
 	ReadTimeout time.Duration
 
 	// WriteTimeout: (optional) timeout for write ops
 	WriteTimeout time.Duration
 
-	// ProxyAll: (optional)  poxy all sites regardless of being blocked or not
-	ProxyAll bool
+	// ProxyAll: (optional) proxy all sites regardless of being blocked or not
+	ProxyAll func() bool
 
 	// MinQOS: (optional) the minimum QOS to require from proxies.
 	MinQOS int
 
-	priorCfg *clientconfig.ClientConfig
+	// Unique identifier for this device
+	DeviceID string
+
+	priorCfg *ClientConfig
 	cfgMutex sync.RWMutex
 
 	// Balanced CONNECT dialers.
-	balCh          chan *balancer.Balancer
-	balInitialized bool
+	bal eventual.Value
 
-	// Reverse HTTP proxies.
-	rpCh          chan *httputil.ReverseProxy
-	rpInitialized bool
-
-	// version of Lantern for this client
-	Version      string
-	RevisionDate string
+	// Reverse proxy
+	rp eventual.Value
 
 	l net.Listener
 }
 
-// ListenAndServe makes the client listen for HTTP connections.  onListeningFn
-// is a callback that gets invoked as soon as the server is accepting TCP
-// connections.
-func (client *Client) ListenAndServe(onListeningFn func()) error {
+func NewClient() *Client {
+	return &Client{
+		bal: eventual.NewValue(),
+		rp:  eventual.NewValue(),
+	}
+}
+
+// Addr returns the address at which the client is listening with HTTP, blocking
+// until the given timeout for an address to become available.
+func Addr(timeout time.Duration) (interface{}, bool) {
+	return addr.Get(timeout)
+}
+
+func (c *Client) Addr(timeout time.Duration) (interface{}, bool) {
+	return Addr(timeout)
+}
+
+// Addr returns the address at which the client is listening with SOCKS5,
+// blocking until the given timeout for an address to become available.
+func Socks5Addr(timeout time.Duration) (interface{}, bool) {
+	return socksAddr.Get(timeout)
+}
+
+func (c *Client) Socks5Addr(timeout time.Duration) (interface{}, bool) {
+	return Socks5Addr(timeout)
+}
+
+// ListenAndServe makes the client listen for HTTP connections at a the given
+// address or, if a blank address is given, at a random port on localhost.
+// onListeningFn is a callback that gets invoked as soon as the server is
+// accepting TCP connections.
+func (client *Client) ListenAndServeHTTP(requestedAddr string, onListeningFn func()) error {
+	log.Debug("About to listen")
+	if requestedAddr == "" {
+		requestedAddr = "localhost:0"
+	}
+
 	var err error
 	var l net.Listener
-
-	if l, err = net.Listen("tcp", client.Addr); err != nil {
-		return fmt.Errorf("Client proxy was unable to listen at %s: %q", client.Addr, err)
+	if l, err = net.Listen("tcp", requestedAddr); err != nil {
+		return fmt.Errorf("Unable to listen: %q", err)
 	}
 
 	client.l = l
+	listenAddr := l.Addr().String()
+	addr.Set(listenAddr)
 	onListeningFn()
 
 	httpServer := &http.Server{
@@ -87,60 +106,43 @@ func (client *Client) ListenAndServe(onListeningFn func()) error {
 		ErrorLog:     log.AsStdLogger(),
 	}
 
-	log.Debugf("About to start client (HTTP) proxy at %s", client.Addr)
-
+	log.Debugf("About to start HTTP client proxy at %v", listenAddr)
 	return httpServer.Serve(l)
 }
 
-func (client *Client) ApplyClientConfig(cfg *config.Config) {
-	cfgMutex.Lock()
-	defer cfgMutex.Unlock()
+func (client *Client) ListenAndServeSOCKS5(requestedAddr string) error {
+	var err error
+	var l net.Listener
+	if l, err = net.Listen("tcp", requestedAddr); err != nil {
+		return fmt.Errorf("Unable to listen: %q", err)
+	}
+	listenAddr := l.Addr().String()
+	socksAddr.Set(listenAddr)
 
-	certs, err := cfg.GetTrustedCACerts()
+	conf := &socks5.Config{
+		Dial: func(network, addr string) (net.Conn, error) {
+			bal, ok := client.bal.Get(1 * time.Minute)
+			if !ok {
+				return nil, fmt.Errorf("Unable to get balancer")
+			}
+			// Using protocol "connect" will cause the balancer to issue an HTTP
+			// CONNECT request to the upstream proxy and return the resulting channel
+			// as a connection.
+			return bal.(*balancer.Balancer).Dial("connect", addr)
+		},
+	}
+	server, err := socks5.New(conf)
 	if err != nil {
-		log.Errorf("Unable to get trusted ca certs, not configure fronted: %s", err)
-	} else {
-		fronted.Configure(certs, cfg.Client.MasqueradeSets)
+		return fmt.Errorf("Unable to create SOCKS5 server: %v", err)
 	}
 
-	autoupdate.Configure(cfg)
-
-	logging.Configure(cfg.Addr, cfg.CloudConfigCA,
-		settings.GetInstanceID(),
-		client.Version, client.RevisionDate)
-
-	proxiedsites.Configure(cfg.ProxiedSites)
-
-	log.Debugf("Proxy all traffic or not: %v", settings.GetProxyAll())
-	pac.ServeProxyAllPacFile(settings.GetProxyAll())
-	// Note - we deliberately ignore the error from statreporter.Configure here
-	_ = statreporter.Configure(cfg.Stats, settings.GetInstanceID())
-
-	// Update client configuration and get the highest QOS dialer available.
-	client.Configure(cfg.Client)
-
-	// We offload this onto a go routine because creating the http clients
-	// blocks on waiting for the local server, and the local server starts
-	// later on this same thread, so it would otherwise creating a deadlock.
-	if runtime.GOOS != "android" {
-		go func() {
-			withHttpClient(cfg.Addr, statserver.Configure)
-		}()
-	}
-}
-
-func withHttpClient(addr string, withClient func(client *http.Client)) {
-	if httpClient, err := util.HTTPClient("", addr); err != nil {
-		log.Errorf("Could not create HTTP client via %s: %s", addr, err)
-	} else {
-		withClient(httpClient)
-	}
+	log.Debugf("About to start SOCKS5 client proxy at %v", listenAddr)
+	return server.Serve(l)
 }
 
 // Configure updates the client's configuration. Configure can be called
-// before or after ListenAndServe, and can be called multiple times.  It
-// returns the highest QOS fronted.Dialer available, or nil if none available.
-func (client *Client) Configure(cfg *clientconfig.ClientConfig) {
+// before or after ListenAndServe, and can be called multiple times.
+func (client *Client) Configure(cfg *ClientConfig, proxyAll func() bool) {
 	client.cfgMutex.Lock()
 	defer client.cfgMutex.Unlock()
 
@@ -158,23 +160,22 @@ func (client *Client) Configure(cfg *clientconfig.ClientConfig) {
 
 	log.Debugf("Requiring minimum QOS of %d", cfg.MinQOS)
 	client.MinQOS = cfg.MinQOS
-	log.Debugf("Proxy all traffic or not: %v", settings.GetProxyAll())
-	client.ProxyAll = settings.GetProxyAll()
+	log.Debugf("Proxy all traffic or not: %v", proxyAll())
+	client.ProxyAll = proxyAll
+	client.DeviceID = cfg.DeviceID
 
-	client.initBalancer(cfg)
+	bal, err := client.initBalancer(cfg)
+	if err != nil {
+		log.Error(err)
+	} else if bal != nil {
+		client.rp.Set(client.newReverseProxy(bal))
+	}
 
 	client.priorCfg = cfg
 }
 
 // Stop is called when the client is no longer needed. It closes the
 // client listener and underlying dialer connection pool
-func (client *Client) Stop() {
-
-	bal := client.GetBalancer()
-	if bal != nil {
-		bal.Close()
-	}
-	if client.l != nil {
-		client.l.Close()
-	}
+func (client *Client) Stop() error {
+	return client.l.Close()
 }

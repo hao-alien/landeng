@@ -5,10 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
-	"runtime"
 	"sync"
-
-	"code.google.com/p/go-uuid/uuid"
 
 	"github.com/getlantern/appdir"
 	"github.com/getlantern/launcher"
@@ -27,8 +24,7 @@ var (
 	service    *ui.Service
 	settings   *Settings
 	httpClient *http.Client
-	yamlName   = "settings.yaml"
-	path       = filepath.Join(appdir.General("Lantern"), yamlName)
+	path       = filepath.Join(appdir.General("Lantern"), "settings.yaml")
 	once       = &sync.Once{}
 )
 
@@ -40,50 +36,34 @@ type Settings struct {
 	AutoReport   bool
 	AutoLaunch   bool
 	ProxyAll     bool
-	InstanceID   string
-
-	HttpAddr  string
-	SocksAddr string
 
 	sync.RWMutex
 }
 
-func SetAndroidPath(settingsDir string) {
-	path = filepath.Join(settingsDir, yamlName)
-}
-
 // Load loads the initial settings at startup, either from disk or using defaults.
-func Load(version, revisionDate, buildDate string) *Settings {
-
-	log.Debugf("Attempting to load settings file from path: %s", path)
-
+func Load(version, revisionDate, buildDate string) {
+	log.Debug("Loading settings")
 	// Create default settings that may or may not be overridden from an existing file
 	// on disk.
 	settings = &Settings{
 		AutoReport: true,
 		AutoLaunch: true,
 		ProxyAll:   false,
-		HttpAddr:   "127.0.0.1:8787",
-		SocksAddr:  "127.0.0.1:9131",
-		InstanceID: uuid.New(),
 	}
 
 	// Use settings from disk if they're available.
-	bytes, err := ioutil.ReadFile(path)
-	if err != nil {
+	if bytes, err := ioutil.ReadFile(path); err != nil {
 		log.Debugf("Could not read file %v", err)
+	} else if err := yaml.Unmarshal(bytes, settings); err != nil {
+		log.Errorf("Could not load yaml %v", err)
+		// Just keep going with the original settings not from disk.
 	} else {
-		if err := yaml.Unmarshal(bytes, settings); err != nil {
-			log.Errorf("Could not load yaml %v", err)
-			// Just keep going with the original settings not from disk.
-		}
+		log.Debugf("Loaded settings from %v", path)
 	}
 
-	// don't create an launch file on android
-	if runtime.GOOS != "android" && settings.AutoLaunch {
+	if settings.AutoLaunch {
 		launcher.CreateLaunchFile(settings.AutoLaunch)
 	}
-
 	// always override below 3 attributes as they are not meant to be persisted across versions
 	settings.Version = version
 	settings.BuildDate = buildDate
@@ -92,32 +72,14 @@ func Load(version, revisionDate, buildDate string) *Settings {
 	// Only configure the UI once. This will typically be the case in the normal
 	// application flow, but tests might call Load twice, for example, which we
 	// want to allow.
-	if runtime.GOOS != "android" {
-		once.Do(func() {
-			err := start(settings)
-			if err != nil {
-				log.Errorf("Unable to register settings service: %q", err)
-				return
-			}
-			go read()
-		})
-	}
-
-	return settings
-}
-
-// GetInstanceID returns the unique identifier for Lantern on this machine.
-func GetInstanceID() string {
-	settings.RLock()
-	defer settings.RUnlock()
-	return settings.InstanceID
-}
-
-// SetInstanceID sets the unique identifier for Lantern on this machine.
-func SetInstanceID(id string) {
-	settings.Lock()
-	defer settings.Unlock()
-	settings.InstanceID = id
+	once.Do(func() {
+		err := start(settings)
+		if err != nil {
+			log.Errorf("Unable to register settings service: %q", err)
+			return
+		}
+		go read()
+	})
 }
 
 // GetProxyAll returns whether or not to proxy all traffic.
@@ -188,11 +150,14 @@ func read() {
 
 // Saves settings to disk.
 func Save() {
+	log.Debug("Saving settings")
 	settings.Lock()
 	defer settings.Unlock()
 	if bytes, err := yaml.Marshal(settings); err != nil {
 		log.Errorf("Could not create yaml from settings %v", err)
 	} else if err := ioutil.WriteFile(path, bytes, 0644); err != nil {
 		log.Errorf("Could not write settings file %v", err)
+	} else {
+		log.Debugf("Saved settings to %s", path)
 	}
 }

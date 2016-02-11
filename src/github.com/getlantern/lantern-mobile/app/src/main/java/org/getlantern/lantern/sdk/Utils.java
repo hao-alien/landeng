@@ -38,14 +38,6 @@ public class Utils {
     private static final String PREFS_NAME = "LanternPrefs";
     private static final String TAG = "Utils";
     private final static String PREF_USE_VPN = "pref_vpn";
-    private final static Map settings;
-    static {
-        settings = new HashMap();
-        settings.put("httpaddr", "127.0.0.1:8787");
-        settings.put("socksaddr", "127.0.0.1:9131"); 
-        settings.put("udpgwaddr", "127.0.0.1:7300"); 
-    }
-
 
     // update START/STOP power Lantern button
     // according to our stored preference
@@ -171,7 +163,6 @@ public class Utils {
     }
 
     public static void clearPreferences(Context context) {
-
         SharedPreferences mPrefs = getSharedPrefs(context);
 
         if (mPrefs != null) {
