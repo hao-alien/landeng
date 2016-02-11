@@ -170,6 +170,7 @@ func doMain() error {
 
 		err := flashlight.Run(
 			"localhost:8787",
+			"localhost:8788",
 			*configdir,
 			*stickyConfig,
 			settings.GetProxyAll,
@@ -200,16 +201,6 @@ func beforeStart(cfg *config.Config) bool {
 		finishProfiling := profiling.Start(cfg.CpuProfile, cfg.MemProfile)
 		addExitFunc(finishProfiling)
 	}
-
-	// Set Lantern as system proxy by creating and using a PAC file.
-	go func() {
-		addr, ok := client.Addr(5 * time.Minute)
-		if !ok {
-			log.Error("Unable to obtain client address to set as system proxy")
-		} else {
-			setProxyAddr(addr.(string))
-		}
-	}()
 
 	if err := setUpPacTool(); err != nil {
 		exit(err)

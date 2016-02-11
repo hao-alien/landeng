@@ -13,17 +13,21 @@ import (
 	"github.com/getlantern/flashlight/logging"
 )
 
-// While in development mode we probably would not want auto-updates to be
-// applied. Using a big number here prevents such auto-updates without
-// disabling the feature completely. The "make package-*" tool will take care
-// of bumping this version number so you don't have to do it by hand.
 const (
+	// While in development mode we probably would not want auto-updates to be
+	// applied. Using a big number here prevents such auto-updates without
+	// disabling the feature completely. The "make package-*" tool will take care
+	// of bumping this version number so you don't have to do it by hand.
 	DefaultPackageVersion = "9999.99.99"
-	PackageVersion        = DefaultPackageVersion
 )
 
 var (
 	log = golog.LoggerFor("flashlight")
+
+	// compileTimePackageVersion is set at compile-time for production builds
+	compileTimePackageVersion string
+
+	PackageVersion = bestPackageVersion()
 
 	Version      string
 	RevisionDate string // The revision date and time that is associated with the version string.
@@ -32,7 +36,16 @@ var (
 	cfgMutex sync.Mutex
 )
 
+func bestPackageVersion() string {
+	if compileTimePackageVersion != "" {
+		return compileTimePackageVersion
+	} else {
+		return DefaultPackageVersion
+	}
+}
+
 func init() {
+	log.Debugf("****************************** Package Version: %v", PackageVersion)
 	if PackageVersion != DefaultPackageVersion {
 		// packageVersion has precedence over GIT revision. This will happen when
 		// packing a version intended for release.
@@ -50,6 +63,7 @@ func init() {
 
 // Run runs a client proxy. It blocks as long as the proxy is running.
 func Run(httpProxyAddr string,
+	socksProxyAddr string,
 	configDir string,
 	stickyConfig bool,
 	proxyAll func() bool,
@@ -89,9 +103,19 @@ func Run(httpProxyAddr string,
 			}
 		}()
 
-		log.Debug("Starting client proxy")
-		err = client.ListenAndServe(httpProxyAddr, func() {
-			log.Debug("Started client proxy")
+		if socksProxyAddr != "" {
+			go func() {
+				log.Debug("Starting client SOCKS5 proxy")
+				err = client.ListenAndServeSOCKS5(socksProxyAddr)
+				if err != nil {
+					log.Errorf("Unable to start SOCKS5 proxy: %v", err)
+				}
+			}()
+		}
+
+		log.Debug("Starting client HTTP proxy")
+		err = client.ListenAndServeHTTP(httpProxyAddr, func() {
+			log.Debug("Started client HTTP proxy")
 			// We finally tell the config package to start polling for new configurations.
 			// This is the final step because the config polling itself uses the full
 			// proxying capabilities of Lantern, so it needs everything to be properly
