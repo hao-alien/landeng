@@ -214,12 +214,6 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
         return true;
     }
 
-    public void sendDesktopVersion(View view) {
-        if (LanternUI != null) {
-            LanternUI.sendDesktopVersion(view);
-        }
-    }
-
     // Make a VPN connection from the client
     // We should only have one active VPN connection per client
     private void startVpnService ()
