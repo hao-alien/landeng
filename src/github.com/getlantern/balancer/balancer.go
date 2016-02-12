@@ -67,14 +67,14 @@ func (b *Balancer) AllAuthTokens() []string {
 	return result
 }
 
-func (b *Balancer) dialerAndConn(network, addr string, targetQOS int) (d *Dialer, conn net.Conn, err error) {
+func (b *Balancer) dialerAndConn(network, addr string, targetQOS int) (*Dialer, net.Conn, error) {
 	var dialers []*dialer
 
 	_, port, _ := net.SplitHostPort(addr)
 
 	// We try to identify HTTP traffic (as opposed to HTTPS) by port and only
 	// send HTTP traffic to dialers marked as trusted.
-	if port == "" || port == "80" || port == "8080" || port == "7300" {
+	if port == "" || port == "80" || port == "8080" {
 		dialers = b.trusted
 		if len(b.trusted) == 0 {
 			log.Error("No trusted dialers!")
@@ -82,6 +82,7 @@ func (b *Balancer) dialerAndConn(network, addr string, targetQOS int) (d *Dialer
 	} else {
 		dialers = b.dialers
 	}
+
 	// To prevent dialing infinitely
 	attempts := 3
 	for i := 0; i < attempts; i++ {
@@ -93,9 +94,8 @@ func (b *Balancer) dialerAndConn(network, addr string, targetQOS int) (d *Dialer
 		if d == nil {
 			return nil, nil, fmt.Errorf("No dialers left on pass %v", i)
 		}
-
 		log.Debugf("Dialing %s://%s with %s", network, addr, d.Label)
-		conn, err = d.Dial(network, addr)
+		conn, err := d.Dial(network, addr)
 
 		if err != nil {
 			log.Errorf("Unable to dial via %v to %s://%s: %v on pass %v...continuing", d.Label, network, addr, err, i)

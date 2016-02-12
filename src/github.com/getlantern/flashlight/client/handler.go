@@ -89,7 +89,7 @@ func (client *Client) intercept(resp http.ResponseWriter, req *http.Request) {
 		// that is effectively always "tcp" in the end, but we look for this
 		// special "transport" in the dialer and send a CONNECT request in that
 		// case.
-		return client.GetBalancer().Dial("connect", addr)
+		return client.getBalancer().Dial("connect", addr)
 	}
 
 	if client.ProxyAll() {

@@ -1,7 +1,7 @@
 package config
 
 import (
-	client "github.com/getlantern/flashlight/client/chained"
+	"github.com/getlantern/flashlight/client"
 )
 
 var fallbacks = map[string]*client.ChainedServerInfo{}
