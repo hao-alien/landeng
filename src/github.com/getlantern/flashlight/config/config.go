@@ -463,6 +463,8 @@ func (cfg Config) cloudPollSleepTime() time.Duration {
 }
 
 func fetchCloudConfig(url string) ([]byte, error) {
+	// Add a cache-buster to the url
+	url = fmt.Sprintf("%v?rand=%v", url, uuid.New())
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to construct request for cloud config at %s: %s", url, err)
