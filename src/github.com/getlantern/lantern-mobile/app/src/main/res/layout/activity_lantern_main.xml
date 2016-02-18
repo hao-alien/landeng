@@ -273,9 +273,8 @@
                     android:gravity="center_horizontal"
                     android:paddingLeft="16dp"
                     android:text="Lantern"
-                    android:textSize="15sp"
-                    android:textColor="#fff"
-                    android:textStyle="bold" />
+                    android:textSize="20sp"
+                    android:textColor="#fff"/>
             </LinearLayout>
         </RelativeLayout>
         <!-- List of Actions (pages) -->

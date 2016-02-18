@@ -41,7 +41,7 @@
     <!-- content background -->
     <item>
         <shape>
-            <solid android:color="#39C2D6" />
+            <solid android:color="#00BCD4" />
         </shape>
     </item>
 

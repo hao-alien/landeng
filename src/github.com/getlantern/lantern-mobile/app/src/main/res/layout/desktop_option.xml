@@ -54,7 +54,6 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:layout_marginLeft="10dp"
         android:orientation="vertical"
         android:elevation="5dp"
         android:background="@android:drawable/dialog_holo_light_frame"

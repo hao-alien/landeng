@@ -25,7 +25,7 @@
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="52dp"
+            android:layout_height="56dp"
             android:layout_centerVertical="true"
             android:layout_marginLeft="15dp"
             android:layout_toRightOf="@+id/plansAvatar"
@@ -88,7 +88,8 @@
                 android:id="@+id/features_list"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
+                android:fontFamily="sans-serif"
+                android:lineSpacingExtra="5dp"
                 android:layout_marginTop="5dp"
                 android:text=""
                 android:textSize="14sp"
@@ -142,7 +143,7 @@
                     android:layout_centerVertical ="true"
                     android:layout_marginLeft="13dp"
                     android:text="$4.99/mo"
-                    android:textSize="34sp"
+                    android:textSize="36sp"
                     android:textStyle="bold"
                     android:alpha=".87"
                     android:textColor="@color/black"/>
@@ -198,7 +199,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="13dp"
                     android:text="$7.99/mo"
-                    android:textSize="34sp"
+                    android:textSize="36sp"
                     android:textStyle="bold"
                     android:alpha=".87"
                     android:textColor="@color/black"/>

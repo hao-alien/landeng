@@ -36,13 +36,13 @@
     <string name="install_update">Update</string>
     <string name="error_update">Error Downloading Update</string>
     <string name="manual_update">Try manually installing the latest version from &lt;a href="https://lantern-android.io">here1&lt;/a></string>
-    <string name="pro_welcome_text">Welcome to Lantern Pro!</string>
-    <string name="thanks_purchase">Thanks for your purchase of Lantern Pro!</string>
+    <string name="pro_welcome_text">Welcome to Lantern PRO!</string>
+    <string name="thanks_purchase">Thanks for your purchase of Lantern PRO!</string>
     <string name="start_inviting">\r\nStart inviting!</string>
-    <string name="invite_friends">Enter your e-mail to receive a code to share with your friends. Get a free month of Pro when they sign up!</string>
-    <string name="invite_friends_welcome">Invite friends and you will both get a free month of Lantern Pro when they sign up.</string>
+    <string name="invite_friends">Enter your e-mail to receive a code to share with your friends. Get a free month of PRO when they sign up!</string>
+    <string name="invite_friends_welcome">Invite friends and you will both get a free month of Lantern PRO when they sign up.</string>
     <string name="invite_friends_btn">Invite Friends</string>
-    <string name="continue_to_pro">Continue to Pro</string>
+    <string name="continue_to_pro">Continue to PRO</string>
     <string name="get_free_months">Get Free Months</string>
     <string name="text_invite">Text Invite</string>
     <string name="email_invite">Email Invite</string>
@@ -51,8 +51,8 @@
     <string name="get_code_text">Enter your email to receive a code to share with your friends, get a free month of PRO when they sign up!</string>
     <string name="enter_your_email">Enter your email to receive a referral code</string>
     <string name="previous_code">If you have previously received a referral code\r\nplease make sure to use the same email address.</string>
-    <string name="payment_plans">Lantern Pro Payment Plans</string>
-    <string name="features_text">Lantern Pro Features</string>
+    <string name="payment_plans">Lantern PRO Payment Plans</string>
+    <string name="features_text">Lantern PRO Features</string>
     <string name="features_list"><![CDATA[ &#8226; Faster Connection Speed<br/>&#8226; Smarter Servers<br/>&#8226; Stronger Blocking Resistance ]]></string>
 	<string name="checkout">Checkout</string>
 	<string name="com.stripe.publishable_key">your-live-publishable-key</string>
@@ -63,7 +63,7 @@
     <string name="progressMessage">Creating Token&#8230;</string>
     <string name="progressMessage2">Retrieving referral code</string>
     <string name="language">Language</string>
-    <string name="sign_in_pro">Sign in to Pro</string>
+    <string name="sign_in_pro">Sign in to PRO</string>
     <string name="sign_in_list"><![CDATA[ &#8226; Enter your email and we will send you a link<br/>&#8226; Click the link to authorize this device to use your Lantern Pro account ]]></string>
     <string name="send_link">Send Link</string>
     <string name="click_button">Click the button to access blocked sites and services</string>
@@ -75,7 +75,7 @@
     <string name="select">Select</string>
     <string name="twelve_months">for 12 months</string>
     <string name="one_month">for 1 month</string>
-    <string name="best_value">Best value!</string>
+    <string name="best_value">Best VALUE!</string>
     <string name="referral_code">Referral Code (optional)</string>
     <string name="total">Total:</string>
     <string name="pro_account_header">Pro Account Management</string>
