@@ -38,7 +38,7 @@ public class PlansActivity extends Activity {
 
     private static final String TAG = "PlansActivity";
     private static final String mCheckoutUrl = "https://s3.amazonaws.com/lantern-android/checkout.html?amount=%d";
-    private static final boolean useAlipay = true;
+    private static final boolean useAlipay = false;
 
     private static final NumberFormat currencyFormatter = 
         NumberFormat.getCurrencyInstance(new Locale("en", "US"));
