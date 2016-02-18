@@ -143,16 +143,8 @@ public class UI {
         this.setupStatusToast();
     }
 
-    public void setVersionNum(final String latestVersion) {
-
-        this.activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mPrefs.edit().putString("versionNum", latestVersion).commit();
-
-                versionNum.setText(latestVersion);
-            }
-        });
+    public void setVersionNum(final String appVersion, final String lanternVersion) {
+        versionNum.setText(String.format("%s-%s", appVersion, lanternVersion));
     }
 
     public void setupSideMenu() throws Exception {

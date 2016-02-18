@@ -19,8 +19,7 @@ import org.getlantern.lantern.sdk.Utils;
 
 import android.support.v4.app.FragmentActivity;
 
- 
-import go.client.*;
+import go.lantern.Lantern;
 
 public class InviteActivity extends FragmentActivity {
 
@@ -88,7 +87,7 @@ public class InviteActivity extends FragmentActivity {
             return;
         }
 
-        this.code = Client.ReferralCode(email);
+        this.code = Lantern.ReferralCode(email);
 
         referralCode.setText(code);
 

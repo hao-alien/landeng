@@ -51,10 +51,10 @@ import java.util.Map;
 import org.getlantern.lantern.activity.PlansActivity;
 import org.getlantern.lantern.activity.InviteActivity;
 import org.getlantern.lantern.config.LanternConfig;
+import org.getlantern.lantern.BuildConfig;
 import org.getlantern.lantern.vpn.Service;
 import org.getlantern.lantern.model.UI;
 import org.getlantern.lantern.sdk.Utils;
-import org.getlantern.lantern.vpn.LanternVpn;
 import org.getlantern.lantern.R;
 
 
@@ -62,7 +62,6 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
 
     private static final String TAG = "LanternMainActivity";
     private static final String PREFS_NAME = "LanternPrefs";
-    private static final int CHECK_NEW_VERSION_DELAY = 10000;
     private final static int REQUEST_VPN = 7777;
     private SharedPreferences mPrefs = null;
     private BroadcastReceiver mReceiver;
@@ -102,7 +101,6 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
 
         LanternUI = new UI(this, mPrefs);
 
-
         // the ACTION_SHUTDOWN intent is broadcast when the phone is
         // about to be shutdown. We register a receiver to make sure we
         // clear the preferences and switch the VpnService to the off
@@ -124,8 +122,12 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
         // setup our UI
         try {
             // configure actions to be taken whenever slider changes state
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            String appVersion = pInfo.versionName;
+            Log.d(TAG, "Currently running Lantern version: " + appVersion);
+
+            LanternUI.setVersionNum(appVersion, BuildConfig.LANTERN_VERSION);
             LanternUI.setupLanternSwitch();
-            LanternVpn.LanternUI = LanternUI;
         } catch (Exception e) {
             Log.d(TAG, "Got an exception " + e);
         }

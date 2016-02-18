@@ -15,7 +15,7 @@ import org.getlantern.lantern.activity.InviteActivity;
 import org.getlantern.lantern.sdk.Utils;
 import org.getlantern.lantern.R;
 
-import go.client.*;
+import go.lantern.Lantern;
 
 public class WelcomeActivity extends Activity {
     private static final String TAG = "WelcomeActivity";
@@ -41,7 +41,7 @@ public class WelcomeActivity extends Activity {
             Log.d(TAG, "Stripe token is " + stripeToken +
                     "; email is " + stripeEmail);
 
-                Client.NewProUser(
+                Lantern.NewProUser(
                         stripeEmail,
                         stripeToken,
                         "year"
