@@ -1,5 +1,7 @@
 package org.getlantern.lantern.activity;
 
+
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.ComponentName;
@@ -58,7 +60,7 @@ import org.getlantern.lantern.sdk.Utils;
 import org.getlantern.lantern.R;
 
 
-public class LanternMainActivity extends AppCompatActivity implements Handler.Callback {
+public class LanternMainActivity extends Activity implements Handler.Callback {
 
     private static final String TAG = "LanternMainActivity";
     private static final String PREFS_NAME = "LanternPrefs";
@@ -84,9 +86,9 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
         // we want to use the ActionBar from the AppCompat
         // support library, but with our custom design
         // we hide the default action bar
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        }  
+        //if (getSupportActionBar() != null) {
+        //     getSupportActionBar().hide();
+        // }  
 
         context = getApplicationContext();
         mPrefs = Utils.getSharedPrefs(context);
