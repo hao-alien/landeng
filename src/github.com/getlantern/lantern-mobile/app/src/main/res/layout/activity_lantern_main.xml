@@ -26,9 +26,6 @@
         xmlns:tools="http://schemas.android.com/tools" 
         android:layout_width="match_parent"
         android:layout_height="fill_parent" 
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="18dp"
-        android:paddingLeft="18dp"
         android:id="@+id/mainView"
         android:gravity="center"
         tools:context=".LanternMainActivity">
@@ -233,6 +230,7 @@
             </RelativeLayout>
         </LinearLayout>
     </RelativeLayout>
+
     <!-- The navigation drawer -->
     <RelativeLayout
         android:layout_width="250dp"
