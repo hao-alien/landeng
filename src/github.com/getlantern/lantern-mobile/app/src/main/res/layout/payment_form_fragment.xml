@@ -16,6 +16,8 @@
         android:drawableLeft="@drawable/email_inactive"
         android:drawablePadding="2dip"
         android:padding="5dp"
+        android:ems="10"
+        android:background="@null"
         android:gravity="fill_horizontal"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:inputType="textEmailAddress" />
@@ -104,6 +106,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="25dp"
+        android:ems="10"
+        android:background="@null"
         android:drawableLeft="@drawable/cvv_inactive"
         android:drawablePadding="2dip"
         android:padding="5dp"

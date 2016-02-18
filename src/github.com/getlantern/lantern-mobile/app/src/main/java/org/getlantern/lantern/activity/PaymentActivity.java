@@ -114,17 +114,12 @@ public class PaymentActivity extends FragmentActivity implements View.OnClickLis
         switch (v.getId()) {
             case R.id.alipayBtn:
                 Log.d(TAG, "Alipay button pressed");
-                /*loadWebView();
-                cardView.setVisibility(View.INVISIBLE);
-                mWebView.setVisibility(View.VISIBLE);*/
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse(String.format(mCheckoutUrl, chargeAmount)));
                 startActivity(intent);
                 return;
             case R.id.cardBtn:
                 Log.d(TAG, "Card button pressed");
-                //cardView.setVisibility(View.VISIBLE);
-                //mWebView.setVisibility(View.INVISIBLE);
                 return;
             case R.id.paymentAvatar:
                 Log.d(TAG, "Back button pressed");
