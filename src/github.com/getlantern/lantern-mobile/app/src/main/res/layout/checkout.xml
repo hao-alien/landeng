@@ -26,7 +26,7 @@
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="52dp"
+            android:layout_height="56dp"
             android:layout_centerVertical="true"
             android:layout_marginLeft="15dp"
             android:layout_toRightOf="@+id/paymentAvatar"
@@ -40,7 +40,7 @@
                 android:layout_marginTop="14dp"
                 android:paddingLeft="10dp"
                 android:text="@string/checkout"
-                android:textSize="15sp"
+                android:textSize="17sp"
                 android:textColor="#fff"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -54,12 +54,12 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:gravity="center"
         android:layout_centerInParent="true"
         android:orientation="horizontal"
         segmentedgroup:sc_border_width="2dp"
-        segmentedgroup:sc_corner_radius="10dp">
+        segmentedgroup:sc_corner_radius="2dp">
 
         <RadioButton
             android:id="@+id/cardBtn"
@@ -150,7 +150,7 @@
             android:layout_below="@+id/referralCode"
             android:layout_width = "fill_parent"
             android:layout_height="1dip"
-            android:layout_marginLeft="35dp"
+            android:layout_marginLeft="45dp"
             android:layout_marginRight="10dp"
             android:layout_centerVertical ="true"
             android:layout_alignParentTop="true"

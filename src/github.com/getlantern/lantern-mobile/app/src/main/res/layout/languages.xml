@@ -11,7 +11,7 @@
         android:id="@+id/navLanguage"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@color/pro_blue_color"
+        android:background="@drawable/nav_background"
         android:paddingTop="15dp"
         android:padding="8dp">
 
@@ -38,7 +38,7 @@
                 android:layout_marginTop="14dp"
                 android:paddingLeft="10dp"
                 android:text="@string/language"
-                android:textSize="15sp"
+                android:textSize="17sp"
                 android:textColor="#fff"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -47,7 +47,7 @@
     <ListView android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#FFFFFF"
+        android:background="@color/card_bg"
         android:layout_weight="1"
         android:drawSelectorOnTop="false"/>
 

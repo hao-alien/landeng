@@ -111,7 +111,6 @@ public class UI {
         .put("Get Free Months", R.drawable.get_free)
         .put("Language", R.drawable.language)
         .put("Desktop Version", R.drawable.ic_desktop)
-        .put("Welcome", R.drawable.get_free)
         .put("Contact", R.drawable.ic_contact)
         .build();
 
@@ -398,9 +397,6 @@ public class UI {
                     break;
                 case "Quit":
                     activity.quitLantern();
-                    break;
-                case "Welcome":
-                    intent = new Intent(this.activity, WelcomeActivity.class);
                     break;
                 case "Desktop Version":
                     intent = new Intent(this.activity, DesktopActivity.class);

@@ -11,7 +11,7 @@
         android:id="@+id/navPaymentPlans"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@color/pro_blue_color"
+        android:background="@drawable/nav_background"
         android:elevation="2dp"
         android:paddingTop="15dp"
         android:padding="8dp">
@@ -39,7 +39,7 @@
                 android:layout_marginTop="14dp"
                 android:paddingLeft="10dp"
                 android:text="@string/payment_plans"
-                android:textSize="15sp"
+                android:textSize="17sp"
                 android:textColor="#fff"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -64,9 +64,10 @@
             <ImageView
                 android:id="@+id/features_image"
                 android:layout_width="wrap_content"
-                android:layout_height="125dp"
-                android:paddingBottom="20dp"
-                android:scaleType="centerCrop"
+                android:layout_height="120dp"
+                android:paddingBottom="10dp"
+                android:scaleType="fitXY"
+                android:layout_centerInParent="true"
                 android:adjustViewBounds="true"
                 android:src="@drawable/lantern_icon"/>
 
@@ -90,7 +91,6 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif"
                 android:lineSpacingExtra="5dp"
-                android:layout_marginTop="5dp"
                 android:text=""
                 android:textSize="14sp"
                 android:alpha=".54"
@@ -112,14 +112,14 @@
                 android:layout_width="fill_parent"
                 android:layout_height="128dp"
                 android:layout_weight="1"
-                android:background="@color/year_plan_bg"
+                android:background="@drawable/year_background"
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
                 android:paddingBottom="8dp">
 
                 <TextView
                     android:id="@+id/best_value"
-                    android:layout_height="33dp"
+                    android:layout_height="36dp"
                     android:layout_width="104dp"
                     android:gravity="center"
                     android:elevation="1dp"
@@ -127,11 +127,11 @@
                     android:paddingBottom="5dp"
                     android:layout_marginLeft="30dp"
                     android:fontFamily="sans-serif-black"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
                     android:text="@string/best_value"
-                    android:background="@color/best_value"
-                    android:alpha=".54"
-                    android:textColor="@color/black"/>
+                    android:background="@drawable/best_value"
+                    android:textColor="#54000000"/>
 
                 <TextView
                     android:id="@+id/year_plan_cost"
@@ -143,7 +143,7 @@
                     android:layout_centerVertical ="true"
                     android:layout_marginLeft="13dp"
                     android:text="$4.99/mo"
-                    android:textSize="36sp"
+                    android:textSize="34sp"
                     android:textStyle="bold"
                     android:alpha=".87"
                     android:textColor="@color/black"/>
@@ -184,7 +184,7 @@
             <RelativeLayout 
                 android:id="@+id/month_plan"
                 android:layout_width="fill_parent"
-                android:layout_height="128dp"
+                android:layout_height="120dp"
                 android:layout_weight="1"
                 android:background="@color/month_plan_bg"
                 android:padding="8dp">
@@ -199,7 +199,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="13dp"
                     android:text="$7.99/mo"
-                    android:textSize="36sp"
+                    android:textSize="34sp"
                     android:textStyle="bold"
                     android:alpha=".87"
                     android:textColor="@color/black"/>

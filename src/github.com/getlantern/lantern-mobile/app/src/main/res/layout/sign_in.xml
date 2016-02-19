@@ -26,7 +26,7 @@
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="52dp"
+            android:layout_height="56dp"
             android:layout_centerVertical="true"
             android:layout_marginLeft="15dp"
             android:layout_toRightOf="@+id/signinAvatar"
@@ -40,7 +40,7 @@
                 android:layout_marginTop="14dp"
                 android:paddingLeft="10dp"
                 android:text="@string/sign_in_pro"
-                android:textSize="15sp"
+                android:textSize="17sp"
                 android:textColor="#fff"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -60,11 +60,13 @@
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
-            android:layout_width="334dp"
-            android:layout_height="206dp"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
             android:layout_weight="1"
-            android:layout_marginLeft="10dp"
-            android:padding="15dp"
+            android:paddingRight="5dp"
+            android:paddingLeft="5dp"
+            android:paddingBottom="5dp"
             android:background="#F4F6F6"
             android:orientation="vertical"
             android:gravity="center_vertical"
@@ -72,12 +74,12 @@
 
             <EditText
                 android:id="@+id/email"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif" 
                 android:background="@null"
                 android:drawableLeft="@drawable/email_inactive"
-                android:drawablePadding="2dip"
+                android:drawablePadding="10dip"
                 android:hint="@string/email_hint"
                 android:ems="10"
                 android:textColor="#BDBDBD"
@@ -92,10 +94,10 @@
             <View
                 android:id="@+id/emailSeparator"
                 android:background="@color/edittext_color"
-                android:layout_below="@+id/sendEmail"
+                android:layout_below="@+id/email"
                 android:layout_width = "fill_parent"
                 android:layout_height="1.5dip"
-                android:layout_marginLeft="22dp"
+                android:layout_marginLeft="27dp"
                 android:layout_centerVertical ="true"
                 android:layout_alignParentTop="true"
                 />
@@ -104,15 +106,16 @@
                 android:id="@+id/sign_in_list"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:lineSpacingExtra="5dp"
+                android:layout_marginTop="10dp"
+                android:padding="10dp"
+                android:lineSpacingExtra="10dp"
                 android:fontFamily="sans-serif" 
                 android:text=""
                 android:alpha=".87"
-                android:textSize="15sp"
+                android:textSize="14sp"
                 android:layout_centerHorizontal="true"
                 android:gravity="left"
-                android:textColor="#000000"
+                android:textColor="@color/black"
                 android:textAppearance="?android:attr/textAppearanceSmall"/>
 
         </LinearLayout>

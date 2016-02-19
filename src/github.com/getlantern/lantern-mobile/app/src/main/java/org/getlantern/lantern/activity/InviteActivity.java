@@ -46,7 +46,9 @@ public class InviteActivity extends FragmentActivity {
         getCodeView = findViewById(R.id.get_code_view);
         referralView = findViewById(R.id.referral_code_view);
 
-        Utils.configureEmailInput((EditText)findViewById(R.id.email), findViewById(R.id.emailSeparator));
+        this.emailInput = (EditText)findViewById(R.id.email);
+
+        Utils.configureEmailInput(this.emailInput, findViewById(R.id.emailSeparator));
 
         this.emailInput = (EditText)findViewById(R.id.email);
         this.getCodeBtn = (Button)findViewById(R.id.getCodeBtn);
@@ -82,14 +84,16 @@ public class InviteActivity extends FragmentActivity {
 
     public void getCode(View view) {
         final String email = emailInput.getText().toString();
+
         if (!Utils.isEmailValid(email)) {
             Utils.showErrorDialog(this, "Invalid e-mail address");
             return;
         }
 
         this.code = Lantern.ReferralCode(email);
-
-        referralCode.setText(code);
+        if (!this.code.equals("")) {
+            referralCode.setText(code);
+        }
 
         referralView.setVisibility(View.VISIBLE);
         getCodeView.setVisibility(View.INVISIBLE);

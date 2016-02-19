@@ -47,6 +47,8 @@ import org.getlantern.lantern.model.ProgressDialogFragment;
 import org.getlantern.lantern.model.PaymentForm;
 import org.getlantern.lantern.R;
 
+import info.hoang8f.android.segmented.SegmentedGroup;
+
 import org.getlantern.lantern.sdk.Utils;
  
 
@@ -61,6 +63,7 @@ public class PaymentActivity extends FragmentActivity implements View.OnClickLis
 
     private ProgressDialogFragment progressFragment;
     private Button checkoutBtn, cardBtn, alipayBtn;
+    private SegmentedGroup segmented; 
     private PaymentFormFragment paymentForm;
     private int chargeAmount;
     private TextView chargeAmountView;
@@ -74,6 +77,9 @@ public class PaymentActivity extends FragmentActivity implements View.OnClickLis
         setContentView(R.layout.checkout);
 
         mContext = this.getApplicationContext();
+
+        segmented = (SegmentedGroup)findViewById(R.id.segmented2);
+        segmented.setTintColor(getResources().getColor(R.color.pro_blue_color));
 
         cardBtn = (Button)findViewById(R.id.cardBtn);
         alipayBtn = (Button)findViewById(R.id.alipayBtn);
