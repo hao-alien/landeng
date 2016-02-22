@@ -29,14 +29,17 @@ import android.webkit.SslErrorHandler;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import android.support.v4.app.FragmentActivity;
+
 import org.getlantern.lantern.activity.PaymentActivity;
 import org.getlantern.lantern.activity.CheckoutActivity;
 import org.getlantern.lantern.R;
 
-public class PlansActivity extends Activity {
+public class PlansActivity extends FragmentActivity {
 
     private static final String TAG = "PlansActivity";
-    private static final String mCheckoutUrl = "https://s3.amazonaws.com/lantern-android/checkout.html?amount=%d";
+    private static final String mCheckoutUrl = 
+        "https://s3.amazonaws.com/lantern-android/checkout.html?amount=%d";
     private static final boolean useAlipay = false;
 
     private static final NumberFormat currencyFormatter = 

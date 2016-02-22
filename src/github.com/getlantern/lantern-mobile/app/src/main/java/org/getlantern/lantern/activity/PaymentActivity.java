@@ -113,9 +113,6 @@ public class PaymentActivity extends FragmentActivity implements View.OnClickLis
         });
 
         progressFragment = ProgressDialogFragment.newInstance(R.string.progressMessage);
-		
-        ImageView backBtn = (ImageView)findViewById(R.id.paymentAvatar);
-        backBtn.setOnClickListener(this);
     }
 
     @Override
@@ -131,9 +128,6 @@ public class PaymentActivity extends FragmentActivity implements View.OnClickLis
             case R.id.cardBtn:
                 Log.d(TAG, "Card button pressed");
                 return;
-            case R.id.paymentAvatar:
-                Log.d(TAG, "Back button pressed");
-                finish();
             default:
                 // Nothing to do
         }
