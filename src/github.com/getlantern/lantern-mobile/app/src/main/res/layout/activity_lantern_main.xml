@@ -251,13 +251,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:src="@drawable/abc_ic_ab_back_mtrl_am_alpha"/>
+                android:layout_marginLeft="10dp"
+                android:src="@drawable/menu"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="52dp"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="15dp"
+                android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@+id/avatar"
                 android:orientation="vertical" >
 
@@ -268,7 +269,7 @@
                     android:fontFamily="sans-serif-medium"
                     android:layout_marginTop="10dp"
                     android:gravity="center_horizontal"
-                    android:paddingLeft="16dp"
+                    android:paddingLeft="20dp"
                     android:text="Lantern"
                     android:textStyle="bold"
                     android:textSize="17sp"

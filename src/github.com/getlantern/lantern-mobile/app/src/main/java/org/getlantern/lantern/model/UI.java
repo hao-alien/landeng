@@ -106,8 +106,8 @@ public class UI {
 
     static Map<String, Integer> menuOptions = ImmutableMap.<String, Integer>builder()
         .put("Share", R.drawable.ic_share)
-        .put("Sign in to Pro", R.drawable.sign_in)
-        .put("Pro Now", R.drawable.pro_now)
+        .put("Sign in to PRO", R.drawable.sign_in)
+        .put("Get PRO Now", R.drawable.pro_now)
         .put("Get Free Months", R.drawable.get_free)
         .put("Language", R.drawable.language)
         .put("Desktop Version", R.drawable.ic_desktop)
@@ -381,7 +381,7 @@ public class UI {
                 case "Share":
                     shareable.showOption();
                     break;
-                case "Sign in to Pro":
+                case "Sign in to PRO":
                     intent = new Intent(this.activity, SignInActivity.class);
                     break;
                 case "PRO Account Management":
@@ -396,7 +396,7 @@ public class UI {
                 case "Desktop Version":
                     intent = new Intent(this.activity, DesktopActivity.class);
                     break;
-                case "Pro Now":
+                case "Get PRO Now":
                     if (mPrefs.getBoolean("proUser", false)) {
                         // if its a Pro user, display the 
                         // Pro account management tab instead

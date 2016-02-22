@@ -27,7 +27,7 @@ public class ProAccountActivity extends FragmentActivity {
     }
 
     public void cancelPro(View view) {
-Context context = getApplicationContext();
+        Context context = getApplicationContext();
         SharedPreferences mPrefs = Utils.getSharedPrefs(context);
         mPrefs.edit().remove("proUser").commit();
         startActivity(new Intent(this, LanternMainActivity.class));
