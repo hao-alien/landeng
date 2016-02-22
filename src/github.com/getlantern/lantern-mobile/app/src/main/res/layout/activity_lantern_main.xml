@@ -22,6 +22,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             class="org.getlantern.lantern.fragment.TitleBar"
+            lantern:backgroundColor="@android:color/transparent"
             lantern:titleImage="@drawable/menu"
             lantern:textColor="@color/cyan_header"
             lantern:titleText="@string/app_name"/>

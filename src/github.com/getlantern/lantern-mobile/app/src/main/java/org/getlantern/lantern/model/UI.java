@@ -243,10 +243,8 @@ public class UI {
         powerLantern.setChecked(useVpn);
 
         if (useVpn) {
-            this.mDrawerLayout.setBackgroundColor(onColor);
             mTitleBar.switchLantern(R.drawable.menu_white, true);   
         } else {
-            this.mDrawerLayout.setBackgroundColor(offColor);
             mTitleBar.switchLantern(R.drawable.menu, false);   
         }
     }

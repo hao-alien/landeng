@@ -2,8 +2,6 @@ package org.getlantern.lantern.activity;
 
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -59,9 +57,7 @@ import org.getlantern.lantern.model.UI;
 import org.getlantern.lantern.sdk.Utils;
 import org.getlantern.lantern.R;
 
-import android.support.v4.app.FragmentActivity;
-
-public class LanternMainActivity extends FragmentActivity implements Handler.Callback {
+public class LanternMainActivity extends AppCompatActivity implements Handler.Callback {
 
     private static final String TAG = "LanternMainActivity";
     private static final String PREFS_NAME = "LanternPrefs";

@@ -14,7 +14,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -37,8 +37,9 @@ public class TitleBar extends Fragment {
     private ImageView mAvatar;
     private String mTitle;
     private TextView mTitleHeader;
-    private Drawable mBackground;
+    private LinearLayout navHeader;
     private Drawable mTitleImage;
+    private Drawable mBackground;
     private Integer mTextColor = 0;
     private int onColor, offColor;
 
@@ -68,8 +69,8 @@ public class TitleBar extends Fragment {
         }
 
         if (mBackground != null) {
-            RelativeLayout navHeader = (RelativeLayout)view.findViewById(R.id.navHeader);
-            navHeader.setBackgroundDrawable(mBackground);
+            navHeader = (LinearLayout)view.findViewById(R.id.navHeader);
+            navHeader.setBackground(mBackground);
         }
 
         if (mTitleImage != null) {
@@ -88,7 +89,7 @@ public class TitleBar extends Fragment {
         TypedArray a = activity.obtainStyledAttributes(attrs,
                 R.styleable.TitleBar);
 
-        onColor = activity.getResources().getColor(R.color.cyan_header);
+        onColor = activity.getResources().getColor(R.color.blue_color);
         offColor = activity.getResources().getColor(R.color.accent_white);
 
         mTitle = a.getString(R.styleable.TitleBar_titleText);
@@ -107,6 +108,7 @@ public class TitleBar extends Fragment {
     public void switchLantern(int imageRes, boolean on) {
         if (mAvatar != null) {
             mAvatar.setImageResource(imageRes);
+            //navHeader.setBackgroundColor(on ? onColor : offColor);
             mTitleHeader.setTextColor(on ? offColor : onColor);
         }
     }
