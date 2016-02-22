@@ -13,7 +13,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         class="org.getlantern.lantern.fragment.TitleBar"
-        lantern:background="@color/pro_blue_color"
+        lantern:backgroundColor="@color/pro_blue_color"
         lantern:titleText="@string/pro_account_header"/>
 
      <RelativeLayout
@@ -81,7 +81,7 @@
                 android:clickable = "true"
                 android:background="#0297A7"
                 android:layout_centerInParent="true"
-                android:onClick="continueToPro" />
+                android:onClick="cancelPro" />
 
 
         </LinearLayout>
