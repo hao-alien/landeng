@@ -59,8 +59,9 @@ import org.getlantern.lantern.model.UI;
 import org.getlantern.lantern.sdk.Utils;
 import org.getlantern.lantern.R;
 
+import android.support.v4.app.FragmentActivity;
 
-public class LanternMainActivity extends Activity implements Handler.Callback {
+public class LanternMainActivity extends FragmentActivity implements Handler.Callback {
 
     private static final String TAG = "LanternMainActivity";
     private static final String PREFS_NAME = "LanternPrefs";
@@ -145,6 +146,7 @@ public class LanternMainActivity extends Activity implements Handler.Callback {
         if (proUser) {
             RelativeLayout proSection = (RelativeLayout)findViewById(R.id.lantern_pro);
             proSection.setVisibility(View.GONE);
+            LanternUI.setTitle("Lantern PRO");
         }
 
         // we check if mPrefs has been initialized before

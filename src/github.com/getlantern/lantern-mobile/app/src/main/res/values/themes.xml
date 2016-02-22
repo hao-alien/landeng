@@ -4,4 +4,17 @@
     <style name="Theme"/>
 
     <style name="Theme.Blank.Dialog" parent="Theme.Compat.Base.Dialog"/>
+
+    <style name="TitleBar">
+        <item name="android:background">@color/pro_blue_color</item>
+        <item name="android:textColor">@color/accent_white</item>
+    </style>
+
+    <style name="MyTextView" parent="@android:style/TextAppearance.Small">
+
+    </style>
+    <style name="WhiteTitleBar">
+        <item name="android:background">@color/accent_white</item>
+        <item name="android:textColor">@color/pro_blue_color</item>
+    </style>
 </resources>

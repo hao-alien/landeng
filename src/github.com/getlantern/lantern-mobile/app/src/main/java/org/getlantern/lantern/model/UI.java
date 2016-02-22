@@ -2,7 +2,6 @@ package org.getlantern.lantern.model;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -59,9 +58,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import com.google.common.collect.ImmutableMap;
+import android.support.v4.app.Fragment;
 
 import org.getlantern.lantern.activity.*;
 import org.getlantern.lantern.config.LanternConfig;
+import org.getlantern.lantern.fragment.TitleBar;
 import org.getlantern.lantern.model.MailSender;
 import org.getlantern.lantern.sdk.Utils;
 import org.getlantern.lantern.R;
@@ -79,12 +80,11 @@ public class UI {
     private ListView mDrawerList;
 
     private ActionBarDrawerToggle mDrawerToggle;
-    private ImageView settingsIcon;
-
-    private LayoutInflater inflater;
 
     private ImageView statusImage;
     private Toast statusToast;
+
+    private TitleBar mTitleBar;
 
     final private SharedPreferences mPrefs;
     final private Shareable shareable;
@@ -94,7 +94,7 @@ public class UI {
     private TextView versionNum, btnText;
 
     private static final int onColor = Color.parseColor("#39C2D6");
-    private static final int offColor = Color.parseColor("#FAFBFB"); 
+    private static final int offColor = Color.parseColor("#FFFFFF"); 
 
     ColorDrawable[] offTransColor = {new ColorDrawable(offColor), new ColorDrawable(onColor)};
     ColorDrawable[] onTransColor = {new ColorDrawable(onColor), new ColorDrawable(offColor)};     
@@ -185,17 +185,15 @@ public class UI {
             }
         };
 
-
-        settingsIcon = (ImageView)this.activity.findViewById(R.id.settings_icon);
-
-        settingsIcon.setOnClickListener(new View.OnClickListener() {
+        mTitleBar = (TitleBar)activity.getSupportFragmentManager().findFragmentById(R.id.titlebar_fragment);
+        mTitleBar.setTitle(mPrefs.getBoolean("proUser", false) ? "Lantern PRO" : "Lantern");
+        mTitleBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mDrawerLayout.openDrawer(Gravity.START);
                 Log.v(TAG, " click");         
             }        
-        });
-
+        });                             
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
@@ -207,16 +205,10 @@ public class UI {
         versionNum = (TextView)this.activity.findViewById(R.id.versionNum);
         versionNum.setText(mPrefs.getString("versionNum", ""));
 
-        settingsIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mDrawerLayout.openDrawer(Gravity.START);
-                Log.v(TAG, " click");         
-            }        
-        });
+    }
 
-
-
+    public void setTitle(String title) {
+        mTitleBar.setTitle(title);
     }
 
     public void handleFatalError() {
@@ -252,10 +244,10 @@ public class UI {
 
         if (useVpn) {
             this.mDrawerLayout.setBackgroundColor(onColor);
-            settingsIcon.setImageResource(R.drawable.menu_white);   
+            mTitleBar.switchLantern(R.drawable.menu_white, true);   
         } else {
             this.mDrawerLayout.setBackgroundColor(offColor);
-            settingsIcon.setImageResource(R.drawable.menu);   
+            mTitleBar.switchLantern(R.drawable.menu, false);   
         }
     }
 
@@ -270,11 +262,11 @@ public class UI {
                     // our image view to use the 'on' image resource
                     colorFadeIn.start();
                     statusImage.setImageResource(R.drawable.toast_on);
-                    settingsIcon.setImageResource(R.drawable.menu_white);   
+                    mTitleBar.switchLantern(R.drawable.menu_white, true);   
                 } else {
                     colorFadeOut.start();
+                    mTitleBar.switchLantern(R.drawable.menu,false);   
                     statusImage.setImageResource(R.drawable.toast_off); 
-                    settingsIcon.setImageResource(R.drawable.menu);
                     powerLantern.setChecked(false);
                 }
 
@@ -291,7 +283,7 @@ public class UI {
         onNavTrans.startTransition(500);
         offNavTrans.startTransition(500);
 
-        inflater = this.activity.getLayoutInflater();
+        LayoutInflater inflater = this.activity.getLayoutInflater();
         statusLayout = inflater.inflate(R.layout.status_layout, 
                 (ViewGroup)this.activity.findViewById(R.id.status_layout_root));
         statusImage = (ImageView)statusLayout.findViewById(R.id.status_image);

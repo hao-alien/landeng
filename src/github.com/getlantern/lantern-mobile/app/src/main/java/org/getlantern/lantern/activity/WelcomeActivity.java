@@ -49,11 +49,16 @@ public class WelcomeActivity extends Activity {
             Log.d(TAG, "Stripe token is " + stripeToken +
                     "; email is " + stripeEmail);
 
-            Lantern.NewProUser(
-                    stripeEmail,
-                    stripeToken,
-                    "year"
-                    );
+            Thread mThread = new Thread() {
+                public void run() {
+                    Lantern.NewProUser(
+                            stripeEmail,
+                            stripeToken,
+                            "year"
+                            );
+                }
+            };
+            mThread.start();
 
             mPrefs.edit().putBoolean("proUser", true).commit();
 

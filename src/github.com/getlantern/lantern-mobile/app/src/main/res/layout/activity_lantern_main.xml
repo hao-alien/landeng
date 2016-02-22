@@ -3,23 +3,8 @@
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/accent_white"
     android:fitsSystemWindows="true">
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-    <ImageView
-        android:id="@+id/settings_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|left"
-        android:clickable="true"
-        android:adjustViewBounds="true"
-        android:paddingTop="15dp"
-        android:paddingLeft="15dp"
-        android:src="@drawable/menu" />
-    </RelativeLayout>
 
     <!-- The main content view -->
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -29,6 +14,18 @@
         android:id="@+id/mainView"
         android:gravity="center"
         tools:context=".LanternMainActivity">
+
+        <fragment
+            xmlns:lantern="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/titlebar_fragment"
+            android:layout_marginLeft="8dp"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            class="org.getlantern.lantern.fragment.TitleBar"
+            lantern:titleImage="@drawable/menu"
+            lantern:textColor="@color/cyan_header"
+            lantern:titleText="@string/app_name"/>
+
 
         <ToggleButton
             android:id="@+id/powerLantern"

@@ -25,6 +25,7 @@ public class LanguageActivity extends ListActivity {
 
     private static final String TAG = "LanguageActivity";
 
+    private ImageView mBackBtn;
     private ArrayAdapter<String> adapter;
     private static ArrayList<String> languages = new ArrayList<String>();
 
@@ -38,6 +39,17 @@ public class LanguageActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.languages);
+
+        mBackBtn = (ImageView)findViewById(R.id.avatar);
+
+        mBackBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Back button pressed");
+                finish();
+            }
+        });
 
         adapter = new ArrayAdapter<String>(this, R.layout.language_item, R.id.title, languages);
         setListAdapter(adapter); 
