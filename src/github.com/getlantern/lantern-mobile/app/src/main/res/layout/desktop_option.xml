@@ -8,44 +8,15 @@
     android:id="@+id/desktopView"
     tools:context=".DesktopActivity">
 
-    <RelativeLayout
-        android:id="@+id/navDesktop"
+
+    <fragment
+        xmlns:lantern="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/titlebar_fragment"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/nav_background"
-        android:paddingTop="15dp"
-        android:paddingBottom="15dp"
-        android:padding="8dp">
-
-        <ImageView
-            android:id="@+id/desktopAvatar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:src="@drawable/abc_ic_ab_back_mtrl_am_alpha"/>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="56dp"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="15dp"
-            android:layout_toRightOf="@+id/desktopAvatar"
-            android:orientation="vertical" >
-
-            <TextView
-                android:id="@+id/desktopText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:layout_marginTop="14dp"
-                android:paddingLeft="10dp"
-                android:text="Lantern Desktop"
-                android:textSize="17sp"
-                android:textColor="#fff"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-    </RelativeLayout>
+        class="org.getlantern.lantern.fragment.TitleBar"
+        lantern:backgroundColor="@drawable/nav_background"
+        lantern:titleText="@string/lantern_desktop"/>
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"

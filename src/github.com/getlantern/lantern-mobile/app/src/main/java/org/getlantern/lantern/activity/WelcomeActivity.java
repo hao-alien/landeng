@@ -20,6 +20,7 @@ import go.lantern.Lantern;
 public class WelcomeActivity extends Activity {
     private static final String TAG = "WelcomeActivity";
 
+    private String stripeToken, stripeEmail;
     private Context mContext;
     private SharedPreferences mPrefs = null;
     private MediaPlayer mMediaPlayer;
@@ -32,23 +33,31 @@ public class WelcomeActivity extends Activity {
 
         mContext = this.getApplicationContext();
         mPrefs = Utils.getSharedPrefs(mContext);
+            
+        Intent intent = getIntent();
+        Uri data = intent.getData();
 
-        Uri data = getIntent().getData();
-        if (data != null) {
-            String stripeToken = data.getQueryParameter("stripeToken");
-            String stripeEmail = data.getQueryParameter("stripeEmail");  
+        if (intent.getExtras() != null) {
+            stripeToken = intent.getStringExtra("stripeToken"); 
+            stripeEmail = intent.getStringExtra("stripeEmail");
+        } else if (data != null) {
+            stripeToken = data.getQueryParameter("stripeToken");
+            stripeEmail = data.getQueryParameter("stripeEmail");  
+        }
 
+        if (stripeToken != "" && stripeEmail != "") {
             Log.d(TAG, "Stripe token is " + stripeToken +
                     "; email is " + stripeEmail);
 
-                Lantern.NewProUser(
-                        stripeEmail,
-                        stripeToken,
-                        "year"
-                );
+            Lantern.NewProUser(
+                    stripeEmail,
+                    stripeToken,
+                    "year"
+                    );
 
-                mPrefs.edit().putBoolean("proUser", true).commit();
-                playWelcomeSound();
+            mPrefs.edit().putBoolean("proUser", true).commit();
+
+            playWelcomeSound();
         }
     }
 

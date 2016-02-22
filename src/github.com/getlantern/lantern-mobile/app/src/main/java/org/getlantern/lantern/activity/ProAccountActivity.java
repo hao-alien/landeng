@@ -7,10 +7,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 
+import android.support.v4.app.FragmentActivity;
+
 import org.getlantern.lantern.R;
  
 
-public class ProAccountActivity extends Activity {
+public class ProAccountActivity extends FragmentActivity {
 
     private static final String TAG = "ProAccountActivity";
 
@@ -18,15 +20,6 @@ public class ProAccountActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pro_account);
-
-        ImageView backBtn = (ImageView)findViewById(R.id.proAccountAvatar);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Back button pressed");
-                finish();
-            }
-        });        
     }
 }
 

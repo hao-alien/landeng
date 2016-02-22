@@ -58,6 +58,8 @@ public class PaymentActivity extends FragmentActivity implements View.OnClickLis
     private static final String publishableApiKey = "pk_test_4MSPZvz9QtXGWEKdODmzV9ql";
     private static final String mCheckoutUrl = "https://s3.amazonaws.com/lantern-android/checkout.html?amount=%d";
 
+    private EditText emailInput;
+
     private Context mContext;
     private SharedPreferences mPrefs = null;
 
@@ -75,6 +77,8 @@ public class PaymentActivity extends FragmentActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.checkout);
+
+        emailInput = (EditText)findViewById(R.id.email);
 
         mContext = this.getApplicationContext();
 
@@ -190,7 +194,14 @@ public class PaymentActivity extends FragmentActivity implements View.OnClickLis
 
 
 	public void submitCard() {
-		// TODO: replace with your own test key
+
+        final String email = emailInput.getText().toString();
+        if (!Utils.isEmailValid(email)) {
+            Utils.showErrorDialog(this, "Invalid e-mail address");
+            return;
+        }
+
+        // TODO: replace with your own test key
 		Log.d(TAG, "Submit card button clicked..");
 		//final String publishableApiKey = BuildConfig.DEBUG ?
 		//"pk_test_4MSPZvz9QtXGWEKdODmzV9ql" :
@@ -219,7 +230,7 @@ public class PaymentActivity extends FragmentActivity implements View.OnClickLis
                             getApplicationContext(),
                             "Token created: " + token.getId(),
                             Toast.LENGTH_LONG).show();*/
-                    finishProgress();
+                    finishProgress(token.getId());
                 }
 
                 public void onError(Exception error) {
@@ -269,12 +280,14 @@ public class PaymentActivity extends FragmentActivity implements View.OnClickLis
         progressFragment.show(getSupportFragmentManager(), "progress");
     }
 
-    private void finishProgress() {
+    private void finishProgress(String token) {
         progressFragment.dismiss();
 
+        String email = emailInput.getText().toString();
         // submit token to Pro server here
-
         Intent intent = new Intent(this, WelcomeActivity.class);
+        intent.putExtra("stripeToken", token);
+        intent.putExtra("stripeEmail", email);
         this.startActivity(intent);
     }
 

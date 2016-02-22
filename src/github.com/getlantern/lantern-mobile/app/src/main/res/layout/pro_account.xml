@@ -7,43 +7,14 @@
     android:id="@+id/proAccountView"
     tools:context=".ProAccountActivity">
 
-     <RelativeLayout
-        android:id="@+id/navInvite"
+    <fragment
+        xmlns:lantern="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/titlebar_fragment"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@color/pro_blue_color"
-        android:paddingTop="15dp"
-        android:padding="8dp">
-
-        <ImageView
-            android:id="@+id/proAccountAvatar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:src="@drawable/abc_ic_ab_back_mtrl_am_alpha"/>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="52dp"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="15dp"
-            android:layout_toRightOf="@+id/proAccountAvatar"
-            android:orientation="vertical" >
-
-            <TextView
-                android:id="@+id/inviteHeader"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:layout_marginTop="14dp"
-                android:paddingLeft="10dp"
-                android:text="@string/pro_account_header"
-                android:textSize="15sp"
-                android:textColor="#fff"
-                android:textStyle="bold" />
-        </LinearLayout>
-    </RelativeLayout>
-
+        class="org.getlantern.lantern.fragment.TitleBar"
+        lantern:background="@color/pro_blue_color"
+        lantern:titleText="@string/pro_account_header"/>
 
      <RelativeLayout
         android:id="@+id/pro_account"

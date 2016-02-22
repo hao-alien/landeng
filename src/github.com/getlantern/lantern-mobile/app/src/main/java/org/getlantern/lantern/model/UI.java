@@ -104,7 +104,7 @@ public class UI {
 
     private View statusLayout;
 
-    static final Map<String, Integer> menuOptions = ImmutableMap.<String, Integer>builder()
+    static Map<String, Integer> menuOptions = ImmutableMap.<String, Integer>builder()
         .put("Share", R.drawable.ic_share)
         .put("Sign in to Pro", R.drawable.sign_in)
         .put("Pro Now", R.drawable.pro_now)
@@ -391,6 +391,9 @@ public class UI {
                     break;
                 case "Sign in to Pro":
                     intent = new Intent(this.activity, SignInActivity.class);
+                    break;
+                case "PRO Account Management":
+                    intent = new Intent(this.activity, ProAccountActivity.class);
                     break;
                 case "Contact":
                     contactOption();

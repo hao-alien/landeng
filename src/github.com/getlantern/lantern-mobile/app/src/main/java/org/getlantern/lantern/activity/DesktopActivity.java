@@ -35,14 +35,6 @@ public class DesktopActivity extends FragmentActivity {
 
         Log.d(TAG, "Desktop activity created...");
 
-        ImageView backBtn = (ImageView)findViewById(R.id.desktopAvatar);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
         emailInput = (EditText)findViewById(R.id.email);
         sendBtn = (Button)findViewById(R.id.sendBtn);
         separator = (View)findViewById(R.id.separator);

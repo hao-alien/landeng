@@ -18,7 +18,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.WebChromeClient;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,22 +59,11 @@ public class PlansActivity extends Activity {
         yearBtn = (Button)findViewById(R.id.year_btn); 
         yearBtn.setTag(yearCost);
 
-        ImageView backBtn = (ImageView)findViewById(R.id.plansAvatar);
-
         featuresList = (TextView)findViewById(R.id.features_list);
         featuresList.setText(Html.fromHtml(getResources().getString(R.string.features_list)));
 
         LinearLayout plansView = (LinearLayout)findViewById(R.id.plans_view);
         plansView.bringToFront();
-
-        backBtn.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Back button pressed");
-                finish();
-            }
-        });
 
     }
 

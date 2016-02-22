@@ -35,15 +35,6 @@ public class SignInActivity extends FragmentActivity {
 
         signinList = (TextView)findViewById(R.id.sign_in_list);
         signinList.setText(Html.fromHtml(getResources().getString(R.string.sign_in_list)));
-
-        ImageView backBtn = (ImageView)findViewById(R.id.signinAvatar);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Back button pressed");
-                finish();
-            }
-        });
     }
 
     public void sendLink(View view) {

@@ -27,7 +27,6 @@ public class InviteActivity extends FragmentActivity {
 
     private ProgressDialogFragment progressFragment;
 
-
     private EditText emailInput;
     private Button getCodeBtn;
     private String code;
@@ -45,33 +44,19 @@ public class InviteActivity extends FragmentActivity {
 
         getCodeView = findViewById(R.id.get_code_view);
         referralView = findViewById(R.id.referral_code_view);
+        emailInput = (EditText)findViewById(R.id.email);
 
-        this.emailInput = (EditText)findViewById(R.id.email);
+        Utils.configureEmailInput(emailInput, findViewById(R.id.emailSeparator));
 
-        Utils.configureEmailInput(this.emailInput, findViewById(R.id.emailSeparator));
+        getCodeBtn = (Button)findViewById(R.id.getCodeBtn);
 
-        this.emailInput = (EditText)findViewById(R.id.email);
-        this.getCodeBtn = (Button)findViewById(R.id.getCodeBtn);
-
-        this.getCodeBtn.setOnClickListener(new View.OnClickListener() {
+        getCodeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "Get code button pressed");
                 getCode(v);
             }
         });
-
-        ImageView backBtn = (ImageView)findViewById(R.id.inviteAvatar);
-
-        backBtn.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Back button pressed");
-                finish();
-            }
-        });
-
     }
 
     private void startProgress() {
