@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-		<title>Lantern Pro Checkout</title>
+        <title>Lantern Pro Checkout</title>
 		<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.js"></script>
         <script type="text/javascript" src="https://checkout.stripe.com/checkout.js">
         <script type="text/javascript" src="js/lantern-pro-js-client.min.js"></script>
@@ -12,6 +12,18 @@
 	</body>
     <script type="text/javascript">
     $(document).ready(function() {
+
+        var launchIframeApproach = function(alt) {
+            var iframe = document.createElement("iframe");
+            iframe.style.border = "none";
+            iframe.style.width = "1px";
+            iframe.style.height = "1px";
+            iframe.onload = function() {
+                window.location = alt;
+            }
+            iframe.src = alt;
+            document.body.appendChild(iframe);
+        };
 
         var QueryString = function () {
             // This function is anonymous, is executed immediately and 
@@ -49,10 +61,20 @@
                     stripeToken: token.id,
                     stripeEmail: token.email,
                 };
-                var url = 'lantern://pro?' + $.param(args);
                 // on successful payment, redirect user
                 // back to Lantern Pro app
-                window.location = url;
+                var url = 'lantern://pro?' + $.param(args);
+                var g_intent = "scheme=lantern;package=org.getlantern.lantern;end";
+
+                if (navigator.userAgent.match(/Chrome/)) {
+                    var url = "intent://pro#Intent;scheme=lantern;action=android.intent.action.VIEW;end";
+                    launchIframeApproach(url);
+                } else if (navigator.userAgent.match(/Firefox/)) {
+
+                }
+                else {
+                    window.location = url;
+                }
             }
         });
     });
