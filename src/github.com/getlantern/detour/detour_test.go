@@ -213,7 +213,7 @@ func TestConcurrency(t *testing.T) {
 	defer stopMockServers()
 	mockURL, _ := newMockServer(directMsg)
 	//mock.Timeout(1*time.Millisecond, directMsg)
-	listener, _ := net.Listen("tcp", ":")
+	listener, _ := net.Listen("tcp", "127.0.0.1:")
 	proxyURL, _ := url.Parse("http://" + listener.Addr().String())
 	go func() {
 		err := http.Serve(listener, &httputil.ReverseProxy{
