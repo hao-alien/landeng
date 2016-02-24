@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"sync/atomic"
+	"time"
 )
 
 // to pass result of read operation to merger from underlie connection
@@ -38,8 +39,14 @@ func (dc *Conn) ioLoop() {
 	// TODO: How to check when using pipelining or HTTP/2?
 	var nonidempotentHTTPRequest bool
 
+	ticker := time.NewTicker(10 * time.Second)
+	defer ticker.Stop()
+
 	for {
 		select {
+		case <-ticker.C:
+			log.Tracef("Waited 10s on connection to %s, dumping internal state", dc.addr)
+			dc.dumpInternal()
 		case c := <-dc.chConnToIOLoop:
 			reRead := false
 			if dc.anyDataReceived() {
@@ -78,6 +85,7 @@ func (dc *Conn) ioLoop() {
 					log.Tracef("Re-read from %s connection to %s", c.Type(), dc.addr)
 					buf := make([]byte, len(firstReadReq.buf))
 					n, err := c.Read(buf, true)
+					atomic.AddUint32(&dc.reread, 1)
 					select {
 					case firstReadReq.chResult <- innerReadResult{c, buf[:n], err}:
 					case <-dc.chClose:
@@ -90,10 +98,12 @@ func (dc *Conn) ioLoop() {
 			atomic.AddUint32(&dc.expectedConns, ^uint32(0))
 
 		case req := <-dc.chReadRequest:
+			atomic.AddUint32(&dc.numReadRequests, 1)
 			if atomic.LoadUint32(&dc.expectedConns) == 1 {
 				c := conns.Next()
 				go func() {
 					n, err := c.Read(req.buf, false)
+					atomic.AddUint32(&dc.numReads, 1)
 					log.Tracef("Read %d bytes via %s connection to %s, err: %v", n, c.Type(), dc.addr, err)
 					if err != nil && err != io.EOF && c.Type() == connTypeDetour {
 						log.Tracef("Detour connection to %s failed, removing from whitelist", dc.addr)
@@ -120,6 +130,7 @@ func (dc *Conn) ioLoop() {
 					chClose:      dc.chClose,
 				}
 				go r.run()
+				atomic.AddUint32(&dc.numReads, 1)
 				return true
 			})
 			go func() {
@@ -146,10 +157,12 @@ func (dc *Conn) ioLoop() {
 			}()
 
 		case req := <-dc.chWriteRequest:
+			atomic.AddUint32(&dc.numWriteRequests, 1)
 			if atomic.LoadUint32(&dc.expectedConns) == 1 {
 				c := conns.Next()
 				go func() {
 					n, err := c.Write(req.buf)
+					atomic.AddUint32(&dc.numWrites, 1)
 					log.Tracef("Wrote %d bytes via %s connection to %s, err: %v", n, c.Type(), dc.addr, err)
 					req.chResult <- ioResult{n, err}
 				}()
@@ -167,7 +180,9 @@ func (dc *Conn) ioLoop() {
 			var lastN int
 			var lastError error
 			conns.Foreach(func(c conn) bool {
-				if n, err := c.Write(req.buf); err != nil {
+				n, err := c.Write(req.buf)
+				atomic.AddUint32(&dc.numWrites, 1)
+				if err != nil {
 					log.Debugf("Error write to %s connection to %s", c.Type(), dc.addr)
 					dc.closeAndDecrease(c)
 					// intentionally not return c to chConns
@@ -207,6 +222,7 @@ func (dc *Conn) ioLoop() {
 }
 
 func (dc *Conn) replay(c conn) bool {
+	atomic.AddUint32(&dc.replayed, 1)
 	dc.muWriteBuffer.RLock()
 	defer dc.muWriteBuffer.RUnlock()
 	numBytes := dc.writeBuffer.Len()
@@ -231,6 +247,32 @@ func (dc *Conn) incReadBytes(n int) {
 func (dc *Conn) closeAndDecrease(c conn) {
 	closeConn(c)
 	atomic.AddUint32(&dc.expectedConns, ^uint32(0))
+}
+
+func (dc *Conn) dumpInternal() {
+	var format = `Dest addr: %s,
+Read bytes: %d,
+expectedConns: %d,
+closed: %v,
+numReadRequests: %d,
+numReads: %d,
+numWriteRequests: %d,
+numWrites: %d,
+replayed: %v,
+reread: %v
+`
+	log.Tracef(format,
+		dc.addr,
+		atomic.LoadUint64(&dc.readBytes),
+		atomic.LoadUint32(&dc.expectedConns),
+		atomic.LoadUint32(&dc.closed) == 1,
+		atomic.LoadUint32(&dc.numReadRequests),
+		atomic.LoadUint32(&dc.numReads),
+		atomic.LoadUint32(&dc.numWriteRequests),
+		atomic.LoadUint32(&dc.numWrites),
+		atomic.LoadUint32(&dc.replayed),
+		atomic.LoadUint32(&dc.reread),
+	)
 }
 
 // close with trace

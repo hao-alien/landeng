@@ -97,12 +97,24 @@ type Conn struct {
 	muWriteBuffer sync.RWMutex
 	// Keeps written bytes through direct connection to replay it if required.
 	writeBuffer bytes.Buffer
+
+	// auxiliary attributes for debugging
+	numReadRequests  uint32
+	numReads         uint32
+	numWriteRequests uint32
+	numWrites        uint32
+	replayed         uint32
+	reread           uint32
 }
 
 // Read() implements the function from net.Conn
 func (dc *Conn) Read(b []byte) (n int, err error) {
 	ch := make(chan ioResult)
-	dc.chReadRequest <- ioRequest{b, ch}
+	select {
+	case dc.chReadRequest <- ioRequest{b, ch}:
+	default:
+		return 0, fmt.Errorf("connection to %s closed before reading", dc.addr)
+	}
 	result, ok := <-ch
 	if !ok {
 		return 0, fmt.Errorf("connection to %s closed during reading", dc.addr)

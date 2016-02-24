@@ -5,8 +5,10 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"os"
+	"sync"
 	"testing"
 	"time"
 
@@ -201,6 +203,52 @@ func TestGetAddr(t *testing.T) {
 		assert.NotEmpty(t, c2.LocalAddr().String())
 		assert.Equal(t, "tcp", c2.RemoteAddr().Network())
 		assert.Equal(t, u2.Host, c2.RemoteAddr().String(), "should get remote address of detour connection")
+	}
+}
+
+func TestConcurrency(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test concurrency in short mode.")
+	}
+	defer stopMockServers()
+	mockURL, _ := newMockServer(directMsg)
+	//mock.Timeout(1*time.Millisecond, directMsg)
+	listener, _ := net.Listen("tcp", ":")
+	proxyURL, _ := url.Parse("http://" + listener.Addr().String())
+	go func() {
+		err := http.Serve(listener, &httputil.ReverseProxy{
+			Director: func(req *http.Request) {},
+			Transport: &http.Transport{
+				// This just detours to net.Dial, meaning that it doesn't accomplish any
+				// unblocking, it's just here for performance testing.
+				Dial: Dialer(net.Dial),
+			},
+			ErrorLog: log.AsStdLogger(),
+		})
+		if err != nil {
+			t.Fatal("Unable to start proxy")
+		}
+	}()
+	time.Sleep(100 * time.Millisecond) // allow proxy to start up
+	c := http.Client{Transport: &http.Transport{
+		DisableKeepAlives: true,
+		Proxy:             http.ProxyURL(proxyURL),
+	}}
+	var wg sync.WaitGroup
+	for i := 0; i < 5000; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			resp, err := c.Get(mockURL)
+			if err != nil {
+				t.Fatal(err)
+			}
+			_ = resp.Body.Close()
+			if resp.StatusCode != 200 {
+				t.Fatalf("Invalid status code %d", resp.StatusCode)
+			}
+		}()
+		wg.Wait()
 	}
 }
 
