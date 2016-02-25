@@ -19,4 +19,8 @@
   <string name="contact_email">team@getlantern.org</string>
   <string name="contact_message">Hilf mir</string>
   <string name="contact_subject">Lantern Android</string>
+  <string name="not_now">Nicht jetzt</string>
+  <string name="install_update">Aktualisieren</string>
+  <string name="error_update">Fehler beim Herunterladen der Aktualisierung</string>
+  <string name="language">Sprache</string>
 </resources>

@@ -57,7 +57,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import com.google.common.collect.ImmutableMap;
 import android.support.v4.app.Fragment;
 
 import org.getlantern.lantern.activity.*;
@@ -105,16 +104,6 @@ public class UI {
 
     private View statusLayout;
 
-    static Map<String, Integer> menuOptions = ImmutableMap.<String, Integer>builder()
-        .put("Share", R.drawable.ic_share)
-        .put("Sign in to PRO", R.drawable.sign_in)
-        .put("Get PRO Now", R.drawable.pro_now)
-        .put("Get Free Months", R.drawable.get_free)
-        .put("Language", R.drawable.language)
-        .put("Desktop Version", R.drawable.ic_desktop)
-        .put("Contact", R.drawable.ic_contact)
-        .build();
-
     public UI(LanternMainActivity activity, SharedPreferences mPrefs) {
         this.activity = activity;
         this.mPrefs = mPrefs;
@@ -149,9 +138,22 @@ public class UI {
 
     public void setupSideMenu() throws Exception {
 
-        for (Map.Entry<String, Integer> entry : menuOptions.entrySet()) {
-            mNavItems.add(new NavItem(entry.getKey(), entry.getValue()));
-        }
+        mNavItems.add(new NavItem(resources.getString(R.string.share_option), 
+                    R.drawable.ic_share));
+        mNavItems.add(new NavItem(resources.getString(R.string.sign_in_pro), 
+                    R.drawable.sign_in));
+        mNavItems.add(new NavItem(resources.getString(R.string.get_pro_now), 
+                    R.drawable.pro_now));
+        mNavItems.add(new NavItem(resources.getString(R.string.get_free_months), 
+                    R.drawable.get_free));
+        mNavItems.add(new NavItem(resources.getString(R.string.language), 
+                    R.drawable.language));
+        mNavItems.add(new NavItem(resources.getString(R.string.desktop_option), 
+                    R.drawable.ic_desktop));
+        mNavItems.add(new NavItem(resources.getString(R.string.contact_option), 
+                    R.drawable.ic_contact));
+        mNavItems.add(new NavItem(resources.getString(R.string.quit_option), 
+                    R.drawable.ic_quit));
 
         // Populate the Navigtion Drawer with options
         mDrawerPane = (RelativeLayout) this.activity.findViewById(R.id.drawerPane);
@@ -375,42 +377,31 @@ public class UI {
 
             Intent intent = null;
 
-            switch (title) {
-                case resources.getString(R.string.share_option):
-                    shareable.showOption();
-                    break;
-                case resources.getString(R.string.sign_in_pro):
-                    intent = new Intent(this.activity, SignInActivity.class);
-                    break;
-                case resources.getString(R.string.pro_account_header):
+            if (title.equals(resources.getString(R.string.share_option))) {
+                shareable.showOption();
+            } else if (title.equals(resources.getString(R.string.sign_in_pro))) {
+                intent = new Intent(this.activity, SignInActivity.class);
+            } else if (title.equals(resources.getString(R.string.pro_account_header))) {
+                intent = new Intent(this.activity, ProAccountActivity.class);
+            } else if (title.equals(resources.getString(R.string.contact_option))) {
+                contactOption();
+            } else if (title.equals(resources.getString(R.string.quit_option))) {
+                activity.quitLantern();                                    
+            } else if (title.equals(resources.getString(R.string.desktop_option))) {
+                intent = new Intent(this.activity, DesktopActivity.class);
+            } else if (title.equals(resources.getString(R.string.get_pro_now))) {
+                if (mPrefs.getBoolean("proUser", false)) {
+                    // if its a Pro user, display the 
+                    // Pro account management tab instead
+                    // of a list of payment options
                     intent = new Intent(this.activity, ProAccountActivity.class);
-                    break;
-                case resources.getString(R.string.contact_option):
-                    contactOption();
-                    break;
-                case resources.getString(R.string.quit_option):
-                    activity.quitLantern();
-                    break;
-                case resources.getString(R.string.desktop_option):
-                    intent = new Intent(this.activity, DesktopActivity.class);
-                    break;
-                case resources.getString(R.string.get_pro_now):
-                    if (mPrefs.getBoolean("proUser", false)) {
-                        // if its a Pro user, display the 
-                        // Pro account management tab instead
-                        // of a list of payment options
-                        intent = new Intent(this.activity, ProAccountActivity.class);
-                    } else {
-                        intent = new Intent(this.activity, PlansActivity.class);
-                    }
-                    break;
-                case resources.getString(R.string.get_free_months):
-                    intent = new Intent(this.activity, InviteActivity.class);
-                    break;
-                case resources.getString(R.string.language):
-                    intent = new Intent(this.activity, LanguageActivity.class);
-                    break;
-                default:
+                } else {
+                    intent = new Intent(this.activity, PlansActivity.class);
+                }
+            } else if (title.equals(resources.getString(R.string.get_free_months))) {
+                intent = new Intent(this.activity, InviteActivity.class);
+            } else if (title.equals(resources.getString(R.string.language))) {
+                intent = new Intent(this.activity, LanguageActivity.class);
             }
 
             if (intent != null) {

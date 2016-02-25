@@ -28,4 +28,9 @@
   <string name="contact_email">team@getlantern.org</string>
   <string name="contact_message">Hulp</string>
   <string name="contact_subject">Lantern Android</string>
+  <string name="not_now">Niet nu</string>
+  <string name="install_update">Update</string>
+  <string name="error_update">Fout Downloaden Update</string>
+  <string name="pro_welcome_text">Welkom bij Lantern Pro!</string>
+  <string name="language">Taal</string>
 </resources>
