@@ -247,6 +247,7 @@ func (dc *Conn) anyDataReceived() bool {
 func (dc *Conn) incReadBytes(n int) {
 	atomic.AddUint64(&dc.readBytes, uint64(n))
 }
+
 func (dc *Conn) closeAndDecrease(c conn) {
 	closeConn(c)
 	atomic.AddUint32(&dc.expectedConns, ^uint32(0))
@@ -336,6 +337,8 @@ func (r *reader) run() {
 	select {
 	case r.chMerge <- innerReadResult{r.c, r.buf[:n], err}:
 	case <-r.chClose:
+		log.Tracef("Read result arrived after %s connection to %s closed",
+			r.c.Type(), r.addr)
 	}
 }
 

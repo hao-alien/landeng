@@ -72,7 +72,7 @@ func Dialer(detourDialer dialFunc) func(network, addr string) (net.Conn, error) 
 				select {
 				case dc.chConnToIOLoop <- res.c:
 					chLastError <- nil
-				default:
+				case <-dc.chClose:
 					log.Tracef(
 						"%s connection to %s established too late, closing",
 						res.c.Type(), dc.addr)
