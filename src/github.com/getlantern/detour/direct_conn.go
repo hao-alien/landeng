@@ -28,33 +28,37 @@ func isDetourable(err error) bool {
 	return err == errDetourable
 }
 
-func dialDirect(network string, addr string, isHTTP bool, detourAllowed eventual.Value) (net.Conn, error) {
+func dialDirect(network string, addr string, isHTTP bool, detourAllowed eventual.Value) net.Conn {
 	log.Tracef("Dialing direct connection to %s", addr)
-	conn, err := net.DialTimeout(network, addr, DirectDialTimeout)
-	if err == nil {
-		if detector.DNSPoisoned(conn) {
-			if err := conn.Close(); err != nil {
-				log.Debugf("Error closing direct connection to %s: %s", addr, err)
+	ec := newEventualConn(DirectDialTimeout, BufferSize, func() (net.Conn, error) {
+		conn, err := net.DialTimeout(network, addr, DirectDialTimeout)
+		if err == nil {
+			if detector.DNSPoisoned(conn) {
+				if err := conn.Close(); err != nil {
+					log.Debugf("Error closing direct connection to %s: %s", addr, err)
+				}
+				log.Debugf("Dial directly to %s, dns hijacked", addr)
+				AddToWl(addr, false)
+				return nil, fmt.Errorf("DNS hijacked")
 			}
-			log.Debugf("Dial directly to %s, dns hijacked", addr)
+			log.Tracef("Dial directly to %s succeeded", addr)
+			return conn, nil
+		} else if detector.TamperingSuspected(err) {
+			log.Debugf("Dial directly to %s, tampering suspected: %s", addr, err)
 			AddToWl(addr, false)
-			return nil, fmt.Errorf("DNS hijacked")
+			// Since we couldn't even dial, it's okay to detour
+			detourAllowed.Set(true)
+		} else {
+			log.Debugf("Dial directly to %s failed: %s", addr, err)
+			detourAllowed.Set(false)
 		}
-		log.Tracef("Dial directly to %s succeeded", addr)
-		return &directConn{Conn: &readBytesCounted{conn, 0},
-			addr:          addr,
-			isHTTP:        isHTTP,
-			detourAllowed: detourAllowed}, nil
-	} else if detector.TamperingSuspected(err) {
-		log.Debugf("Dial directly to %s, tampering suspected: %s", addr, err)
-		AddToWl(addr, false)
-		// Since we couldn't even dial, it's okay to detour
-		detourAllowed.Set(true)
-	} else {
-		log.Debugf("Dial directly to %s failed: %s", addr, err)
-		detourAllowed.Set(false)
-	}
-	return nil, err
+		return nil, err
+	})
+
+	return &directConn{Conn: &readBytesCounted{ec, 0},
+		addr:          addr,
+		isHTTP:        isHTTP,
+		detourAllowed: detourAllowed}
 }
 
 func (dc *directConn) Write(b []byte) (int, error) {
@@ -117,10 +121,9 @@ func checkFollowupRead(b []byte, n int, err error, addr string) error {
 
 func (dc *directConn) doRead(b []byte, checker readChecker) (int, error) {
 	n, err := dc.Conn.Read(b)
-	log.Trace("Did read")
+	log.Tracef("Did read: %v", n)
 	err = checker(b, n, err, dc.addr)
 	if err != nil {
-		b = nil
 		n = 0
 	}
 	return n, err

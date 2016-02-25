@@ -73,12 +73,12 @@ func TestReadTimeout(t *testing.T) {
 	mockURL, mock := newMockServer("")
 	mock.Timeout(200*time.Millisecond, directMsg)
 
-	client := &http.Client{Timeout: 100 * time.Millisecond}
+	client := &http.Client{Timeout: 500 * time.Millisecond}
 	resp, err := client.Get(mockURL)
 	assert.Error(t, err, "direct access to a timeout url should fail")
 
 	u, _ := url.Parse(mockURL)
-	client = newClient(proxiedURL, 150*time.Millisecond)
+	client = newClient(proxiedURL, 550*time.Millisecond)
 	resp, err = client.Get(mockURL)
 	if assert.NoError(t, err, "should have no error if reading times out") {
 		time.Sleep(200 * time.Millisecond)

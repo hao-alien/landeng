@@ -3,10 +3,13 @@
 package main
 
 import (
+	nlog "log"
+	"math/rand"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	_ "net/http/pprof"
+	"os"
 	"strconv"
 	"sync/atomic"
 	"time"
@@ -19,7 +22,29 @@ const (
 	counterHeader = "X-Detour-Counter"
 )
 
-var log = golog.LoggerFor("detour.proxy")
+var (
+	log = golog.LoggerFor("detour.proxy")
+
+	letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	data        []byte
+)
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+
+	data = []byte(randStringRunes(32276))
+	data[len(data)-1] = '\n'
+}
+
+// randStringRunes generates a random string of the given length.
+// Taken from http://stackoverflow.com/questions/22892120/how-to-generate-a-random-string-of-a-fixed-length-in-golang.
+func randStringRunes(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
+}
 
 type mockHandler struct {
 	writer func(w http.ResponseWriter)
@@ -28,9 +53,8 @@ type mockHandler struct {
 func (m *mockHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var msg = r.Header.Get(counterHeader) + "\n"
 	log.Debug("***Server got " + msg)
-	w.Header()["Content-Length"] = []string{strconv.Itoa(len(msg))}
-	time.Sleep(2000)
-	_, _ = w.Write([]byte(msg))
+	w.Header()["Content-Length"] = []string{strconv.Itoa(len(data))}
+	_, _ = w.Write(data)
 	w.(http.Flusher).Flush()
 }
 
@@ -69,5 +93,6 @@ func main() {
 				return net.Dial("tcp", "127.0.0.1:8082")
 			}),
 		},
+		ErrorLog: nlog.New(os.Stderr, "proxy", 0),
 	}))
 }

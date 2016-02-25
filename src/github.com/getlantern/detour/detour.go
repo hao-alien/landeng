@@ -35,9 +35,7 @@ func Dialer(isHTTP bool, dialDetour dialFN) dialFN {
 		conn := &dconn{}
 
 		// Set up a direct connection which we try to use
-		conn.direct = newEventualConn(DirectDialTimeout, BufferSize, func() (net.Conn, error) {
-			return dialDirect(network, addr, isHTTP, detourAllowed)
-		})
+		conn.direct = dialDirect(network, addr, isHTTP, detourAllowed)
 		// Use direct as the initial reader
 		conn.reader = conn.direct
 
@@ -93,12 +91,7 @@ func (conn *dconn) Read(b []byte) (n int, err error) {
 		return n, err
 	}
 	log.Trace("Subsequent read")
-	nd, ed := conn.direct.Read(b)
-	nt, et := conn.detoured.Read(b)
-	if ed == nil {
-		return nd, ed
-	}
-	return nt, et
+	return conn.reader.Read(b)
 }
 
 func (conn *dconn) Close() error {

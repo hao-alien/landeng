@@ -62,8 +62,10 @@ func (conn *eventualConn) Write(b []byte) (n int, err error) {
 	conn.writeMutex.Lock()
 	defer conn.writeMutex.Unlock()
 	if !conn.writeToConn {
+		log.Trace("Writing to buffer")
 		return conn.writeBuf.Write(b)
 	} else {
+		log.Trace("Writing to underlying conn")
 		c, err := conn.getConn()
 		if err != nil {
 			return 0, err
