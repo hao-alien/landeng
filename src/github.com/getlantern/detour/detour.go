@@ -38,10 +38,10 @@ func Dialer(isHTTP bool, dialDetour dialFN) dialFN {
 
 		detourAllowed := eventual.NewValue()
 
-		conn := &dconn{}
+		conn := &dconn{
+			direct: dialDirect(network, addr, isHTTP, detourAllowed),
+		}
 
-		// Set up a direct connection which we try to use
-		conn.direct = dialDirect(network, addr, isHTTP, detourAllowed)
 		// Use direct as the initial reader
 		conn.reader = conn.direct
 
@@ -50,7 +50,7 @@ func Dialer(isHTTP bool, dialDetour dialFN) dialFN {
 		conn.detoured = newEventualConn(detouredTimeout, BufferSize, func() (net.Conn, error) {
 			allowed, ok := detourAllowed.Get(detouredTimeout)
 			if !ok || !allowed.(bool) {
-				err := fmt.Errorf("Detouring not allowed for %v. Timed out? %v", addr, !ok)
+				err := fmt.Errorf("Detouring not allowed for %v. Timed out waiting for connection? %v", addr, !ok)
 				log.Trace(err)
 				return nil, err
 			}
@@ -72,6 +72,9 @@ type dconn struct {
 
 func (conn *dconn) Write(b []byte) (n int, err error) {
 	log.Trace("Writing")
+	// We write to both the direct and the detoured connections so that if we have
+	// to switch to detoured, we've already done some of the work.
+	// Since both connections are buffered, this won't block.
 	nd, ed := conn.direct.Write(b)
 	nt, et := conn.detoured.Write(b)
 	log.Tracef("Wrote")
