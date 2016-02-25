@@ -45,8 +45,10 @@ func (dc *Conn) ioLoop() {
 	for {
 		select {
 		case <-ticker.C:
-			log.Tracef("Waited 10s on connection to %s, dumping internal state", dc.addr)
-			dc.dumpInternal()
+			if log.IsTraceEnabled() {
+				log.Tracef("Waited 10s on connection to %s, dumping internal state", dc.addr)
+				dc.dumpInternal()
+			}
 		case c := <-dc.chConnToIOLoop:
 			reRead := false
 			if dc.anyDataReceived() {

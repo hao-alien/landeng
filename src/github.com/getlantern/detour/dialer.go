@@ -10,6 +10,11 @@ import (
 
 type dialFunc func(network, addr string) (net.Conn, error)
 
+type dialResult struct {
+	c   conn
+	err error
+}
+
 // Dialer returns a function with same signature of net.Dialer.Dial().
 func Dialer(detourDialer dialFunc) func(network, addr string) (net.Conn, error) {
 	return func(network, addr string) (net.Conn, error) {
@@ -21,23 +26,16 @@ func Dialer(detourDialer dialFunc) func(network, addr string) (net.Conn, error) 
 			chWriteRequest:  make(chan ioRequest),
 			chDialDetourNow: make(chan struct{}),
 			chGetAddr:       make(chan getAddrRequest),
+			// set as maximum and decrease afterwards
+			expectedConns: 2,
 		}
 
-		type dialResult struct {
-			c   conn
-			err error
-		}
 		ch := make(chan dialResult)
-		dc.expectedConns = 1
-		if !whitelisted(addr) {
-			dc.expectedConns = 2
-		}
-
-		// Dialing logic
-		numDial := int(dc.expectedConns)
-		chLastError := make(chan error, numDial)
 		go func() {
-			if numDial == 2 {
+			// Dialing logic
+			if whitelisted(addr) {
+				ch <- dialResult{nil, errors.New("no need to dial direct")}
+			} else {
 				go func() {
 					c, err := dialDirect(network, addr)
 					ch <- dialResult{c, err}
@@ -59,9 +57,10 @@ func Dialer(detourDialer dialFunc) func(network, addr string) (net.Conn, error) 
 
 		// Merge dialing results. Run until all dialing attempts return
 		// but notify caller as soon as any connection available.
+		chLastError := make(chan error, 2)
 		go func() {
 			var res dialResult
-			for i := 0; i < numDial; i++ {
+			for i := 0; i < 2; i++ {
 				res = <-ch
 				if res.err != nil {
 					atomic.AddUint32(&dc.expectedConns, ^uint32(0))
