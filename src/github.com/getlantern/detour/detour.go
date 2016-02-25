@@ -3,6 +3,7 @@ package detour
 import (
 	"fmt"
 	"net"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -30,6 +31,11 @@ type dialFN func(network, addr string) (net.Conn, error)
 
 func Dialer(isHTTP bool, dialDetour dialFN) dialFN {
 	return func(network, addr string) (net.Conn, error) {
+		if whitelisted(addr) {
+			log.Tracef("Using detour for already whitelisted address: %v", addr)
+			return dialDetour(network, addr)
+		}
+
 		detourAllowed := eventual.NewValue()
 
 		conn := &dconn{}
@@ -60,6 +66,7 @@ type dconn struct {
 	direct    net.Conn
 	detoured  net.Conn
 	reader    net.Conn
+	readMutex sync.Mutex
 	readFirst int32
 }
 
@@ -75,6 +82,8 @@ func (conn *dconn) Write(b []byte) (n int, err error) {
 }
 
 func (conn *dconn) Read(b []byte) (n int, err error) {
+	conn.readMutex.Lock()
+	defer conn.readMutex.Unlock()
 	log.Trace("Reading")
 	defer func() {
 		log.Trace("Read")
