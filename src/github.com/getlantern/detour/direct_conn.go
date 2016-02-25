@@ -1,34 +1,36 @@
 package detour
 
 import (
+	"bytes"
 	"fmt"
 	"net"
 	"sync/atomic"
+
+	"github.com/getlantern/eventual"
 )
 
 type directConn struct {
 	net.Conn
-	addr string
+	addr          string
+	wroteFirst    int32
+	readFirst     int32
+	isHTTP        bool
+	detourAllowed eventual.Value
 }
 
 var (
-	blockDetector atomic.Value
+	detector = defaultDetector
+
+	errDetourable = fmt.Errorf("detourable error")
 )
 
-// SetCountry sets the ISO 3166-1 alpha-2 country code
-// to load country specific detection rules
-func SetCountry(country string) {
-	blockDetector.Store(detectorByCountry(country))
+func isDetourable(err error) bool {
+	return err == errDetourable
 }
 
-func init() {
-	blockDetector.Store(detectorByCountry(""))
-}
-
-func dialDirect(network string, addr string) (conn, error) {
+func dialDirect(network string, addr string, isHTTP bool, detourAllowed eventual.Value) (net.Conn, error) {
 	log.Tracef("Dialing direct connection to %s", addr)
-	conn, err := net.DialTimeout(network, addr, TimeoutToConnect)
-	detector := blockDetector.Load().(*Detector)
+	conn, err := net.DialTimeout(network, addr, DirectDialTimeout)
 	if err == nil {
 		if detector.DNSPoisoned(conn) {
 			if err := conn.Close(); err != nil {
@@ -39,31 +41,39 @@ func dialDirect(network string, addr string) (conn, error) {
 			return nil, fmt.Errorf("DNS hijacked")
 		}
 		log.Tracef("Dial directly to %s succeeded", addr)
-		return &directConn{Conn: &readBytesCounted{conn, 0}, addr: addr}, nil
+		return &directConn{Conn: &readBytesCounted{conn, 0},
+			addr:          addr,
+			isHTTP:        isHTTP,
+			detourAllowed: detourAllowed}, nil
 	} else if detector.TamperingSuspected(err) {
 		log.Debugf("Dial directly to %s, tampering suspected: %s", addr, err)
 		AddToWl(addr, false)
+		// Since we couldn't even dial, it's okay to detour
+		detourAllowed.Set(true)
 	} else {
 		log.Debugf("Dial directly to %s failed: %s", addr, err)
+		detourAllowed.Set(false)
 	}
 	return nil, err
 }
 
-func (dc *directConn) Type() connType {
-	return connTypeDirect
+func (dc *directConn) Write(b []byte) (int, error) {
+	if atomic.CompareAndSwapInt32(&dc.wroteFirst, 0, 1) {
+		dc.detourAllowed.Set(dc.isHTTP && mightBeIdempotentHTTPRequest(b))
+	}
+	return dc.Conn.Write(b)
 }
 
-func (dc *directConn) Read(b []byte, isFirst bool) (int, error) {
-	if isFirst {
-		return dc.doRead(b, checkFirstRead)
+func (dc *directConn) Read(b []byte) (int, error) {
+	if atomic.CompareAndSwapInt32(&dc.readFirst, 0, 1) {
+		return dc.doRead(b, dc.checkFirstRead)
 	}
 	return dc.doRead(b, checkFollowupRead)
 }
 
 type readChecker func([]byte, int, error, string) error
 
-func checkFirstRead(b []byte, n int, err error, addr string) error {
-	detector := blockDetector.Load().(*Detector)
+func (dc *directConn) checkFirstRead(b []byte, n int, err error, addr string) error {
 	if err == nil {
 		if !detector.FakeResponse(b) {
 			return nil
@@ -75,12 +85,18 @@ func checkFirstRead(b []byte, n int, err error, addr string) error {
 	log.Debugf("Error while read from %s directly: %s", addr, err)
 	if detector.TamperingSuspected(err) {
 		AddToWl(addr, false)
+		// Check if it's okay to detour
+		allowed, ok := dc.detourAllowed.Get(DirectDialTimeout)
+		if ok && allowed.(bool) {
+			log.Tracef("Allowing detouring after encountering: %v", err)
+			return errDetourable
+		}
+		return err
 	}
 	return err
 }
 
 func checkFollowupRead(b []byte, n int, err error, addr string) error {
-	detector := blockDetector.Load().(*Detector)
 	if err != nil {
 		if detector.TamperingSuspected(err) {
 			log.Debugf("Seems %s is still blocked, add to whitelist to try detour next time", addr)
@@ -101,6 +117,7 @@ func checkFollowupRead(b []byte, n int, err error, addr string) error {
 
 func (dc *directConn) doRead(b []byte, checker readChecker) (int, error) {
 	n, err := dc.Conn.Read(b)
+	log.Trace("Did read")
 	err = checker(b, n, err, dc.addr)
 	if err != nil {
 		b = nil
@@ -120,4 +137,23 @@ func (dc *directConn) Close() (err error) {
 		}
 	}
 	return
+}
+
+var nonidempotentMethods = [][]byte{
+	[]byte("PUT "),
+	[]byte("POST "),
+	[]byte("PATCH "),
+}
+
+// Ref https://tools.ietf.org/html/rfc2616#section-9.1.2
+// We consider the https handshake phase to be idemponent.
+func mightBeIdempotentHTTPRequest(b []byte) bool {
+	if len(b) > 4 {
+		for _, m := range nonidempotentMethods {
+			if bytes.HasPrefix(b, m) {
+				return false
+			}
+		}
+	}
+	return true
 }

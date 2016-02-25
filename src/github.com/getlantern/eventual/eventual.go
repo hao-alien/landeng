@@ -51,6 +51,9 @@ func DefaultGetter(val interface{}) Getter {
 }
 
 func (v *value) Set(val interface{}) {
+	if val == nil {
+		panic("Attempted to set nil value")
+	}
 	v.updates <- val
 }
 

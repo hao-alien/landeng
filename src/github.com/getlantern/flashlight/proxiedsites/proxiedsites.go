@@ -56,10 +56,6 @@ func Configure(cfg *proxiedsites.Config) {
 }
 
 func updateDetour(delta *proxiedsites.Delta) {
-	// TODO: subscribe changes of geolookup and set country accordingly
-	// safe to hardcode here as IR has all detection rules
-	detour.SetCountry("IR")
-
 	// for simplicity, detour matches whitelist using host:port string
 	// so we add ports to each proxiedsites
 	for _, v := range delta.Deletions {

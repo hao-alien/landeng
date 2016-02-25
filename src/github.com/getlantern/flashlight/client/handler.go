@@ -17,13 +17,6 @@ const (
 	httpConnectMethod = "CONNECT" // HTTP CONNECT method
 )
 
-func init() {
-	// Add a small delay to avoid detour most directly accessible sites.
-	// For those sites much slower accessing directly (delta > 500ms), we
-	// just accelerate them through Lantern server.
-	detour.DelayBeforeDetour = 500 * time.Millisecond
-}
-
 // ServeHTTP implements the method from interface http.Handler using the latest
 // handler available from getHandler() and latest ReverseProxy available from
 // getReverseProxy().
@@ -87,7 +80,7 @@ func (client *Client) intercept(resp http.ResponseWriter, req *http.Request) {
 
 	// Establish outbound connection.
 	addr := hostIncludingPort(req, 443)
-	d := client.proxiedDialer(func(network, addr string) (net.Conn, error) {
+	d := client.proxiedDialer(false, func(network, addr string) (net.Conn, error) {
 		// UGLY HACK ALERT! In this case, we know we need to send a CONNECT request
 		// to the chained server. We need to send that request from chained/dialer.go
 		// though because only it knows about the authentication token to use.

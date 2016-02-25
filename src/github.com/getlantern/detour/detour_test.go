@@ -42,8 +42,7 @@ func (t timestamped) Write(p []byte) (int, error) {
 }
 
 func init() {
-	TimeoutToConnect = 150 * time.Millisecond
-	DelayBeforeDetour = 50 * time.Millisecond
+	DirectDialTimeout = 150 * time.Millisecond
 	golog.SetOutputs(timestamped{os.Stderr}, timestamped{os.Stdout})
 }
 
@@ -51,7 +50,7 @@ func TestTampering(t *testing.T) {
 	defer stopMockServers()
 	proxiedURL, _ := newMockServer(detourMsg)
 
-	client := newClient(proxiedURL, 100*time.Millisecond)
+	client := newClient(proxiedURL, 500*time.Millisecond)
 	resp, err := client.Get("http://255.0.0.1") // it's reserved for future use so will always time out
 	if assert.NoError(t, err, "should have no error when dial a timeout host") {
 		time.Sleep(200 * time.Millisecond)
@@ -59,7 +58,7 @@ func TestTampering(t *testing.T) {
 		assertContent(t, resp, detourMsg, "should detour if dialing times out")
 	}
 
-	client = newClient(proxiedURL, 100*time.Millisecond)
+	client = newClient(proxiedURL, 500*time.Millisecond)
 	resp, err = client.Get("http://127.0.0.1:4325") // hopefully this port didn't open, so connection will be refused
 	if assert.NoError(t, err, "should have no error if connection is refused") {
 		time.Sleep(60 * time.Millisecond)
@@ -162,7 +161,6 @@ func TestClosing(t *testing.T) {
 func TestIranRules(t *testing.T) {
 	defer stopMockServers()
 	proxiedURL, _ := newMockServer(detourMsg)
-	SetCountry("IR")
 	u, mock := newMockServer(directMsg)
 	client := newClient(proxiedURL, 100*time.Millisecond)
 
@@ -185,7 +183,7 @@ func TestGetAddr(t *testing.T) {
 	mockURL, _ := newMockServer(directMsg)
 	proxiedURL, _ := newMockServer(detourMsg)
 	u, _ := url.Parse(mockURL)
-	d := Dialer(func(network, addr string) (net.Conn, error) {
+	d := Dialer(true, func(network, addr string) (net.Conn, error) {
 		u, _ := url.Parse(proxiedURL)
 		return net.Dial("tcp", u.Host)
 	})
@@ -221,7 +219,7 @@ func TestConcurrency(t *testing.T) {
 			Transport: &http.Transport{
 				// This just detours to net.Dial, meaning that it doesn't accomplish any
 				// unblocking, it's just here for performance testing.
-				Dial: Dialer(net.Dial),
+				Dial: Dialer(true, net.Dial),
 			},
 			ErrorLog: log.AsStdLogger(),
 		})
@@ -255,7 +253,7 @@ func TestConcurrency(t *testing.T) {
 func newClient(proxyURL string, timeout time.Duration) *http.Client {
 	return &http.Client{
 		Transport: &http.Transport{
-			Dial: Dialer(func(network, addr string) (net.Conn, error) {
+			Dial: Dialer(true, func(network, addr string) (net.Conn, error) {
 				u, _ := url.Parse(proxyURL)
 				return net.Dial("tcp", u.Host)
 			})},

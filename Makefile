@@ -420,7 +420,12 @@ package-darwin: package-darwin-manoto
 
 binaries: docker genassets linux windows darwin
 
-packages: require-version require-secrets clean update-dist binaries package-windows package-linux package-darwin
+docker-packages: require-version require-secrets clean update-dist binaries package-windows package-linux package-darwin
+
+packages:
+	@echo "Generating all distributions" && \
+	$(call docker-up) && \
+
 
 release-qa: require-version require-s3cmd
 	@BASE_NAME="lantern-installer-qa" && \

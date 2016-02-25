@@ -192,12 +192,12 @@ func (client *Client) Stop() error {
 	return client.l.Close()
 }
 
-func (client *Client) proxiedDialer(orig func(network, addr string) (net.Conn, error)) func(network, addr string) (net.Conn, error) {
+func (client *Client) proxiedDialer(isHTTP bool, orig func(network, addr string) (net.Conn, error)) func(network, addr string) (net.Conn, error) {
 	var proxied func(network, addr string) (net.Conn, error)
 	if client.ProxyAll() {
 		proxied = orig
 	} else {
-		proxied = detour.Dialer(orig)
+		proxied = detour.Dialer(isHTTP, orig)
 	}
 
 	return func(network, addr string) (net.Conn, error) {

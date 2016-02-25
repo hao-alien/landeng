@@ -24,7 +24,7 @@ func (client *Client) newReverseProxy(bal *balancer.Balancer) *httputil.ReverseP
 	// challenge is that ReverseProxy reuses connections for
 	// different requests, so we might have to configure different
 	// ReverseProxies for different QOS's or something like that.
-	transport.Dial = client.proxiedDialer(bal.Dial)
+	transport.Dial = client.proxiedDialer(true, bal.Dial)
 
 	allAuthTokens := bal.AllAuthTokens()
 	return &httputil.ReverseProxy{

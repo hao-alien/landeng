@@ -9,6 +9,7 @@ import (
 	_ "net/http/pprof"
 	"strconv"
 	"sync/atomic"
+	"time"
 
 	"github.com/getlantern/detour"
 	"github.com/getlantern/golog"
@@ -25,9 +26,10 @@ type mockHandler struct {
 }
 
 func (m *mockHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var msg = r.Header.Get(counterHeader)
+	var msg = r.Header.Get(counterHeader) + "\n"
 	log.Debug("***Server got " + msg)
 	w.Header()["Content-Length"] = []string{strconv.Itoa(len(msg))}
+	time.Sleep(2000)
 	_, _ = w.Write([]byte(msg))
 	w.(http.Flusher).Flush()
 }
@@ -61,7 +63,11 @@ func main() {
 		Transport: &http.Transport{
 			// This just detours to net.Dial, meaning that it doesn't accomplish any
 			// unblocking, it's just here for performance testing.
-			Dial: detour.Dialer(net.Dial),
+			Dial: detour.Dialer(true, func(network, addr string) (net.Conn, error) {
+				// Always dial to our server, no matter what was requested (simulates
+				// blocking)
+				return net.Dial("tcp", "127.0.0.1:8082")
+			}),
 		},
 	}))
 }
