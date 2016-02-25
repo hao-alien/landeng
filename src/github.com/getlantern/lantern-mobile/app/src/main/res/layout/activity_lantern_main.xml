@@ -271,7 +271,7 @@
                     android:layout_marginTop="10dp"
                     android:gravity="center_horizontal"
                     android:paddingLeft="20dp"
-                    android:text="Lantern"
+                    android:text="@string/app_name"
                     android:textStyle="bold"
                     android:textSize="17sp"
                     android:textColor="#fff"/>

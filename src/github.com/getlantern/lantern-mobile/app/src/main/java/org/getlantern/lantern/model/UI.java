@@ -71,7 +71,7 @@ public class UI {
 
     private static final String TAG = "LanternUI";
 
-    private ArrayList<NavItem> mNavItems;
+    private ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
 
     private DrawerLayout mDrawerLayout;
     private ObjectAnimator colorFadeIn, colorFadeOut;
@@ -92,6 +92,7 @@ public class UI {
 
     private ToggleButton powerLantern;
     private TextView versionNum, btnText;
+    private Resources resources;
 
     private static final int onColor = Color.parseColor("#39C2D6");
     private static final int offColor = Color.parseColor("#FFFFFF"); 
@@ -115,10 +116,9 @@ public class UI {
         .build();
 
     public UI(LanternMainActivity activity, SharedPreferences mPrefs) {
-        this.mNavItems = new ArrayList<NavItem>();
-
         this.activity = activity;
         this.mPrefs = mPrefs;
+        this.resources = activity.getResources();
 
         // DrawerLayout
         this.mDrawerLayout = (DrawerLayout) this.activity.findViewById(R.id.drawerLayout);
@@ -376,25 +376,25 @@ public class UI {
             Intent intent = null;
 
             switch (title) {
-                case "Share":
+                case resources.getString(R.string.share_option):
                     shareable.showOption();
                     break;
-                case "Sign in to PRO":
+                case resources.getString(R.string.sign_in_pro):
                     intent = new Intent(this.activity, SignInActivity.class);
                     break;
-                case "PRO Account Management":
+                case resources.getString(R.string.pro_account_header):
                     intent = new Intent(this.activity, ProAccountActivity.class);
                     break;
-                case "Contact":
+                case resources.getString(R.string.contact_option):
                     contactOption();
                     break;
-                case "Quit":
+                case resources.getString(R.string.quit_option):
                     activity.quitLantern();
                     break;
-                case "Desktop Version":
+                case resources.getString(R.string.desktop_option):
                     intent = new Intent(this.activity, DesktopActivity.class);
                     break;
-                case "Get PRO Now":
+                case resources.getString(R.string.get_pro_now):
                     if (mPrefs.getBoolean("proUser", false)) {
                         // if its a Pro user, display the 
                         // Pro account management tab instead
@@ -404,10 +404,10 @@ public class UI {
                         intent = new Intent(this.activity, PlansActivity.class);
                     }
                     break;
-                case "Get Free Months":
+                case resources.getString(R.string.get_free_months):
                     intent = new Intent(this.activity, InviteActivity.class);
                     break;
-                case "Language":
+                case resources.getString(R.string.language):
                     intent = new Intent(this.activity, LanguageActivity.class);
                     break;
                 default:

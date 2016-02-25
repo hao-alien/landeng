@@ -1,8 +1,5 @@
 package org.getlantern.lantern.activity;
 
-
-import android.app.Activity;
-import android.content.ComponentName;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -25,7 +22,6 @@ import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageInfo;
-import android.app.Activity;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -83,9 +79,9 @@ public class LanternMainActivity extends AppCompatActivity implements Handler.Ca
         // we want to use the ActionBar from the AppCompat
         // support library, but with our custom design
         // we hide the default action bar
-        //if (getSupportActionBar() != null) {
-        //     getSupportActionBar().hide();
-        // }  
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
 
         context = getApplicationContext();
         mPrefs = Utils.getSharedPrefs(context);
