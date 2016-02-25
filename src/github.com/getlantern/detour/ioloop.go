@@ -26,10 +26,10 @@ type innerReadRequest struct {
 // ioLoop is the core of detour. It waits for connections and handles
 // read/write requests
 func (dc *Conn) ioLoop() {
-	// Use buffered channel in same goroutine so we can easily add / remove
-	// connections. Should switch to container/ring if performace matters.
+	// Wraps slice of connections to easily add/remove them.
+	// Should switch to container/ring if performace matters.
 	// It's not safe to access it from multiple goroutines.
-	conns := newConnQueue(2)
+	conns := connQueue{}
 	// Requests ioLoop to remove already closed connections.
 	chRemoveConn := make(chan conn)
 	// Hold the read request so we can re-read after replay.
@@ -99,8 +99,9 @@ func (dc *Conn) ioLoop() {
 
 		case req := <-dc.chReadRequest:
 			atomic.AddUint32(&dc.numReadRequests, 1)
-			if atomic.LoadUint32(&dc.expectedConns) == 1 {
-				c := conns.Next()
+			// short path for most requests
+			if atomic.LoadUint32(&dc.expectedConns) == 1 && conns.Len() == 1 {
+				c := conns.First()
 				go func() {
 					n, err := c.Read(req.buf, false)
 					atomic.AddUint32(&dc.numReads, 1)
@@ -158,8 +159,9 @@ func (dc *Conn) ioLoop() {
 
 		case req := <-dc.chWriteRequest:
 			atomic.AddUint32(&dc.numWriteRequests, 1)
-			if atomic.LoadUint32(&dc.expectedConns) == 1 {
-				c := conns.Next()
+			// short path for most requests
+			if atomic.LoadUint32(&dc.expectedConns) == 1 && conns.Len() == 1 {
+				c := conns.First()
 				go func() {
 					n, err := c.Write(req.buf)
 					atomic.AddUint32(&dc.numWrites, 1)
@@ -187,11 +189,10 @@ func (dc *Conn) ioLoop() {
 					dc.closeAndDecrease(c)
 					// intentionally not return c to chConns
 					return false
-				} else {
-					log.Tracef("Wrote %v bytes to %s connection to %s", n, c.Type(), dc.addr)
-					lastN = n
-					return true
 				}
+				log.Tracef("Wrote %v bytes to %s connection to %s", n, c.Type(), dc.addr)
+				lastN = n
+				return true
 			})
 			if lastN > 0 {
 				req.chResult <- ioResult{lastN, nil}
@@ -204,7 +205,7 @@ func (dc *Conn) ioLoop() {
 			if conns.Len() == 0 {
 				panic("should have at least one valid connection")
 			}
-			c := conns.Next()
+			c := conns.First()
 			if req.isLocal {
 				req.chResult <- c.LocalAddr()
 			} else {
@@ -346,7 +347,7 @@ type merger struct {
 
 func (m *merger) run() (connsToRemove []conn) {
 	var got bool
-	var i uint32 = 0
+	var i uint32
 	for ; i < atomic.LoadUint32(m.expectedConns); i++ {
 		var result innerReadResult
 		select {

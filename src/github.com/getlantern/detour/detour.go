@@ -110,11 +110,7 @@ type Conn struct {
 // Read() implements the function from net.Conn
 func (dc *Conn) Read(b []byte) (n int, err error) {
 	ch := make(chan ioResult)
-	select {
-	case dc.chReadRequest <- ioRequest{b, ch}:
-	default:
-		return 0, fmt.Errorf("connection to %s closed before reading", dc.addr)
-	}
+	dc.chReadRequest <- ioRequest{b, ch}
 	result, ok := <-ch
 	if !ok {
 		return 0, fmt.Errorf("connection to %s closed during reading", dc.addr)
