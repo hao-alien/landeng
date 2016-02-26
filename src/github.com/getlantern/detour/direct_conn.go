@@ -46,7 +46,8 @@ func dialDirect(network string, addr string, isHTTP bool, detourAllowed eventual
 		} else if detector.TamperingSuspected(err) {
 			log.Debugf("Dial directly to %s, tampering suspected: %s", addr, err)
 			AddToWl(addr, false)
-			// Since we couldn't even dial, it's okay to detour
+			// Since we couldn't even dial, it's okay to detour no matter whether this
+			// is idempotent HTTP traffic or not.
 			detourAllowed.Set(true)
 		} else {
 			log.Debugf("Dial directly to %s failed: %s", addr, err)

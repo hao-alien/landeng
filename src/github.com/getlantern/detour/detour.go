@@ -15,7 +15,12 @@ var (
 	log = golog.LoggerFor("detour")
 
 	// DirectDialTimeout controls the dial timeout for direct connections
-	DirectDialTimeout = 30 * time.Second
+	// We make this relatively small because detour won't fail over to a proxied
+	// connection until this timeout is hit. The detoured connection is eagerly
+	// fetched, so once we fail over the request will complete very quickly, so
+	// 5 seconds is a good approximation of our maximum latency for initial
+	// detouring.
+	DirectDialTimeout = 5 * time.Second
 
 	// BufferSize controls the read and write buffer sizes for connections.
 	// Since detour writes to multiple connections simultaneously, buffering
@@ -55,9 +60,15 @@ func Dialer(isHTTP bool, dialDetour dialFN) dialFN {
 				return nil, err
 			}
 			log.Tracef("Dialing detour for %v", addr)
-			return dialDetour(network, addr)
+			conn, err := dialDetour(network, addr)
+			if err == nil {
+				// Prefetch up to 1 MB
+				conn = newEagerconn(conn, 1024768)
+			}
+			return conn, err
 		})
 
+		log.Tracef("Returning detour conn for %v", addr)
 		return conn, nil
 	}
 }

@@ -24,7 +24,7 @@ func newEventualConn(timeout time.Duration, bufferSize int, dial func() (net.Con
 	conn := &eventualConn{
 		conn:     eventual.NewValue(),
 		timeout:  timeout,
-		writeBuf: bytes.NewBuffer(make([]byte, 0, bufferSize)),
+		writeBuf: bytes.NewBuffer(make([]byte, 0)),
 	}
 
 	// Dial on a goroutine and report the result
