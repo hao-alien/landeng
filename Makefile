@@ -241,7 +241,7 @@ docker-package-debian-arm: require-version docker-linux-arm
 	@echo "-> lantern_$(VERSION)_arm.deb"
 
 docker-package-windows: require-version docker-windows-386
-	@if [[ -z "$$BNS_CERT" ]]; then echo "BNS_CERT environment value is required."; exit 1; fi && \
+	if [[ ! -f "$$BNS_CERT" ]]; then echo "BNS_CERT is not a file."; exit 1; fi && \
 	if [[ -z "$$BNS_CERT_PASS" ]]; then echo "BNS_CERT_PASS environment value is required."; exit 1; fi && \
 	INSTALLER_RESOURCES="installer-resources/windows" && \
 	rm -f $$INSTALLER_RESOURCES/$(PACKAGED_YAML) && \
@@ -373,6 +373,7 @@ package-linux: require-version package-linux-386 package-linux-amd64
 package-windows: require-version windows
 	@echo "Generating distribution package for windows/386..." && \
 	if [[ -z "$$SECRETS_DIR" ]]; then echo "SECRETS_DIR environment value is required."; exit 1; fi && \
+	if [[ ! -f "$$SECRETS_DIR/bns.pfx" ]]; then echo "Expecting a certificate named bns.pfx inside SECRETS_DIR."; exit 1; fi && \
 	if [[ -z "$$BNS_CERT_PASS" ]]; then echo "BNS_CERT_PASS environment value is required."; exit 1; fi && \
 	$(call docker-up) && \
 	docker run -v $$PWD:/lantern -v $$SECRETS_DIR:/secrets -t $(DOCKER_IMAGE_TAG) /bin/bash -c 'cd /lantern && BNS_CERT="/secrets/bns.pfx" BNS_CERT_PASS="'$$BNS_CERT_PASS'" VERSION="'$$VERSION'" make docker-package-windows' && \
