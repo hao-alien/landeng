@@ -89,7 +89,7 @@ func run(configDir string) {
 		"localhost:0", // listen for SOCKS on random address
 		configDir,     // place to store lantern configuration
 		false,         // don't make config sticky
-		func() bool { return true },                   // proxy all requests
+		true,          // proxy all requests
 		make(map[string]interface{}),                  // no special configuration flags
 		func(cfg *config.Config) bool { return true }, // beforeStart()
 		func(cfg *config.Config) {},                   // afterStart()
