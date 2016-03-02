@@ -16,6 +16,7 @@ import (
 	"github.com/getlantern/eventual"
 	"github.com/getlantern/golog"
 	"github.com/getlantern/i18n"
+	"github.com/getlantern/launcher"
 	"github.com/getlantern/profiling"
 
 	"github.com/getlantern/flashlight"
@@ -49,7 +50,6 @@ func init() {
 
 	rand.Seed(time.Now().UnixNano())
 
-	settings = LoadSettings(flashlight.Version, flashlight.RevisionDate, flashlight.BuildDate)
 }
 
 func logPanic(msg string) {
@@ -132,6 +132,11 @@ func doMain() error {
 		return err
 	}
 
+	settings = LoadSettings(flashlight.Version, flashlight.RevisionDate, flashlight.BuildDate)
+
+	settings.AddBoolNotifier(AutoLaunch, launcher.CreateLaunchFile)
+	settings.AddBoolNotifier(SystemProxy, toggleSystemProxy)
+
 	// Schedule cleanup actions
 	handleSignals()
 	addExitFunc(func() {
@@ -140,7 +145,6 @@ func doMain() error {
 		}
 	})
 	addExitFunc(quitSystray)
-	addExitFunc(settings.Save)
 
 	i18nInit()
 	if showui {
@@ -356,4 +360,17 @@ func handleSignals() {
 // WaitForExit waits for a request to exit the application.
 func waitForExit() error {
 	return <-exitCh
+}
+
+func toggleSystemProxy(enable bool) {
+	if enable {
+		pacOn()
+	} else {
+		pacOff()
+	}
+	preferredUIAddr, addrChanged := ui.PreferProxiedUI(enable)
+	if !enable && addrChanged {
+		log.Debugf("System proxying disabled, redirect UI to: %v", preferredUIAddr)
+		settings.RedirectTo(preferredUIAddr)
+	}
 }

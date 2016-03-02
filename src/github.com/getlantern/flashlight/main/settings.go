@@ -2,71 +2,83 @@ package main
 
 import (
 	"io/ioutil"
-	"net/http"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/getlantern/appdir"
-	"github.com/getlantern/launcher"
 	"github.com/getlantern/yaml"
 
 	"github.com/getlantern/flashlight/ui"
 )
 
+// Notifier is what caller register to get notified when a settings entry changed
+type Notifier func(prev, cur interface{})
+
+// BoolNotifier is a shortcut of Notifier on bool entries
+type BoolNotifier func(cur bool)
+
 const (
+	ProxyAll    id = "proxyAll"
+	AutoReport  id = "autoReport"
+	AutoLaunch  id = "autoLaunch"
+	SystemProxy id = "systemProxy"
+
+	// nonpersistent ones
+	Version      id = "version"
+	BuildDate    id = "buildDate"
+	RevisionDate id = "revisionDate"
+
 	messageType = `Settings`
 )
 
 var (
-	service    *ui.Service
-	settings   *Settings
-	httpClient *http.Client
-	path       = filepath.Join(appdir.General("Lantern"), "settings.yaml")
-	once       = &sync.Once{}
+	settings *Settings
+	path     = filepath.Join(appdir.General("Lantern"), "settings.yaml")
+	once     = &sync.Once{}
 )
+
+type id string
+
+type entries map[id]interface{}
 
 // Settings is a struct of all settings unique to this particular Lantern instance.
 type Settings struct {
-	Version      string
-	BuildDate    string
-	RevisionDate string
-	AutoReport   bool
-	AutoLaunch   bool
-	ProxyAll     bool
-	SystemProxy  bool
-
+	entries   entries
+	persist   map[id]bool
+	notifiers map[id][]Notifier
 	sync.RWMutex
+
+	service *ui.Service
 }
 
-// Load loads the initial settings at startup, either from disk or using defaults.
+// LoadSettings loads the initial settings at startup, either from disk or
+// using defaults.
 func LoadSettings(version, revisionDate, buildDate string) *Settings {
 	log.Debug("Loading settings")
 	// Create default settings that may or may not be overridden from an existing file
 	// on disk.
-	settings = &Settings{
+	settings = New(entries{
 		AutoReport:  true,
 		AutoLaunch:  true,
 		ProxyAll:    false,
 		SystemProxy: true,
-	}
+	}, true)
 
 	// Use settings from disk if they're available.
 	if bytes, err := ioutil.ReadFile(path); err != nil {
 		log.Debugf("Could not read file %v", err)
-	} else if err := yaml.Unmarshal(bytes, settings); err != nil {
+	} else if err := yaml.Unmarshal(bytes, settings.entries); err != nil {
 		log.Errorf("Could not load yaml %v", err)
 		// Just keep going with the original settings not from disk.
 	} else {
 		log.Debugf("Loaded settings from %v", path)
 	}
 
-	if settings.AutoLaunch {
-		launcher.CreateLaunchFile(settings.AutoLaunch)
-	}
 	// always override below 3 attributes as they are not meant to be persisted across versions
-	settings.Version = version
-	settings.BuildDate = buildDate
-	settings.RevisionDate = revisionDate
+	settings.entries[Version] = version
+	settings.entries[BuildDate] = buildDate
+	settings.entries[RevisionDate] = revisionDate
 
 	// Only configure the UI once. This will typically be the case in the normal
 	// application flow, but tests might call Load twice, for example, which we
@@ -77,13 +89,13 @@ func LoadSettings(version, revisionDate, buildDate string) *Settings {
 			log.Errorf("Unable to register settings service: %q", err)
 			return
 		}
-		go settings.read()
+		go settings.readLoop()
 	})
 	return settings
 }
 
 type msg struct {
-	Settings   *Settings
+	Settings   map[string]interface{}
 	RedirectTo string
 }
 
@@ -91,42 +103,119 @@ type msg struct {
 func (s *Settings) start() error {
 	var err error
 
-	ui.PreferProxiedUI(s.SystemProxy)
+	ui.PreferProxiedUI(s.GetBool(SystemProxy))
 	helloFn := func(write func(interface{}) error) error {
 		log.Debugf("Sending Lantern settings to new client")
 		s.Lock()
 		defer s.Unlock()
-		return write(&msg{Settings: s})
+		dumped := s.dump(false, true)
+		return write(&msg{Settings: dumped})
 	}
-	service, err = ui.Register(messageType, nil, helloFn)
+	s.service, err = ui.Register(messageType, nil, helloFn)
 	return err
 }
 
-func (s *Settings) read() {
-	log.Debugf("Reading settings messages!!")
-	for message := range service.In {
-		log.Debugf("Read settings message!! %v", message)
-		msg := (message).(map[string]interface{})
-
-		if autoReport, ok := msg["autoReport"].(bool); ok {
-			s.SetAutoReport(autoReport)
-		} else if proxyAll, ok := msg["proxyAll"].(bool); ok {
-			s.SetProxyAll(proxyAll)
-		} else if autoLaunch, ok := msg["autoLaunch"].(bool); ok {
-			s.SetAutoLaunch(autoLaunch)
-		} else if systemProxy, ok := msg["systemProxy"].(bool); ok {
-			log.Debugf("Setting system proxy")
-			s.SetSystemProxy(systemProxy)
+func New(entries entries, persist bool) *Settings {
+	settings = &Settings{
+		entries:   entries,
+		persist:   map[id]bool{},
+		notifiers: map[id][]Notifier{},
+	}
+	if persist {
+		for k, _ := range entries {
+			settings.persist[k] = true
 		}
+	}
+	return settings
+}
+
+func (s *Settings) readLoop() {
+	for message := range s.service.In {
+		log.Debugf("Read settings message from UI: %v", message)
+		msg := (message).(map[string]interface{})
+		s.read(msg)
+	}
+}
+
+func (s *Settings) read(msg map[string]interface{}) {
+	for k, v := range msg {
+		// currently all settings available in UI is bool
+		if value, ok := v.(bool); ok {
+			s.Set(id(k), value)
+		} else {
+			log.Errorf("Received non-bool value from UI: %s = %v", k, v)
+		}
+	}
+}
+
+// AddBoolNotifier is a shortcut for notification of bool entries.
+func (s *Settings) AddBoolNotifier(id id, fn BoolNotifier) {
+	s.AddNotifier(id, func(prev, cur interface{}) {
+		fn(cur.(bool))
+	})
+}
+
+// AddNotifier attaches the notifier to settings entry with the specific id.
+// Multiple notifiers can be attached to same id.
+func (s *Settings) AddNotifier(id id, fn Notifier) {
+	s.Lock()
+	defer s.Unlock()
+	s.notifiers[id] = append(s.notifiers[id], fn)
+}
+
+// GetBool is a shortcut to get bool entry, will panic if the entry doesn't
+// exist or is not a bool.
+func (s *Settings) GetBool(id id) bool {
+	return s.Get(id).(bool)
+}
+
+// Getid is a shortcut to get id entry, will panic if the entry doesn't
+// exist or is not a id.
+func (s *Settings) GetString(id id) string {
+	return s.Get(id).(string)
+}
+
+// Get gets the value of single settings entry, or nil if the entry doesn't exist.
+func (s *Settings) Get(id id) interface{} {
+	s.RLock()
+	defer s.RUnlock()
+	v := s.entries[id]
+	log.Tracef("Get settings entry '%s', return %+v", id, v)
+	return v
+}
+
+// Set sets the value of single settings entry.
+func (s *Settings) Set(id id, value interface{}) {
+	s.Lock()
+	defer s.Unlock()
+	log.Tracef("Set settings entry '%s' to %+v", id, value)
+	prev := s.entries[id]
+	if prev == value {
+		log.Debugf("Settings entry '%s' doesn't change from its previous value %+v", id, value)
+		return
+	}
+	s.entries[id] = value
+	for _, fn := range s.notifiers[id] {
+		log.Tracef("Calling notifier on '%s' with (%+v, %+v)", id, prev, value)
+		fn(prev, value)
+	}
+	if s.persist[id] {
+		s.save()
 	}
 }
 
 // Save saves settings to disk.
 func (s *Settings) Save() {
-	log.Debug("Saving settings")
 	s.Lock()
 	defer s.Unlock()
-	if bytes, err := yaml.Marshal(s); err != nil {
+	s.save()
+}
+
+// save saves settings to disk without locking.
+func (s *Settings) save() {
+	toBeSaved := s.dump(true, false)
+	log.Tracef("Saving settings: %+v", toBeSaved)
+	if bytes, err := yaml.Marshal(toBeSaved); err != nil {
 		log.Errorf("Could not create yaml from settings %v", err)
 	} else if err := ioutil.WriteFile(path, bytes, 0644); err != nil {
 		log.Errorf("Could not write settings file %v", err)
@@ -135,65 +224,61 @@ func (s *Settings) Save() {
 	}
 }
 
+// dump dumps settings entries to map[string]interface{} so we can save to file or
+// send on wire. It only dumps the entries with persist flag if persistOnly  is
+// true. It will make first letter of the id upper case when capitalize is true
+// (to compatible with current Lantern UI, will be removed in next major release).
+func (s *Settings) dump(persistOnly bool, capitalize bool) map[string]interface{} {
+	ret := map[string]interface{}{}
+	for id, v := range s.entries {
+		if persistOnly && !s.persist[id] {
+			continue
+		}
+		k := string(id)
+		if capitalize {
+			k = strings.ToUpper(k[:1]) + k[1:]
+		}
+		ret[k] = v
+	}
+	return ret
+}
+
 // GetProxyAll returns whether or not to proxy all traffic.
 func (s *Settings) GetProxyAll() bool {
-	s.RLock()
-	defer s.RUnlock()
-	return s.ProxyAll
+	return s.GetBool(ProxyAll)
 }
 
 // SetProxyAll sets whether or not to proxy all traffic.
 func (s *Settings) SetProxyAll(proxyAll bool) {
-	s.Lock()
-	defer s.Unlock()
-	s.ProxyAll = proxyAll
+	s.Set(ProxyAll, proxyAll)
 }
 
 // IsAutoReport returns whether or not to auto-report debugging and analytics data.
 func (s *Settings) IsAutoReport() bool {
-	s.RLock()
-	defer s.RUnlock()
-	return s.AutoReport
+	return s.GetBool(AutoReport)
 }
 
 // SetAutoReport sets whether or not to auto-report debugging and analytics data.
 func (s *Settings) SetAutoReport(auto bool) {
-	s.Lock()
-	defer s.Unlock()
-	s.AutoReport = auto
+	s.Set(AutoReport, auto)
 }
 
 // SetAutoLaunch sets whether or not to auto-launch Lantern on system startup.
 func (s *Settings) SetAutoLaunch(auto bool) {
-	s.Lock()
-	defer s.Unlock()
-	s.AutoLaunch = auto
-	go launcher.CreateLaunchFile(auto)
+	s.Set(AutoLaunch, auto)
 }
 
 // GetSystemProxy returns whether or not to set system proxy when lantern starts
 func (s *Settings) GetSystemProxy() bool {
-	s.RLock()
-	defer s.RUnlock()
-	return s.SystemProxy
+	return s.GetBool(SystemProxy)
 }
 
 // SetSystemProxy sets whether or not to set system proxy when lantern starts
 func (s *Settings) SetSystemProxy(enable bool) {
-	s.Lock()
-	defer s.Unlock()
-	changed := enable != s.SystemProxy
-	s.SystemProxy = enable
-	if changed {
-		if enable {
-			pacOn()
-		} else {
-			pacOff()
-		}
-		preferredUIAddr, addrChanged := ui.PreferProxiedUI(enable)
-		if !enable && addrChanged {
-			log.Debugf("System proxying disabled, redirect UI to: %v", preferredUIAddr)
-			service.Out <- &msg{RedirectTo: preferredUIAddr}
-		}
-	}
+	s.Set(SystemProxy, enable)
+}
+
+// RedirectTo tells UI to redirect to specific address
+func (s *Settings) RedirectTo(addr string) {
+	s.service.Out <- &msg{RedirectTo: addr}
 }
