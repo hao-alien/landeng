@@ -133,8 +133,13 @@ func doMain() error {
 	}
 
 	settings = LoadSettings(flashlight.Version, flashlight.RevisionDate, flashlight.BuildDate)
-
 	settings.AddBoolNotifier(AutoLaunch, launcher.CreateLaunchFile)
+	err := settings.Start()
+	if err != nil {
+		log.Errorf("Unable to register settings service: %q", err)
+	}
+	// toggleSystemProxy will block until proxy is ready, so we put it after
+	// settings.Start to avoid it from being called at this moment.
 	settings.AddBoolNotifier(SystemProxy, toggleSystemProxy)
 
 	// Schedule cleanup actions

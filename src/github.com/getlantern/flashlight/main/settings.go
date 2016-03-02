@@ -35,7 +35,6 @@ const (
 var (
 	settings *Settings
 	path     = filepath.Join(appdir.General("Lantern"), "settings.yaml")
-	once     = &sync.Once{}
 )
 
 type id string
@@ -80,39 +79,7 @@ func LoadSettings(version, revisionDate, buildDate string) *Settings {
 	settings.entries[BuildDate] = buildDate
 	settings.entries[RevisionDate] = revisionDate
 
-	// Only configure the UI once. This will typically be the case in the normal
-	// application flow, but tests might call Load twice, for example, which we
-	// want to allow.
-	once.Do(func() {
-		err := settings.start()
-		if err != nil {
-			log.Errorf("Unable to register settings service: %q", err)
-			return
-		}
-		go settings.readLoop()
-	})
 	return settings
-}
-
-type msg struct {
-	Settings   map[string]interface{}
-	RedirectTo string
-}
-
-// start the settings service that synchronizes Lantern's configuration with every UI client
-func (s *Settings) start() error {
-	var err error
-
-	ui.PreferProxiedUI(s.GetBool(SystemProxy))
-	helloFn := func(write func(interface{}) error) error {
-		log.Debugf("Sending Lantern settings to new client")
-		s.Lock()
-		defer s.Unlock()
-		dumped := s.dump(false, true)
-		return write(&msg{Settings: dumped})
-	}
-	s.service, err = ui.Register(messageType, nil, helloFn)
-	return err
 }
 
 func New(entries entries, persist bool) *Settings {
@@ -127,6 +94,37 @@ func New(entries entries, persist bool) *Settings {
 		}
 	}
 	return settings
+}
+
+type msg struct {
+	Settings   map[string]interface{}
+	RedirectTo string
+}
+
+// Start starts the settings service that synchronizes Lantern's configuration
+// with every UI client.  All added notifiers before this point will be called
+// with prev as nil, in hope to avoid extra initialization for any code depends on
+// settings.
+func (s *Settings) Start() (err error) {
+	ui.PreferProxiedUI(s.GetBool(SystemProxy))
+	helloFn := func(write func(interface{}) error) error {
+		log.Debugf("Sending Lantern settings to new client")
+		s.Lock()
+		defer s.Unlock()
+		dumped := s.dump(false, true)
+		return write(&msg{Settings: dumped})
+	}
+	s.service, err = ui.Register(messageType, nil, helloFn)
+	if err == nil {
+		for k, e := range s.entries {
+			for _, fn := range s.notifiers[k] {
+				fn(nil, e)
+			}
+		}
+		go settings.readLoop()
+
+	}
+	return
 }
 
 func (s *Settings) readLoop() {
