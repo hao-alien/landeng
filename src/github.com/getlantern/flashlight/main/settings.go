@@ -214,13 +214,13 @@ func (s *Settings) Save() {
 // save saves settings to disk without locking.
 func (s *Settings) save() {
 	toBeSaved := s.dump(true, false)
-	log.Tracef("Saving settings: %+v", toBeSaved)
+	log.Tracef("Saving settings:\n %+v", toBeSaved)
 	if bytes, err := yaml.Marshal(toBeSaved); err != nil {
 		log.Errorf("Could not create yaml from settings %v", err)
 	} else if err := ioutil.WriteFile(path, bytes, 0644); err != nil {
 		log.Errorf("Could not write settings file %v", err)
 	} else {
-		log.Debugf("Saved settings to %s with contents %v", path, string(bytes))
+		log.Debugf("Saved settings to %s with contents\n %v", path, string(bytes))
 	}
 }
 

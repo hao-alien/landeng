@@ -165,12 +165,12 @@ func doMain() error {
 		if listenAddr == "" {
 			listenAddr = "localhost:8787"
 		}
-		err := flashlight.Run(
+		proxyAllUpdater, err := flashlight.Run(
 			listenAddr,
 			"localhost:8788",
 			*configdir,
 			*stickyConfig,
-			settings.GetProxyAll,
+			settings.GetProxyAll(),
 			flagsAsMap(),
 			beforeStart,
 			afterStart,
@@ -180,6 +180,7 @@ func doMain() error {
 			exit(err)
 			return
 		}
+		settings.AddBoolNotifier(ProxyAll, proxyAllUpdater)
 	}()
 
 	return waitForExit()

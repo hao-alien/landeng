@@ -43,7 +43,7 @@ type Client struct {
 	WriteTimeout time.Duration
 
 	// ProxyAll: (optional) proxy all sites regardless of being blocked or not
-	ProxyAll func() bool
+	ProxyAll bool
 
 	// MinQOS: (optional) the minimum QOS to require from proxies.
 	MinQOS int
@@ -154,25 +154,30 @@ func (client *Client) ListenAndServeSOCKS5(requestedAddr string) error {
 
 // Configure updates the client's configuration. Configure can be called
 // before or after ListenAndServe, and can be called multiple times.
-func (client *Client) Configure(cfg *ClientConfig, proxyAll func() bool) {
+func (client *Client) Configure(cfg *ClientConfig, proxyAll bool) {
 	client.cfgMutex.Lock()
 	defer client.cfgMutex.Unlock()
 
 	log.Debug("Configure() called")
 
-	if client.priorCfg != nil {
-		if reflect.DeepEqual(client.priorCfg, cfg) {
+	if client.priorCfg == nil {
+		var changed bool
+		if !reflect.DeepEqual(client.priorCfg, cfg) {
+			log.Debugf("Client configuration changed")
+			changed = true
+		} else if client.ProxyAll != proxyAll {
+			log.Debugf("Proxy all traffic flag changed to %v", proxyAll)
+			changed = true
+		}
+		if !changed {
 			log.Debugf("Client configuration unchanged")
 			return
 		}
-		log.Debugf("Client configuration changed")
 	} else {
 		log.Debugf("Client configuration initialized")
 	}
 
-	log.Debugf("Requiring minimum QOS of %d", cfg.MinQOS)
 	client.MinQOS = cfg.MinQOS
-	log.Debugf("Proxy all traffic or not: %v", proxyAll())
 	client.ProxyAll = proxyAll
 	client.DeviceID = cfg.DeviceID
 
@@ -194,7 +199,7 @@ func (client *Client) Stop() error {
 
 func (client *Client) proxiedDialer(orig func(network, addr string) (net.Conn, error)) func(network, addr string) (net.Conn, error) {
 	var proxied func(network, addr string) (net.Conn, error)
-	if client.ProxyAll() {
+	if client.ProxyAll {
 		proxied = orig
 	} else {
 		proxied = detour.Dialer(orig)

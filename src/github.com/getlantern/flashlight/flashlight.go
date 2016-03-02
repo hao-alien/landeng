@@ -66,54 +66,63 @@ func Run(httpProxyAddr string,
 	socksProxyAddr string,
 	configDir string,
 	stickyConfig bool,
-	proxyAll func() bool,
+	proxyAll bool,
 	flagsAsMap map[string]interface{},
 	beforeStart func(cfg *config.Config) bool,
 	afterStart func(cfg *config.Config),
 	onConfigUpdate func(cfg *config.Config),
-	onError func(err error)) error {
+	onError func(err error)) (proxyAllUpdater func(bool), err error) {
+
 	displayVersion()
 
 	log.Debug("Initializing configuration")
 	cfg, err := config.Init(PackageVersion, configDir, stickyConfig, flagsAsMap)
 	if err != nil {
-		return fmt.Errorf("Unable to initialize configuration: %v", err)
+		err = fmt.Errorf("Unable to initialize configuration: %v", err)
 	}
 
 	client := client.NewClient()
 
-	if beforeStart(cfg) {
-		log.Debug("Preparing to start client proxy")
-		geolookup.Configure(client.Addr)
-		cfgMutex.Lock()
-		applyClientConfig(client, cfg, proxyAll)
-		cfgMutex.Unlock()
+	if !beforeStart(cfg) {
+		return
+	}
 
+	proxyAllUpdater = func(proxyAll bool) {
+		applyClientConfig(client, cfg, proxyAll)
+	}
+
+	log.Debug("Preparing to start client proxy")
+	geolookup.Configure(client.Addr)
+	cfgMutex.Lock()
+	applyClientConfig(client, cfg, proxyAll)
+	cfgMutex.Unlock()
+
+	go func() {
+		err := config.Run(func(updated *config.Config) {
+			log.Debug("Applying updated configuration")
+			cfgMutex.Lock()
+			applyClientConfig(client, updated, proxyAll)
+			onConfigUpdate(updated)
+			cfgMutex.Unlock()
+			log.Debug("Applied updated configuration")
+		})
+		if err != nil {
+			onError(err)
+		}
+	}()
+
+	if socksProxyAddr != "" {
 		go func() {
-			err := config.Run(func(updated *config.Config) {
-				log.Debug("Applying updated configuration")
-				cfgMutex.Lock()
-				applyClientConfig(client, updated, proxyAll)
-				onConfigUpdate(updated)
-				cfgMutex.Unlock()
-				log.Debug("Applied updated configuration")
-			})
+			log.Debug("Starting client SOCKS5 proxy")
+			err = client.ListenAndServeSOCKS5(socksProxyAddr)
 			if err != nil {
-				onError(err)
+				log.Errorf("Unable to start SOCKS5 proxy: %v", err)
 			}
 		}()
+	}
 
-		if socksProxyAddr != "" {
-			go func() {
-				log.Debug("Starting client SOCKS5 proxy")
-				err = client.ListenAndServeSOCKS5(socksProxyAddr)
-				if err != nil {
-					log.Errorf("Unable to start SOCKS5 proxy: %v", err)
-				}
-			}()
-		}
-
-		log.Debug("Starting client HTTP proxy")
+	log.Debug("Starting client HTTP proxy")
+	go func() {
 		err = client.ListenAndServeHTTP(httpProxyAddr, func() {
 			log.Debug("Started client HTTP proxy")
 			// We finally tell the config package to start polling for new configurations.
@@ -128,12 +137,12 @@ func Run(httpProxyAddr string,
 			log.Errorf("Error starting client proxy: %v", err)
 			onError(err)
 		}
-	}
+	}()
 
-	return nil
+	return
 }
 
-func applyClientConfig(client *client.Client, cfg *config.Config, proxyAll func() bool) {
+func applyClientConfig(client *client.Client, cfg *config.Config, proxyAll bool) {
 	certs, err := cfg.GetTrustedCACerts()
 	if err != nil {
 		log.Errorf("Unable to get trusted ca certs, not configuring fronted: %s", err)
