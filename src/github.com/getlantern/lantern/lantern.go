@@ -57,7 +57,7 @@ type StartResult struct {
 // time out.
 func Start(configDir string, timeoutMillis int) (*StartResult, error) {
 	startOnce.Do(func() {
-		go run(configDir)
+		start(configDir)
 	})
 
 	start := time.Now()
@@ -79,13 +79,13 @@ func AddLoggingMetadata(key, value string) {
 	logging.SetExtraLogglyInfo(key, value)
 }
 
-func run(configDir string) {
+func start(configDir string) {
 	err := os.MkdirAll(configDir, 0755)
 	if os.IsExist(err) {
 		log.Errorf("Unable to create configDir at %v: %v", configDir, err)
 		return
 	}
-	flashlight.Run("localhost:0", // listen for HTTP on random address
+	flashlight.Start("localhost:0", // listen for HTTP on random address
 		"localhost:0", // listen for SOCKS on random address
 		configDir,     // place to store lantern configuration
 		false,         // don't make config sticky

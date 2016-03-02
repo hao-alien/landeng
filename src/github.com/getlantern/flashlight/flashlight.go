@@ -61,8 +61,8 @@ func init() {
 	}
 }
 
-// Run runs a client proxy. It blocks as long as the proxy is running.
-func Run(httpProxyAddr string,
+// Start runs a client proxy in separate goroutine.
+func Start(httpProxyAddr string,
 	socksProxyAddr string,
 	configDir string,
 	stickyConfig bool,

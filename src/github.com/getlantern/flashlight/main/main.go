@@ -165,7 +165,7 @@ func doMain() error {
 		if listenAddr == "" {
 			listenAddr = "localhost:8787"
 		}
-		proxyAllUpdater, err := flashlight.Run(
+		proxyAllUpdater, err := flashlight.Start(
 			listenAddr,
 			"localhost:8788",
 			*configdir,
