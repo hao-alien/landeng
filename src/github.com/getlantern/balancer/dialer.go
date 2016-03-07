@@ -52,9 +52,10 @@ var (
 )
 
 type metrics struct {
-	avgConnTime     int64
+	avgDialTime     int64
 	consecSuccesses int32
 	consecFailures  int32
+	errorCount      int32
 }
 
 type dialer struct {
@@ -68,7 +69,8 @@ type dialer struct {
 	// if the connect time for i iteration is t[i], after n iteration, its value
 	// will be 1/2(t[n] + 1/2(t[n-1] + 1/2(t[n-2) + ... + t[1]))...), most
 	// recent connect time contributes most to the value, seems a good indicator.
-	avgConnTime int64
+	avgDialTime int64
+	errorCount  int32
 }
 
 func (d *dialer) start() {
@@ -120,9 +122,10 @@ func (d *dialer) stop() {
 
 func (d *dialer) metrics() metrics {
 	return metrics{
-		avgConnTime:     atomic.LoadInt64(&d.avgConnTime),
+		avgDialTime:     atomic.LoadInt64(&d.avgDialTime),
 		consecSuccesses: atomic.LoadInt32(&d.consecSuccesses),
 		consecFailures:  atomic.LoadInt32(&d.consecFailures),
+		errorCount:      atomic.LoadInt32(&d.errorCount),
 	}
 }
 
@@ -137,9 +140,9 @@ func (d *dialer) checkedDial(network, addr string) (net.Conn, error) {
 		d.onError(err)
 	} else {
 		d.markSuccess()
-		d.updateAvgConnTime(time.Now().Sub(t))
+		d.updateAvgDialTime(time.Now().Sub(t))
 	}
-	return conn, err
+	return &errorCounted{conn, &d.errorCount}, err
 }
 
 func (d *dialer) onError(err error) {
@@ -151,12 +154,12 @@ func (d *dialer) onError(err error) {
 	}
 }
 
-func (d *dialer) updateAvgConnTime(t time.Duration) {
-	// Ref the declaration of avgConnTime for the rationale.
+func (d *dialer) updateAvgDialTime(t time.Duration) {
+	// Ref the declaration of avgDialTime for the rationale.
 	// Use integer arithmetic as the values should be large enough to safely
 	// ignore decimals.
-	newAvg := (atomic.LoadInt64(&d.avgConnTime) + t.Nanoseconds()) / 2
-	atomic.StoreInt64(&d.avgConnTime, newAvg)
+	newAvg := (atomic.LoadInt64(&d.avgDialTime) + t.Nanoseconds()) / 2
+	atomic.StoreInt64(&d.avgDialTime, newAvg)
 }
 
 func (d *dialer) markSuccess() {
