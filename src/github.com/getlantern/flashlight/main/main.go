@@ -155,12 +155,13 @@ func doMain() error {
 
 		listenAddr := *addr
 		if listenAddr == "" {
-			listenAddr = "localhost:8787"
+			listenAddr = "127.0.0.1:8787"
 		}
+		socksProxyAddr := "127.0.0.1:8788"
 
 		err := flashlight.Run(
 			listenAddr,
-			"localhost:8788",
+			socksProxyAddr,
 			*configdir,
 			*stickyConfig,
 			settings.GetProxyAll,
