@@ -89,11 +89,7 @@ func (c *Client) Socks5Addr(timeout time.Duration) (interface{}, bool) {
 // onListeningFn is a callback that gets invoked as soon as the server is
 // accepting TCP connections.
 func (client *Client) ListenAndServeHTTP(requestedAddr string, onListeningFn func()) error {
-	log.Debug("About to listen")
-	if requestedAddr == "" {
-		requestedAddr = "localhost:0"
-	}
-
+	log.Debugf("About to listen on %s", requestedAddr)
 	var err error
 	var l net.Listener
 	if l, err = net.Listen("tcp", requestedAddr); err != nil {
@@ -101,8 +97,7 @@ func (client *Client) ListenAndServeHTTP(requestedAddr string, onListeningFn fun
 	}
 
 	client.l = l
-	listenAddr := l.Addr().String()
-	addr.Set(listenAddr)
+	addr.Set(requestedAddr)
 	onListeningFn()
 
 	httpServer := &http.Server{
@@ -112,7 +107,7 @@ func (client *Client) ListenAndServeHTTP(requestedAddr string, onListeningFn fun
 		ErrorLog:     log.AsStdLogger(),
 	}
 
-	log.Debugf("About to start HTTP client proxy at %v", listenAddr)
+	log.Debugf("About to start HTTP client proxy at %v", requestedAddr)
 	return httpServer.Serve(l)
 }
 
