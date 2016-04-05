@@ -17,6 +17,7 @@ import (
 	"github.com/getlantern/golog"
 	"github.com/getlantern/i18n"
 	"github.com/getlantern/profiling"
+	"github.com/getlantern/ipfs-lantern"
 
 	"github.com/getlantern/flashlight"
 	"github.com/getlantern/flashlight/analytics"
@@ -28,6 +29,7 @@ import (
 	"github.com/getlantern/flashlight/ui"
 
 	"github.com/mitchellh/panicwrap"
+	"github.com/mitchellh/go-homedir"
 )
 
 var (
@@ -147,6 +149,16 @@ func doMain() error {
 			return err
 		}
 	}
+
+	// Run IPFS before Lantern client
+	go func() {
+		homedir, err := homedir.Dir()
+		if err != nil {
+			log.Errorf("Could not initialize IPFS: ", err)
+			return
+		}
+		ipfs.Run("QmX6YMnsCUnAtRrsgQZenxTnGkPuHv4WxHujV6cNT2xMsX", homedir+"/.ipfs")
+	}()
 
 	// Run below in separate goroutine as config.Init() can potentially block when Lantern runs
 	// for the first time. User can still quit Lantern through systray menu when it happens.
