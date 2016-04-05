@@ -1,0 +1,21 @@
+os:
+  - linux
+  - osx
+
+language: go
+
+go:
+    - 1.5.2
+
+env:
+    - GO15VENDOREXPERIMENT=1
+
+install: true
+
+script:
+  - make deps
+  - go test ./p2p/...
+
+cache:
+    directories:
+        - $GOPATH/src/gx
