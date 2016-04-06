@@ -17,8 +17,7 @@ import (
 )
 
 type IPFSService struct {
-	node    *core.IpfsNode
-	context *context.Context
+	node *core.IpfsNode
 }
 
 func NewIPFSService(localRepo string) (*IPFSService, error) {
@@ -43,14 +42,13 @@ func NewIPFSService(localRepo string) (*IPFSService, error) {
 	}
 
 	return &IPFSService{
-			node:    nd,
-			context: &ctx,
+			node: nd,
 		},
 		nil
 }
 
-func (srv *IPFSService) resolve(name string) (string, error) {
-	p, err := srv.node.Namesys.ResolveN(*srv.context, name, 1)
+func (srv *IPFSService) resolve(ctx context.Context, name string) (string, error) {
+	p, err := srv.node.Namesys.ResolveN(ctx, name, 1)
 	if err != nil {
 		return "", err
 	}
@@ -58,14 +56,14 @@ func (srv *IPFSService) resolve(name string) (string, error) {
 	return p.String(), nil
 }
 
-func (srv *IPFSService) get(pt string) (string, error) {
+func (srv *IPFSService) get(ctx context.Context, pt string) (string, error) {
 	p := path.Path(pt)
-	dn, err := core.Resolve(*srv.context, srv.node, p)
+	dn, err := core.Resolve(ctx, srv.node, p)
 	if err != nil {
 		return "", err
 	}
 
-	reader, err := uio.NewDagReader(*srv.context, dn, srv.node.DAG)
+	reader, err := uio.NewDagReader(ctx, dn, srv.node.DAG)
 	if err != nil {
 		return "", err
 	}
@@ -77,21 +75,23 @@ func (srv *IPFSService) get(pt string) (string, error) {
 	return buf.String(), nil
 }
 
-func (srv *IPFSService) getIPNS(w http.ResponseWriter, r *http.Request) {
+func (srv *IPFSService) getRef(w http.ResponseWriter, r *http.Request) {
 	ref := r.URL.Query().Get("ref")
 	if ref == "" {
 		return
 	}
 
-	realPath, err := srv.resolve(ref)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	realPath, err := srv.resolve(ctx, ref)
 	if err != nil {
 		fmt.Printf("resolve: %s\n", err)
 		return
 		//return fmt.Errorf("Error resolving IPNS link: %v", err)
 	}
-	fmt.Printf("Real path for %s: %s\n", ref, realPath)
 
-	s, err := srv.get(realPath)
+	s, err := srv.get(ctx, realPath)
 	if err != nil {
 		fmt.Printf("get: %s\n", err)
 		return
@@ -102,7 +102,7 @@ func (srv *IPFSService) getIPNS(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *IPFSService) ServeHTTP() error {
-	http.HandleFunc("/ipns-get", srv.getIPNS)
+	http.HandleFunc("/get", srv.getRef)
 
 	return http.ListenAndServe(":8799", nil)
 }
