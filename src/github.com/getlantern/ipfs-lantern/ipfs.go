@@ -78,6 +78,7 @@ func (srv *IPFSService) get(ctx context.Context, pt string) (string, error) {
 func (srv *IPFSService) getRef(w http.ResponseWriter, r *http.Request) {
 	ref := r.URL.Query().Get("ref")
 	if ref == "" {
+		http.Error(w, "No ref provided", http.StatusInternalServerError)
 		return
 	}
 
@@ -86,16 +87,14 @@ func (srv *IPFSService) getRef(w http.ResponseWriter, r *http.Request) {
 
 	realPath, err := srv.resolve(ctx, ref)
 	if err != nil {
-		fmt.Printf("resolve: %s\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-		//return fmt.Errorf("Error resolving IPNS link: %v", err)
 	}
 
 	s, err := srv.get(ctx, realPath)
 	if err != nil {
-		fmt.Printf("get: %s\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-		//return fmt.Errorf("Error retrieving IPFS file: %v", err)
 	}
 
 	w.Write([]byte(s))
