@@ -8,6 +8,7 @@ import (
 
 	logging "gx/ipfs/Qmazh5oNUVsDZTs2g59rq8aYQqwpss8tcUWQzor5sCCEuH/go-log"
 
+	"github.com/ipfs/go-ipfs/blocks/key"
 	"github.com/ipfs/go-ipfs/core"
 	"github.com/ipfs/go-ipfs/path"
 	"github.com/ipfs/go-ipfs/repo/fsrepo"
@@ -75,6 +76,23 @@ func (srv *IPFSService) get(ctx context.Context, pt string) (string, error) {
 	return buf.String(), nil
 }
 
+func (node *IPFSService) put(ctx context.Context, p string) (string, error) {
+	ref := path.Path(p)
+	k := node.node.PrivateKey
+
+	err := node.node.Namesys.Publish(ctx, k, ref)
+	if err != nil {
+		return "", err
+	}
+
+	hash, err := k.GetPublic().Hash()
+	if err != nil {
+		return "", err
+	}
+
+	return key.Key(hash).String(), nil
+}
+
 func (srv *IPFSService) getRef(w http.ResponseWriter, r *http.Request) {
 	ref := r.URL.Query().Get("ref")
 	if ref == "" {
@@ -100,8 +118,28 @@ func (srv *IPFSService) getRef(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(s))
 }
 
+func (srv *IPFSService) storeData(w http.ResponseWriter, r *http.Request) {
+	data := r.FormValue("data")
+	if data == "" {
+		http.Error(w, "No data provided", http.StatusInternalServerError)
+		return
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	ref, err := srv.put(ctx, data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Write([]byte(ref))
+}
+
 func (srv *IPFSService) ServeHTTP() error {
 	http.HandleFunc("/get", srv.getRef)
+	http.HandleFunc("/put", srv.storeData)
 
 	return http.ListenAndServe(":8799", nil)
 }

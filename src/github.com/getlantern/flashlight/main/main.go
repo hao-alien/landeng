@@ -16,8 +16,8 @@ import (
 	"github.com/getlantern/eventual"
 	"github.com/getlantern/golog"
 	"github.com/getlantern/i18n"
-	"github.com/getlantern/profiling"
 	"github.com/getlantern/ipfs-lantern"
+	"github.com/getlantern/profiling"
 
 	"github.com/getlantern/flashlight"
 	"github.com/getlantern/flashlight/analytics"
@@ -28,8 +28,8 @@ import (
 	"github.com/getlantern/flashlight/proxiedsites"
 	"github.com/getlantern/flashlight/ui"
 
-	"github.com/mitchellh/panicwrap"
 	"github.com/mitchellh/go-homedir"
+	"github.com/mitchellh/panicwrap"
 )
 
 var (
@@ -153,11 +153,18 @@ func doMain() error {
 	// Run IPFS before Lantern client
 	go func() {
 		homedir, err := homedir.Dir()
+		ipfsSrv, err := ipfs.NewIPFSService(homedir + "/.ipfs")
 		if err != nil {
 			log.Errorf("Could not initialize IPFS: ", err)
 			return
 		}
-		ipfs.Run("QmX6YMnsCUnAtRrsgQZenxTnGkPuHv4WxHujV6cNT2xMsX", homedir+"/.ipfs")
+
+		err = ipfsSrv.ServeHTTP()
+		if err != nil {
+			log.Errorf("Could not initialize IPFS HTTP API: ", err)
+			fmt.Println(err)
+			return
+		}
 	}()
 
 	// Run below in separate goroutine as config.Init() can potentially block when Lantern runs
