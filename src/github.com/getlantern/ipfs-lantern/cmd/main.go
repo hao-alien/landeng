@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/getlantern/ipfs-lantern"
+	"github.com/mitchellh/go-homedir"
 )
 
 func main() {
@@ -12,5 +13,15 @@ func main() {
 		fmt.Println("Please give a peer ID as an argument")
 		return
 	}
-	ipfs.Run(os.Args[1], ".ipfs")
+
+	homedir, err := homedir.Dir()
+	if err != nil {
+		fmt.Println("Could not initialize IPFS: ", err)
+		return
+	}
+
+	err = ipfs.Run(os.Args[1], homedir+"/.ipfs")
+	if err != nil {
+		fmt.Println(err)
+	}
 }
