@@ -1,0 +1,59 @@
+
+// feed
+{
+  "name": "China Digital Times",
+  "time": "1435398707 -0700",
+  "entries": [
+    {"@link": "b7d3ead....1"},
+    {"@link": "b7d3ead....2"},
+    {"@link": "b7d3ead....3"},
+    {"@link": "b7d3ead....4"},
+    {"@link": "b7d3ead....5"},
+    {"@link": "b7d3ead....6"},
+    {"@link": "b7d3ead....7"},
+    {"@link": "b7d3ead....8"},
+    {"@link": "b7d3ead....9"},
+    {"@link": "b7d3ead....10"},
+  ],
+  "old-entries": {"@link": "e4647147e940e2fab134e7f3d8a40c2022cb36f3"},
+}
+
+// entry
+{
+  "feed": {"@link": "e4647147e940e2fab134e7f3d8a40c2022cb36f3"},
+  "time": "1435398707 -0700",
+  "author": "China Digital Times",
+  "abstract": "Great article about the state of China",
+  "image": {"@link": "fl303afe1d803u29jdakf006f5bd1a7a858rlpw03"},
+  "text": {"@link": "201419da1732386940409206f5bd1a7a858ab6c95"},
+  "html": {"@link": "091434ga1d80086fhjaioh26f5bd1a7a8uroq0173"},
+  "comments": [
+    {"@link": "42988...comment 1"},
+    {"@link": "42988...comment 2"},
+    {"@link": "42988...comment 3"},
+  ],
+  "old-comments": {"@link": "e4647147e940e2fab134e7f3d8a40c2022cb36f3"},
+  "reactions": {
+    "like": "1",
+    "dislike": "2",
+    "funny": "7",
+  }
+}
+
+// Comment
+{
+  "entry": {"@link": "b7d3ead....1"},
+  "text": "Wow, what an article",
+  "time": "1435398707 -0700",
+  "comments": [
+    {"@link": "42988...comment 1"},
+    {"@link": "42988...comment 2"},
+    {"@link": "42988...comment 3"},
+  ],
+  "old-comments": {"@link": "e4647147e940e2fab134e7f3d8a40c2022cb36f3"},
+  "reactions": {
+    "like": "1",
+    "dislike": "2",
+    "funny": "7",
+  },
+}
