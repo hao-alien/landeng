@@ -24,8 +24,8 @@ import (
 	"github.com/ipfs/go-ipfs/core/corerouting"
 	nodeMount "github.com/ipfs/go-ipfs/fuse/node"
 	fsrepo "github.com/ipfs/go-ipfs/repo/fsrepo"
-	conn "gx/ipfs/QmSN2ELGRp4T9kjqiSsSNJRUeR9JKXzQEgwe1HH3tdSGbC/go-libp2p/p2p/net/conn"
-	peer "gx/ipfs/QmSN2ELGRp4T9kjqiSsSNJRUeR9JKXzQEgwe1HH3tdSGbC/go-libp2p/p2p/peer"
+	conn "gx/ipfs/QmZMehXD2w81qeVJP6r1mmocxwsD7kqAvuzGm2QWDw1H88/go-libp2p/p2p/net/conn"
+	peer "gx/ipfs/QmZMehXD2w81qeVJP6r1mmocxwsD7kqAvuzGm2QWDw1H88/go-libp2p/p2p/peer"
 	util "gx/ipfs/QmZNVWh8LLjAavuQ2JXuFmuYH3C11xo988vSgp7UQrTRj1/go-ipfs-util"
 )
 
@@ -40,6 +40,7 @@ const (
 	unrestrictedApiAccessKwd  = "unrestricted-api"
 	unencryptTransportKwd     = "disable-transport-encryption"
 	enableGCKwd               = "enable-gc"
+	adjustFDLimitKwd          = "manage-fdlimit"
 	// apiAddrKwd    = "address-api"
 	// swarmAddrKwd  = "address-swarm"
 )
@@ -132,6 +133,7 @@ future version, along with this notice. Please move to setting the HTTP Headers.
 		cmds.BoolOption(unrestrictedApiAccessKwd, "Allow API access to unlisted hashes"),
 		cmds.BoolOption(unencryptTransportKwd, "Disable transport encryption (for debugging protocols)"),
 		cmds.BoolOption(enableGCKwd, "Enable automatic periodic repo garbage collection"),
+		cmds.BoolOption(adjustFDLimitKwd, "Check and raise file descriptor limits if needed"),
 
 		// TODO: add way to override addresses. tricky part: updating the config if also --init.
 		// cmds.StringOption(apiAddrKwd, "Address for the daemon rpc API (overrides config)"),
@@ -152,9 +154,18 @@ func defaultMux(path string) corehttp.ServeOption {
 	}
 }
 
+var fileDescriptorCheck = func() error { return nil }
+
 func daemonFunc(req cmds.Request, res cmds.Response) {
 	// let the user know we're going.
 	fmt.Printf("Initializing daemon...\n")
+
+	managefd, _, _ := req.Option(adjustFDLimitKwd).Bool()
+	if managefd {
+		if err := fileDescriptorCheck(); err != nil {
+			log.Error("setting file descriptor limit: %s", err)
+		}
+	}
 
 	ctx := req.InvocContext()
 
