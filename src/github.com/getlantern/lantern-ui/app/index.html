@@ -34,6 +34,7 @@
     <script src="bower_components/angular-ui-utils/ui-utils.min.js"></script>
     <script src="bower_components/angular-websocket/angular-websocket.min.js"></script>
     <script src="bower_components/angular-local-storage/dist/angular-local-storage.min.js"></script>
+    <script src="bower_components/angular-lazy-img/release/angular-lazy-img.js"></script>
     <script src="lib/angular-ui-bootstrap-tpls.js"></script>
 
     <script src="lib/mailer.js"></script>
@@ -78,11 +79,11 @@
     <div id="fb-root"></div>
     <div id="waiting" ng-show="!wsConnected">
     <div ng-show="!backendIsGone">
-        <div>{{ 'WAITING_FOR_LANTERN' | translate }}</div>
-        <img src="img/spinner.gif">
-        </div>
-        <div ng-show="backendIsGone">
-        <div class="backend-gone">{{ 'LANTERN_GONE' | translate }}</div>
+      <div>{{ 'WAITING_FOR_LANTERN' | translate }}</div>
+      <img src="img/spinner.gif">
+    </div>
+    <div ng-show="backendIsGone">
+      <div class="backend-gone">{{ 'LANTERN_GONE' | translate }}</div>
     </div>
     </div>
     <div class="message">
@@ -92,9 +93,7 @@
 
     <div ng-include src="'partials/modals.html'"></div>
     <div ng-include src="'partials/get-mobile.html'"></div>
-    <!--
-    <div ng-include src="'partials/bookmarks.html'"></div>
-  -->
+    <div ng-include src="'partials/bookmarks.html'" ng-show="newsError"></div>
     <div ng-include src="'partials/news.html'"></div>
     <div ng-include src="'partials/footer.html'"></div>
     <div ng-include src="'partials/developer.html'"></div>

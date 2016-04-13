@@ -182,9 +182,14 @@ app.controller('MobileAdCtrl', ['$scope', 'MODAL', 'gaMgr', function($scope, MOD
 app.controller('NewsfeedCtrl', ['$scope', '$rootScope', '$translate', function($scope, $rootScope, $translate) {
   $scope.showNewsfeed = function(e) {
     $rootScope.showNews = true;
+    $rootScope.newsLoaded = true;
   };
   $scope.hideNewsfeed = function(e) {
     $rootScope.showNews = false;
+  };
+  $scope.newsfeedError = function(e) {
+    $rootScope.newsError = true;
+    $scope.hideNewsfeed();
   };
   $scope.hideNewsfeed();
   $scope.feedUrl = function() {

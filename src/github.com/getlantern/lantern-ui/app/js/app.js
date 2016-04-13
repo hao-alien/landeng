@@ -6,6 +6,7 @@ var app = angular.module('app', [
   'LocalStorageModule',
   'app.helpers',
   'pascalprecht.translate',
+  'angularLazyImg',
   'app.filters',
   'app.services',
   'app.directives',
@@ -18,7 +19,7 @@ var app = angular.module('app', [
   'ui.validate',
   'ui.bootstrap',
   'ui.bootstrap.tpls',
-  'feeds'
+  'feeds',
   ])
   .directive('dynamic', function ($compile) {
     return {

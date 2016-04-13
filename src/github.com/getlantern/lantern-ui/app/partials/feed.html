@@ -1,4 +1,4 @@
-<img class="feed-thumbnail" ng-if="feed.image" ng-src="{{feed.image}}" />
+<img class="feed-thumbnail" ng-if="feed.image" lazy-img="{{feed.image}}" />
 <div class="content">
   <span class="feed-source"></span>
   <p class="feed-date">{{feed.source}}&nbsp;{{feed.publishedDate | date: mediumDate}}</p>
