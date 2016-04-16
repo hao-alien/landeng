@@ -44,8 +44,11 @@
   border: 1px solid black;
   margin: 0 auto;
   height: 800px;
+  overflow: hidden;
+}
+
+#news .feeds-container:hover {
   overflow-y: scroll;
-  overflow-x: hidden;
 }
 
 @media (min-width: 780px){
