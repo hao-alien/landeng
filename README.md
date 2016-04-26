@@ -131,7 +131,7 @@ To get the build working for Android Studio, you'll want to add the following
 dummy values to your ``~/.gradle/gradle.properties`` file:
 
 ```
-lanternRevisionDate="April 26, 2016"
+lanternRevisionDate=April 26, 2016
 lanternVersion=2.2.1
 ```
 
