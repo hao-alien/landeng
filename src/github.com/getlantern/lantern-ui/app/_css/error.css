@@ -3,7 +3,7 @@
   top: 125px;
   margin-left: auto;
   margin-right: auto;
-  width: 640px;
+  width: 600px;
   padding-bottom:90px;
   font-family: LBL;
   text-align: left;
@@ -18,7 +18,7 @@
 }
 
 #error #error-description {
-  display: inline-block;
+  text-align: center;
   padding-bottom: 16px;
   margin-bottom: 16px;
   border-bottom: 1px black solid;
