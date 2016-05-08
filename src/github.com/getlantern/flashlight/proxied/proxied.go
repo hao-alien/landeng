@@ -6,7 +6,6 @@ package proxied
 
 import (
 	"crypto/tls"
-	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -17,6 +16,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/getlantern/errlog"
 	"github.com/getlantern/eventual"
 	"github.com/getlantern/fronted"
 	"github.com/getlantern/golog"
@@ -28,7 +28,8 @@ const (
 )
 
 var (
-	log = golog.LoggerFor("flashlight.proxied")
+	log  = golog.LoggerFor("flashlight.proxied")
+	elog = errlog.ErrorLoggerFor("flashlight.util")
 
 	proxyAddrMutex sync.RWMutex
 	proxyAddr      = eventual.DefaultUnsetGetter()
@@ -125,7 +126,7 @@ func (cf *chainedFetcher) RoundTrip(req *http.Request) (*http.Response, error) {
 	log.Debugf("Using chained fronter")
 	rt, err := ChainedNonPersistent("")
 	if err != nil {
-		log.Errorf("Could not create HTTP client: %v", err)
+		elog.Log(err, errlog.WithOp("create-http-client"))
 		return nil, err
 	}
 	return rt.RoundTrip(req)
@@ -158,7 +159,7 @@ func (df *dualFetcher) do(req *http.Request, chainedFunc func(*http.Request) (*h
 	req.Header.Del("Lantern-Fronted-URL")
 
 	if frontedURL == "" {
-		return nil, errors.New("Callers MUST specify the fronted URL in the Lantern-Fronted-URL header")
+		return nil, fmt.Errorf("Callers MUST specify the fronted URL in the Lantern-Fronted-URL header")
 	}
 
 	// Make a copy of the original requeest headers to include in the fronted
@@ -181,7 +182,12 @@ func (df *dualFetcher) do(req *http.Request, chainedFunc func(*http.Request) (*h
 
 	request := func(clientFunc func(*http.Request) (*http.Response, error), req *http.Request) error {
 		if resp, err := clientFunc(req); err != nil {
-			log.Errorf("Could not complete request with: %v, %v", frontedURL, err)
+			elog.Log(err,
+				errlog.WithOp("send-http-client"),
+				errlog.WithProxy(&errlog.ProxyingInfo{
+					ProxyType:  errlog.DirectFrontedProxy,
+					OriginSite: frontedURL,
+				}))
 			errs <- err
 			return err
 		} else {
@@ -204,14 +210,24 @@ func (df *dualFetcher) do(req *http.Request, chainedFunc func(*http.Request) (*h
 
 	doFronted := func() {
 		if frontedReq, err := http.NewRequest("GET", frontedURL, nil); err != nil {
-			log.Errorf("Could not create request for: %v, %v", frontedURL, err)
+			elog.Log(err,
+				errlog.WithOp("create-http-request"),
+				errlog.WithProxy(&errlog.ProxyingInfo{
+					ProxyType:  errlog.DirectFrontedProxy,
+					OriginSite: frontedURL,
+				}))
 			errs <- err
 		} else {
 			log.Debug("Sending request via DDF")
 			frontedReq.Header = headersCopy
 
 			if err := request(ddfFunc, frontedReq); err != nil {
-				log.Errorf("Fronted request failed: %v", err)
+				elog.Log(err,
+					errlog.WithOp("request"),
+					errlog.WithProxy(&errlog.ProxyingInfo{
+						ProxyType:  errlog.DirectFrontedProxy,
+						OriginSite: frontedURL,
+					}))
 			} else {
 				log.Debug("Fronted request succeeded")
 			}

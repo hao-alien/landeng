@@ -15,6 +15,7 @@ import (
 
 	"github.com/getlantern/appdir"
 	"github.com/getlantern/detour"
+	"github.com/getlantern/errlog"
 	"github.com/getlantern/fronted"
 	"github.com/getlantern/golog"
 	"github.com/getlantern/keyman"
@@ -34,9 +35,10 @@ const (
 )
 
 var (
-	log = golog.LoggerFor("flashlight.config")
-	m   *yamlconf.Manager
-	r   = regexp.MustCompile("\\d+\\.\\d+")
+	log  = golog.LoggerFor("flashlight.config")
+	elog = errlog.ErrorLoggerFor("flashlight.config")
+	m    *yamlconf.Manager
+	r    = regexp.MustCompile("\\d+\\.\\d+")
 )
 
 // Config contains general configuration for Lantern either set globally via
@@ -114,7 +116,7 @@ func Init(userConfig UserConfig, version string, configDir string, stickyConfig 
 	file := "lantern-" + version + ".yaml"
 	_, configPath, err := inConfigDir(configDir, file)
 	if err != nil {
-		log.Errorf("Could not get config path? %v", err)
+		elog.Log(err, errlog.WithOp("init"))
 		return nil, err
 	}
 
@@ -142,7 +144,7 @@ func Init(userConfig UserConfig, version string, configDir string, stickyConfig 
 
 	var cfg *Config
 	if err != nil {
-		log.Errorf("Error initializing config: %v", err)
+		elog.Log(err, errlog.WithOp("init"))
 	} else {
 		cfg = initial.(*Config)
 	}
@@ -193,7 +195,7 @@ func (cfg *Config) GetTrustedCACerts() (pool *x509.CertPool, err error) {
 	}
 	pool, err = keyman.PoolContainingCerts(certs...)
 	if err != nil {
-		log.Errorf("Could not create pool %v", err)
+		elog.Log(err, errlog.WithOp("create-certs-pool"))
 	}
 	return
 }

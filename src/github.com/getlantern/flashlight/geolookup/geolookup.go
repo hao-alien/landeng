@@ -4,6 +4,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/getlantern/errlog"
 	"github.com/getlantern/eventual"
 	geo "github.com/getlantern/geolookup"
 	"github.com/getlantern/golog"
@@ -12,7 +13,8 @@ import (
 )
 
 var (
-	log = golog.LoggerFor("flashlight.geolookup")
+	log  = golog.LoggerFor("flashlight.geolookup")
+	elog = errlog.ErrorLoggerFor("flashlight.geolookup")
 
 	refreshRequest = make(chan interface{}, 1)
 	currentGeoInfo = eventual.NewValue()
@@ -96,7 +98,7 @@ func doLookup() (*geoInfo, error) {
 	city, ip, err := geo.LookupIP("", proxied.ParallelPreferChained())
 
 	if err != nil {
-		log.Errorf("Could not lookup IP %v", err)
+		elog.Log(err, errlog.WithOp("geolookup"))
 		return nil, err
 	}
 	return &geoInfo{ip, city}, nil
