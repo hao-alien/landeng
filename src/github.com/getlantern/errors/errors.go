@@ -1,30 +1,31 @@
 /*
 Package errors defines error types used across Lantern project.
 
+  errors.ReportTo(myErrorReporter)
+  ...
   if n, err := Foo(); err != nil {
     errors.Wrap(err).Report()
   }
 
-Log() method will try as much as possible to extract details from the error
+Wrap() method will try as much as possible to extract details from the error
 passed in, if it's errors defined in Go standard library. For application
-defined error type, at least the Go type name and what yourErr.Error() returns
+defined error type, at least the Go type name and what err.Error() returns
 will be recorded.
 
-Extra parameters can be passed like this in any order.
-  elog.Log(err, errors.WithOp("proxy"), errors.WithUserAgent("Mozilla/5.0..."))
+Extra fields can be chained in any order, at any time.
 
-Or to attach arbitrary data with the error.
-  elog.Log(err, errors.WithField("foo": "bar"))
+  func Foo() *Error {
+  	//...
+    return errors.New("some error").With("some_counter", 1).WithOp("connect")
+  }
+  ...
+  if err := Foo(); err != nil {
+	err.UserAgent("Mozilla/5.0...").With("proxy_all", true).Report()
+  }
 
-Guildlines to report error:
+If you want additional logging, call WithLogging(true) during program bootstrapping. If that flag is set, Report() will get a logger using golog.LoggerFor("<package-name-in-which-the-error-is-created">) and call its Error() method.
 
-1. Report at the end of error propagation chain, that is, before the code
-resumes from the error or makes a decision based on it.
-
-2. Report when more relevant knowledge is available.
-
-The purpose is to avoid reporting repetitively, and prevent lower level of code
-from depending on this package.
+It's the caller's responsibility to avoid race condition accessing same error instance from multiple goroutines.
 */
 package errors
 
@@ -68,6 +69,7 @@ func init() {
 		OSArch:    runtime.GOARCH,
 		OSVersion: osVersion,
 		GoVersion: runtime.Version(),
+		//TODO: app vesion is also required. As a low level library, we need it to be initialized by caller.
 	}
 }
 
@@ -75,8 +77,7 @@ type Reporter interface {
 	Report(*Error)
 }
 
-type StdReporter struct {
-}
+type StdReporter struct{}
 
 func (l StdReporter) Report(e *Error) {
 	fmt.Printf("%+v", e.Error())
@@ -123,9 +124,9 @@ type Error struct {
 	Func    string          `json:"func"`    // foo.Bar
 	// FileLine is the file path relative to GOPATH together with the line when
 	// Error is created.
-	FileLine string `json:"file-line"` // github.com/lantern/foo.go:10
+	FileLine string `json:"file_line"` // github.com/lantern/foo.go:10
 	// ReportFileLine is the file and line where the error is reported
-	ReportFileLine string `json:"report-file-line"`
+	ReportFileLine string `json:"report_file_line"`
 	// Go type name or constant/variable name of the error
 	GoType string `json:"type"`
 	// Error description, by either Go library or application
@@ -222,6 +223,8 @@ func (e *Error) WithUserLocale() *Error {
 	return e
 }
 
+// With attaches arbitrary field to the error. key will be normalized as underscore_divided_words, so dashes, dots and spaces will all be replaced with underscores, and all characters will be lowercased.
+// TODO: normalize key
 func (e *Error) With(key string, value interface{}) *Error {
 	if e.Extra == nil {
 		e.Extra = make(map[string]string)
@@ -309,26 +312,11 @@ func (e *Error) applyDefaults() {
 	}
 }
 
-// Customized marshaller to marshal extra fields to same level as other struct fields
-/*func (e Error) MarshalJSON() ([]byte, error) {
-	var buf bytes.Buffer
-	// safe to ignore return value as error returned is always nil
-	_, _ = buf.WriteString(fmt.Sprintf(`{"package":"%s","type":"%s","desc":"%s"`, e.GoPackage, e.GoType, e.Desc))
-	if e.Extra != nil && len(e.Extra) > 0 {
-		_, _ = buf.WriteString(",")
-		for k, v := range e.Extra {
-			_, _ = buf.WriteString(fmt.Sprintf(`"%s":"%s"`, k, v))
-		}
-	}
-	_, _ = buf.WriteString("}")
-	return buf.Bytes(), nil
-}*/
-
 type systemInfo struct {
-	OSType    string `json:"os-type"`
-	OSVersion string `json:"os-version"`
-	OSArch    string `json:"os-arch"`
-	GoVersion string `json:"go-version"`
+	OSType    string `json:"os_type"`
+	OSVersion string `json:"os_version"`
+	OSArch    string `json:"os_arch"`
+	GoVersion string `json:"go_version"`
 }
 
 func (si *systemInfo) String() string {
@@ -349,7 +337,7 @@ func (si *systemInfo) String() string {
 }
 
 type UserLocale struct {
-	TimeZone string `json:"time-zone,omitempty"`
+	TimeZone string `json:"time_zone,omitempty"`
 	Language string `json:"language,omitempty"`
 	Country  string `json:"country,omitempty"`
 }
@@ -373,7 +361,7 @@ type ProxyType string
 
 const (
 	// direct access, not proxying at all
-	NoProxy ProxyType = "no-proxy"
+	NoProxy ProxyType = "no_proxy"
 	// access through Lantern hosted chained server
 	ChainedProxy ProxyType = "chained"
 	// access through domain fronting
@@ -384,12 +372,12 @@ const (
 
 // ProxyingInfo encapsulates fields to describe an access through a proxy channel.
 type ProxyingInfo struct {
-	ProxyType  ProxyType `json:"proxy-type,omitempty"`
-	LocalAddr  string    `json:"local-addr,omitempty"`
-	ProxyAddr  string    `json:"proxy-addr,omitempty"`
-	Datacenter string    `json:"proxy-datacenter,omitempty"`
-	OriginSite string    `json:"origin-site,omitempty"`
-	URIScheme  string    `json:"uri-scheme,omitempty"`
+	ProxyType  ProxyType `json:"proxy_type,omitempty"`
+	LocalAddr  string    `json:"local_addr,omitempty"`
+	ProxyAddr  string    `json:"proxy_addr,omitempty"`
+	Datacenter string    `json:"proxy_datacenter,omitempty"`
+	OriginSite string    `json:"origin_site,omitempty"`
+	URIScheme  string    `json:"uri_scheme,omitempty"`
 }
 
 func (pi *ProxyingInfo) String() string {
@@ -418,7 +406,7 @@ func (pi *ProxyingInfo) String() string {
 // UserAgentInfo encapsulates traits of the browsers or 3rd party applications
 // directing traffic through Lantern.
 type UserAgentInfo struct {
-	UserAgent string `json:"user-agent,omitempty"`
+	UserAgent string `json:"user_agent,omitempty"`
 }
 
 func (ul *UserAgentInfo) String() string {
@@ -433,10 +421,10 @@ func parseError(err error) (op string, goType string, desc string, extra map[str
 		if opError, ok := err.(*net.OpError); ok {
 			op = opError.Op
 			if opError.Source != nil {
-				extra["local-addr"] = opError.Source.String()
+				extra["local_addr"] = opError.Source.String()
 			}
 			if opError.Addr != nil {
-				extra["remote-addr"] = opError.Addr.String()
+				extra["remote_addr"] = opError.Addr.String()
 			}
 			extra["network"] = opError.Net
 			err = opError.Err
@@ -451,7 +439,7 @@ func parseError(err error) (op string, goType string, desc string, extra map[str
 			desc = actual.Err
 			extra["domain"] = actual.Name
 			if actual.Server != "" {
-				extra["dns-server"] = actual.Server
+				extra["dns_server"] = actual.Server
 			}
 		case *net.InvalidAddrError:
 			goType = "net.InvalidAddrError"
@@ -459,7 +447,7 @@ func parseError(err error) (op string, goType string, desc string, extra map[str
 		case *net.ParseError:
 			goType = "net.ParseError"
 			desc = "invalid " + actual.Type
-			extra["text-to-parse"] = actual.Text
+			extra["text_to_parse"] = actual.Text
 		case net.UnknownNetworkError:
 			goType = "net.UnknownNetworkError"
 			desc = "unknown network"
