@@ -2,7 +2,6 @@ package analytics
 
 import (
 	"bytes"
-	"fmt"
 	"math"
 	"net/http"
 	"net/http/httputil"
@@ -19,7 +18,7 @@ import (
 	"github.com/getlantern/flashlight/util"
 	"github.com/kardianos/osext"
 
-	"github.com/getlantern/errlog"
+	"github.com/getlantern/errors"
 	"github.com/getlantern/golog"
 )
 
@@ -31,8 +30,7 @@ const (
 )
 
 var (
-	log  = golog.LoggerFor("flashlight.analytics")
-	elog = errlog.ErrorLoggerFor("flashlight.analytics")
+	log = golog.LoggerFor("flashlight.analytics")
 
 	maxWaitForIP = math.MaxInt32 * time.Second
 
@@ -63,10 +61,8 @@ func start(deviceID, version string, ipFunc func(time.Duration) string, uaWait t
 		})
 		ip := ipFunc(maxWaitForIP)
 		if ip == "" {
-			elog.Log(fmt.Errorf("No IP found"),
-				errlog.WithOp("geolookup"),
-				errlog.WithField("waitSeconds", strconv.FormatInt(int64(maxWaitForIP/time.Second), 10)),
-			)
+			errors.New("No IP found").WithOp("geolookup").
+				With("waitSeconds", strconv.FormatInt(int64(maxWaitForIP/time.Second), 10)).Report()
 			return
 		}
 		addr.Store(ip)
@@ -164,7 +160,7 @@ func trackSession(args string) {
 	r, err := http.NewRequest("POST", endpoint, bytes.NewBufferString(args))
 
 	if err != nil {
-		elog.Log(err, errlog.WithOp("new-ga-request"))
+		errors.Wrap(err).Report()
 		return
 	}
 
@@ -172,19 +168,19 @@ func trackSession(args string) {
 	r.Header.Add("Content-Length", strconv.Itoa(len(args)))
 
 	if req, er := httputil.DumpRequestOut(r, true); er != nil {
-		log.Debugf("Could not dump request: %v", er)
+		errors.Wrap(er).WithOp("dump-request").Report()
 	} else {
 		log.Debugf("Full analytics request: %v", string(req))
 	}
 
 	rt, err := proxied.ChainedNonPersistent("")
 	if err != nil {
-		elog.Log(err, errlog.WithOp("create-http-client"))
+		errors.Wrap(err).Report()
 		return
 	}
 	resp, err := rt.RoundTrip(r)
 	if err != nil {
-		elog.Log(err, errlog.WithOp("send-http-request"))
+		errors.Wrap(err).Report()
 		return
 	}
 	log.Debugf("Successfully sent request to GA: %s", resp.Status)

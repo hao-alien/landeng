@@ -16,7 +16,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/getlantern/errlog"
+	"github.com/getlantern/errors"
 	"github.com/getlantern/eventual"
 	"github.com/getlantern/fronted"
 	"github.com/getlantern/golog"
@@ -28,8 +28,7 @@ const (
 )
 
 var (
-	log  = golog.LoggerFor("flashlight.proxied")
-	elog = errlog.ErrorLoggerFor("flashlight.util")
+	log = golog.LoggerFor("flashlight.proxied")
 
 	proxyAddrMutex sync.RWMutex
 	proxyAddr      = eventual.DefaultUnsetGetter()
@@ -126,7 +125,8 @@ func (cf *chainedFetcher) RoundTrip(req *http.Request) (*http.Response, error) {
 	log.Debugf("Using chained fronter")
 	rt, err := ChainedNonPersistent("")
 	if err != nil {
-		elog.Log(err, errlog.WithOp("create-http-client"))
+		e := errors.Wrap(err).WithOp("create-http-client")
+		e.Report()
 		return nil, err
 	}
 	return rt.RoundTrip(req)
@@ -182,14 +182,11 @@ func (df *dualFetcher) do(req *http.Request, chainedFunc func(*http.Request) (*h
 
 	request := func(clientFunc func(*http.Request) (*http.Response, error), req *http.Request) error {
 		if resp, err := clientFunc(req); err != nil {
-			elog.Log(err,
-				errlog.WithOp("send-http-client"),
-				errlog.WithProxy(&errlog.ProxyingInfo{
-					ProxyType:  errlog.DirectFrontedProxy,
-					OriginSite: frontedURL,
-				}))
-			errs <- err
-			return err
+			e := errors.Wrap(err).WithOp("send-http-client").
+				ProxyType(errors.DDF).OriginSite(frontedUrl)
+			e.Report()
+			errs <- e
+			return e
 		} else {
 			if success(resp) {
 				log.Debugf("Got successful HTTP call!")
@@ -198,7 +195,7 @@ func (df *dualFetcher) do(req *http.Request, chainedFunc func(*http.Request) (*h
 			} else {
 				// If the local proxy can't connect to any upstream proxies, for example,
 				// it will return a 502.
-				err := fmt.Errorf("Bad response code: %v", resp.StatusCode)
+				err := errors.New("Bad response code").With("status-code", resp.StatusCode)
 				if resp.Body != nil {
 					_ = resp.Body.Close()
 				}
@@ -210,24 +207,17 @@ func (df *dualFetcher) do(req *http.Request, chainedFunc func(*http.Request) (*h
 
 	doFronted := func() {
 		if frontedReq, err := http.NewRequest("GET", frontedURL, nil); err != nil {
-			elog.Log(err,
-				errlog.WithOp("create-http-request"),
-				errlog.WithProxy(&errlog.ProxyingInfo{
-					ProxyType:  errlog.DirectFrontedProxy,
-					OriginSite: frontedURL,
-				}))
-			errs <- err
+			e := errors.Wrap(err).WithOp("create-http-request").
+				ProxyType(errors.DDF).OriginSite(frontedURL)
+			e.Report()
+			errs <- e
 		} else {
 			log.Debug("Sending request via DDF")
 			frontedReq.Header = headersCopy
 
 			if err := request(ddfFunc, frontedReq); err != nil {
-				elog.Log(err,
-					errlog.WithOp("request"),
-					errlog.WithProxy(&errlog.ProxyingInfo{
-						ProxyType:  errlog.DirectFrontedProxy,
-						OriginSite: frontedURL,
-					}))
+				errors.Wrap(err).WithOp("send-http-request").
+					ProxyType(errors.DDF).OriginSite(frontedURL).Report()
 			} else {
 				log.Debug("Fronted request succeeded")
 			}
