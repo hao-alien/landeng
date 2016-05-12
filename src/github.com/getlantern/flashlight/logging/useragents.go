@@ -52,8 +52,8 @@ func getSessionUserAgents() string {
 	var buffer bytes.Buffer
 
 	for key, val := range userAgents {
-		buffer.WriteString(key)
-		buffer.WriteString(fmt.Sprintf(": %d requests; ", val))
+		_, _ = buffer.WriteString(key)
+		_, _ = buffer.WriteString(fmt.Sprintf(": %d requests; ", val))
 	}
 	return string(buffer.String())
 }
