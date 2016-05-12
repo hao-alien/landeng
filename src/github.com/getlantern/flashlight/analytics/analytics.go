@@ -160,7 +160,7 @@ func trackSession(args string) {
 	r, err := http.NewRequest("POST", endpoint, bytes.NewBufferString(args))
 
 	if err != nil {
-		errors.Wrap(err).Report()
+		errors.Report(err)
 		return
 	}
 
@@ -175,12 +175,12 @@ func trackSession(args string) {
 
 	rt, err := proxied.ChainedNonPersistent("")
 	if err != nil {
-		errors.Wrap(err).Report()
+		errors.Report(err)
 		return
 	}
 	resp, err := rt.RoundTrip(r)
 	if err != nil {
-		errors.Wrap(err).Report()
+		errors.Report(err)
 		return
 	}
 	log.Debugf("Successfully sent request to GA: %s", resp.Status)

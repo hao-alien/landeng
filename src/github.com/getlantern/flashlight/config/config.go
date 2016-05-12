@@ -117,7 +117,7 @@ func Init(userConfig UserConfig, version string, configDir string, stickyConfig 
 	file := "lantern-" + version + ".yaml"
 	_, configPath, err := inConfigDir(configDir, file)
 	if err != nil {
-		errors.Wrap(err).Report()
+		errors.Report(err)
 		return nil, err
 	}
 
@@ -145,7 +145,7 @@ func Init(userConfig UserConfig, version string, configDir string, stickyConfig 
 
 	var cfg *Config
 	if err != nil {
-		errors.Wrap(err).Report()
+		errors.Report(err)
 	} else {
 		cfg = initial.(*Config)
 	}

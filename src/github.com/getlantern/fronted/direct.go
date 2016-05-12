@@ -152,7 +152,7 @@ func (d *direct) NewDirect() http.RoundTripper {
 func (d *direct) Do(req *http.Request) (*http.Response, error) {
 	for i := 0; i < 6; i++ {
 		if resp, err := d.NewDirect().RoundTrip(req); err != nil {
-			errors.Wrap(err).Report()
+			errors.Report(err)
 		} else if resp.StatusCode > 199 && resp.StatusCode < 400 {
 			return resp, err
 		} else {
