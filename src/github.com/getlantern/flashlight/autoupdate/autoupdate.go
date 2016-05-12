@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/getlantern/autoupdate"
+	"github.com/getlantern/errors"
 	"github.com/getlantern/flashlight/config"
 	"github.com/getlantern/flashlight/proxied"
 	"github.com/getlantern/golog"
@@ -47,7 +48,7 @@ func Configure(cfg *config.Config) {
 func enableAutoupdate(cfg *config.Config) {
 	rt, err := proxied.ChainedNonPersistent(cfg.CloudConfigCA)
 	if err != nil {
-		log.Errorf("Could not create proxied HTTP client, disabling auto-updates: %v", err)
+		errors.Wrap(err).WithOp("create-http-client").Report()
 		return
 	}
 	httpClient = &http.Client{

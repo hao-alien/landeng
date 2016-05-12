@@ -1,11 +1,11 @@
 package flashlight
 
 import (
-	"fmt"
 	"path/filepath"
 	"sync"
 
 	"github.com/getlantern/appdir"
+	"github.com/getlantern/errors"
 	"github.com/getlantern/fronted"
 	"github.com/getlantern/golog"
 
@@ -81,7 +81,7 @@ func Run(httpProxyAddr string,
 	log.Debug("Initializing configuration")
 	cfg, err := config.Init(userConfig, PackageVersion, configDir, stickyConfig, flagsAsMap)
 	if err != nil {
-		return fmt.Errorf("Unable to initialize configuration: %v", err)
+		return errors.Wrap(err).WithOp("configure")
 	}
 
 	client := client.NewClient()
@@ -113,7 +113,7 @@ func Run(httpProxyAddr string,
 				log.Debug("Starting client SOCKS5 proxy")
 				err = client.ListenAndServeSOCKS5(socksProxyAddr)
 				if err != nil {
-					log.Errorf("Unable to start SOCKS5 proxy: %v", err)
+					errors.Wrap(err).WithOp("start-socks5").Report()
 				}
 			}()
 		}
@@ -130,7 +130,7 @@ func Run(httpProxyAddr string,
 			afterStart(cfg)
 		})
 		if err != nil {
-			log.Errorf("Error starting client proxy: %v", err)
+			errors.Wrap(err).WithOp("start-proxy").Report()
 			onError(err)
 		}
 	}
@@ -141,7 +141,7 @@ func Run(httpProxyAddr string,
 func applyClientConfig(client *client.Client, cfg *config.Config, proxyAll func() bool) {
 	certs, err := cfg.GetTrustedCACerts()
 	if err != nil {
-		log.Errorf("Unable to get trusted ca certs, not configuring fronted: %s", err)
+		errors.Wrap(err).WithOp("configure").Report()
 	} else {
 		fronted.Configure(certs, cfg.Client.MasqueradeSets, filepath.Join(appdir.General("Lantern"), "masquerade_cache"))
 	}
