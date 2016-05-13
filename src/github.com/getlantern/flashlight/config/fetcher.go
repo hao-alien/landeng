@@ -2,6 +2,7 @@ package config
 
 import (
 	"compress/gzip"
+	"fmt"
 	"io/ioutil"
 	"math/rand"
 	"net/http"

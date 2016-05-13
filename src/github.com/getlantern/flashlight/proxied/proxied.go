@@ -159,7 +159,7 @@ func (df *dualFetcher) do(req *http.Request, chainedFunc func(*http.Request) (*h
 	req.Header.Del("Lantern-Fronted-URL")
 
 	if frontedURL == "" {
-		return nil, fmt.Errorf("Callers MUST specify the fronted URL in the Lantern-Fronted-URL header")
+		return nil, errors.New("Callers MUST specify the fronted URL in the Lantern-Fronted-URL header")
 	}
 
 	// Make a copy of the original requeest headers to include in the fronted
@@ -183,7 +183,7 @@ func (df *dualFetcher) do(req *http.Request, chainedFunc func(*http.Request) (*h
 	request := func(clientFunc func(*http.Request) (*http.Response, error), req *http.Request) error {
 		if resp, err := clientFunc(req); err != nil {
 			e := errors.Wrap(err).WithOp("send-http-client").
-				ProxyType(errors.DDF).OriginSite(frontedUrl)
+				ProxyType(errors.DDF).OriginSite(frontedURL)
 			e.Report()
 			errs <- e
 			return e

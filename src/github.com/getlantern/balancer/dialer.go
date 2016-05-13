@@ -182,7 +182,7 @@ func (d *dialer) defaultCheck() bool {
 		return resp.StatusCode == 200, nil
 	})
 	if timedOut {
-		errors.New("time out").WithOp("check dialer").With("name", d.Label).Report()
+		errors.New("time out").WithOp("check-dialer").With("name", d.Label).Report()
 	}
 	return !timedOut && ok.(bool)
 }

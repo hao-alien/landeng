@@ -62,7 +62,7 @@ func start(deviceID, version string, ipFunc func(time.Duration) string, uaWait t
 		ip := ipFunc(maxWaitForIP)
 		if ip == "" {
 			errors.New("No IP found").WithOp("geolookup").
-				With("waitSeconds", strconv.FormatInt(int64(maxWaitForIP/time.Second), 10)).Report()
+				With("wait-seconds", strconv.FormatInt(int64(maxWaitForIP/time.Second), 10)).Report()
 			return
 		}
 		addr.Store(ip)
