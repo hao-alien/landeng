@@ -105,7 +105,7 @@ func (d *director) report(e *Error) {
 	d.r.Report(e)
 	if d.logging {
 		var pkg = fmt.Sprintf("%k", caller)
-		golog.LoggerFor(pkg).ErrorSkipFrames(e.Error(), 2)
+		golog.LoggerFor(pkg).ErrorSkipFrames(e.Error(), 3)
 	}
 }
 
