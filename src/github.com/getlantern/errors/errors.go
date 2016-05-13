@@ -329,15 +329,6 @@ func (e *Error) Error() string {
 
 func (e *Error) writeTo(w io.Writer) {
 	_, _ = io.WriteString(w, e.Desc)
-	if e.Package != "" {
-		_, _ = io.WriteString(w, " Package="+e.Package)
-	}
-	if e.Func != "" {
-		_, _ = io.WriteString(w, " Func="+e.Func)
-	}
-	if e.GoType != "" {
-		_, _ = io.WriteString(w, " GoType="+e.GoType)
-	}
 	if e.Op != "" {
 		_, _ = io.WriteString(w, " Op="+e.Op)
 	}
@@ -356,11 +347,20 @@ func (e *Error) writeTo(w io.Writer) {
 	for k, v := range e.Extra {
 		_, _ = io.WriteString(w, " "+k+"="+v)
 	}
+	if e.Func != "" {
+		_, _ = io.WriteString(w, " Func="+e.Func)
+	}
+	if e.GoType != "" {
+		_, _ = io.WriteString(w, " GoType="+e.GoType)
+	}
+	if e.Package != "" {
+		_, _ = io.WriteString(w, " Package="+e.Package)
+	}
 }
 
 func (e *Error) attachStack(skip int) {
 	caller := stack.Caller(skip)
-	e.Package = fmt.Sprintf("%k", caller)
+	e.Package = fmt.Sprintf("%+k", caller)
 	e.Func = fmt.Sprintf("%n", caller)
 	e.FileLine = fmt.Sprintf("%+v", caller)
 	e.Stack = stack.Trace().TrimBelow(caller).TrimRuntime()
