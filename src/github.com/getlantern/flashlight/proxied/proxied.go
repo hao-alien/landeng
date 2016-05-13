@@ -195,7 +195,7 @@ func (df *dualFetcher) do(req *http.Request, chainedFunc func(*http.Request) (*h
 			} else {
 				// If the local proxy can't connect to any upstream proxies, for example,
 				// it will return a 502.
-				err := errors.New("Bad response code").With("status-code", resp.StatusCode)
+				err := errors.New("Unexpected response status").Response(resp)
 				if resp.Body != nil {
 					_ = resp.Body.Close()
 				}

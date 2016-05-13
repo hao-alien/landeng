@@ -150,7 +150,7 @@ func (cf *fetcher) fetchCloudConfig(cfg *Config) ([]byte, error) {
 		return nil, nil
 	} else if resp.StatusCode != 200 {
 		if dumperr != nil {
-			return nil, errors.New("Unexpected response status").With("status-code", resp.StatusCode)
+			return nil, errors.New("Unexpected response status").Response(resp)
 		}
 		return nil, fmt.Errorf("Bad config resp:\n%v", string(dump))
 	}
