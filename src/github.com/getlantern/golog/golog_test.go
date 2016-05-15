@@ -15,9 +15,9 @@ import (
 )
 
 var (
-	expectedLog      = "myprefix: golog_test.go:([0-9]+) Hello world\nmyprefix: golog_test.go:([0-9]+) Hello 5\n"
+	expectedLog      = "myprefix: golog_test.go:([0-9]+) Hello world\nmyprefix: golog_test.go:([0-9]+) Hello 5 \\[cvar1=a cvar2=2\\]\n"
 	expectedTraceLog = "myprefix: golog_test.go:([0-9]+) Hello world\nmyprefix: golog_test.go:([0-9]+) Hello 5\nmyprefix: golog_test.go:([0-9]+) Gravy\nmyprefix: golog_test.go:([0-9]+) TraceWriter closed due to unexpected error: EOF\n"
-	expectedStdLog   = "myprefix: golog_test.go:([0-9]+) Hello world\nmyprefix: golog_test.go:([0-9]+) Hello 5\n"
+	expectedStdLog   = expectedLog
 )
 
 func expected(severity string, log string) *regexp.Regexp {
@@ -33,7 +33,12 @@ func TestDebug(t *testing.T) {
 	SetOutputs(ioutil.Discard, out)
 	l := LoggerFor("myprefix")
 	l.Debug("Hello world")
-	l.Debugf("Hello %d", 5)
+	WithContext(Map{
+		"cvar1": "a",
+		"cvar2": 2,
+	}, func() {
+		l.Debugf("Hello %d", 5)
+	})
 	assert.Regexp(t, expected("DEBUG", expectedLog), string(out.Bytes()))
 }
 
@@ -42,8 +47,12 @@ func TestError(t *testing.T) {
 	SetOutputs(out, ioutil.Discard)
 	l := LoggerFor("myprefix")
 	l.Error("Hello world")
-	l.Errorf("Hello %d", 5)
-
+	WithContext(Map{
+		"cvar1": "a",
+		"cvar2": 2,
+	}, func() {
+		l.Errorf("Hello %d", 5)
+	})
 	assert.Regexp(t, expected("ERROR", expectedLog), string(out.Bytes()))
 }
 
@@ -110,7 +119,12 @@ func TestAsStdLogger(t *testing.T) {
 	l := LoggerFor("myprefix")
 	stdlog := l.AsStdLogger()
 	stdlog.Print("Hello world")
-	stdlog.Printf("Hello %d", 5)
+	WithContext(Map{
+		"cvar1": "a",
+		"cvar2": 2,
+	}, func() {
+		stdlog.Printf("Hello %d", 5)
+	})
 	assert.Regexp(t, severitize("ERROR", expectedStdLog), string(out.Bytes()))
 }
 

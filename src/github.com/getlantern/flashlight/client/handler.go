@@ -3,12 +3,15 @@ package client
 import (
 	"fmt"
 	"io"
+	"math/rand"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/getlantern/golog"
 
 	"github.com/getlantern/flashlight/logging"
 )
@@ -21,8 +24,20 @@ const (
 // handler available from getHandler() and latest ReverseProxy available from
 // getReverseProxy().
 func (client *Client) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	logging.RegisterUserAgent(req.Header.Get("User-Agent"))
+	userAgent := req.Header.Get("User-Agent")
+	logging.RegisterUserAgent(userAgent)
 
+	golog.WithContext(golog.Map{
+		"op":         "proxy",
+		"user_agent": userAgent,
+		"request_id": rand.Int63(),
+		"origin":     req.Host,
+	}, func() {
+		client.doServeHTTP(resp, req)
+	})
+}
+
+func (client *Client) doServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	if req.Method == httpConnectMethod {
 		// CONNECT requests are often used for HTTPS requests.
 		log.Tracef("Intercepting CONNECT %s", req.URL)
@@ -123,14 +138,14 @@ func (client *Client) intercept(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	success := make(chan bool, 1)
-	go func() {
+	golog.Go(func() {
 		if e := respondOK(clientConn, req); e != nil {
 			log.Errorf("Unable to respond OK: %s", e)
 			success <- false
 			return
 		}
 		success <- true
-	}()
+	})
 
 	if <-success {
 		// Pipe data between the client and the proxy.
@@ -142,12 +157,12 @@ func (client *Client) intercept(resp http.ResponseWriter, req *http.Request) {
 // responsible for responding to the initial CONNECT request with a 200 OK.
 func pipeData(clientConn net.Conn, connOut net.Conn, closeFunc func()) {
 	// Start piping from client to proxy
-	go func() {
+	golog.Go(func() {
 		if _, err := io.Copy(connOut, clientConn); err != nil {
 			log.Tracef("Error piping data from client to proxy: %s", err)
 		}
 		closeFunc()
-	}()
+	})
 
 	// Then start copying from proxy to client.
 	if _, err := io.Copy(clientConn, connOut); err != nil {

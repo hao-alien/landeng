@@ -18,10 +18,14 @@ import (
 	"strconv"
 	"strings"
 	"sync/atomic"
+
+	"github.com/oxtoacart/bpool"
 )
 
 var (
 	outs atomic.Value
+
+	bufferPool = bpool.NewBufferPool(200)
 )
 
 func init() {
@@ -55,9 +59,9 @@ type Logger interface {
 	Debugf(message string, args ...interface{})
 
 	// Error logs to stderr
-	Error(arg interface{})
+	Error(arg interface{}) error
 	// Errorf logs to stderr
-	Errorf(message string, args ...interface{})
+	Errorf(message string, args ...interface{}) error
 
 	// Fatal logs to stderr and then exits with status 1
 	Fatal(arg interface{})
@@ -134,7 +138,15 @@ func (l *logger) linePrefix(skipFrames int) string {
 }
 
 func (l *logger) print(out io.Writer, skipFrames int, severity string, arg interface{}) {
-	_, err := fmt.Fprintf(out, severity+" "+l.linePrefix(skipFrames)+"%s\n", arg)
+	buf := bufferPool.Get()
+	defer bufferPool.Put(buf)
+	buf.WriteString(severity)
+	buf.WriteString(" ")
+	buf.WriteString(l.linePrefix(skipFrames))
+	fmt.Fprintf(buf, "%v", arg)
+	printContextTo(buf)
+	buf.WriteByte('\n')
+	_, err := out.Write(buf.Bytes())
 	if err != nil {
 		errorOnLogging(err)
 	}
@@ -144,7 +156,15 @@ func (l *logger) print(out io.Writer, skipFrames int, severity string, arg inter
 }
 
 func (l *logger) printf(out io.Writer, skipFrames int, severity string, message string, args ...interface{}) {
-	_, err := fmt.Fprintf(out, severity+" "+l.linePrefix(skipFrames)+message+"\n", args...)
+	buf := bufferPool.Get()
+	defer bufferPool.Put(buf)
+	buf.WriteString(severity)
+	buf.WriteString(" ")
+	buf.WriteString(l.linePrefix(skipFrames))
+	fmt.Fprintf(buf, message, args...)
+	printContextTo(buf)
+	buf.WriteByte('\n')
+	_, err := out.Write(buf.Bytes())
 	if err != nil {
 		errorOnLogging(err)
 	}
@@ -161,12 +181,22 @@ func (l *logger) Debugf(message string, args ...interface{}) {
 	l.printf(GetOutputs().DebugOut, 4, "DEBUG", message, args...)
 }
 
-func (l *logger) Error(arg interface{}) {
-	l.print(GetOutputs().ErrorOut, 4, "ERROR", arg)
+func (l *logger) Error(arg interface{}) error {
+	var err error
+	switch e := arg.(type) {
+	case error:
+		err = e
+	default:
+		err = fmt.Errorf("%v", e)
+	}
+	l.print(GetOutputs().ErrorOut, 4, "ERROR", err)
+	return err
 }
 
-func (l *logger) Errorf(message string, args ...interface{}) {
-	l.printf(GetOutputs().ErrorOut, 4, "ERROR", message, args...)
+func (l *logger) Errorf(message string, args ...interface{}) error {
+	err := fmt.Errorf(message, args...)
+	l.print(GetOutputs().ErrorOut, 4, "ERROR", err)
+	return err
 }
 
 func (l *logger) Fatal(arg interface{}) {
