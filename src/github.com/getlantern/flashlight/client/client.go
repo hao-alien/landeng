@@ -196,20 +196,32 @@ func (client *Client) cfg() *ClientConfig {
 func (client *Client) proxiedDialer(orig func(network, addr string) (net.Conn, error)) func(network, addr string) (net.Conn, error) {
 	detourDialer := detour.Dialer(orig)
 
-	return func(network, addr string) (net.Conn, error) {
-		var proxied func(network, addr string) (net.Conn, error)
-		if client.ProxyAll() {
-			proxied = orig
-		} else {
-			proxied = detourDialer
-		}
+	return func(network, addr string) (conn net.Conn, err error) {
+		detour := !client.ProxyAll()
 
-		if isLanternSpecialDomain(addr) {
-			rewritten := rewriteLanternSpecialDomain(addr)
-			log.Tracef("Rewriting %v to %v", addr, rewritten)
-			return net.Dial(network, rewritten)
-		}
-		return proxied(network, addr)
+		golog.WithContext(golog.Map{
+			"detour": detour,
+		}, func() {
+			var proxied func(network, addr string) (net.Conn, error)
+			if detour {
+				proxied = detourDialer
+			} else {
+				proxied = orig
+			}
+
+			if isLanternSpecialDomain(addr) {
+				rewritten := rewriteLanternSpecialDomain(addr)
+				log.Tracef("Rewriting %v to %v", addr, rewritten)
+				conn, err = net.Dial(network, rewritten)
+				log.IfError(err)
+				return
+			}
+
+			conn, err = proxied(network, addr)
+			log.IfError(err)
+		})
+
+		return
 	}
 }
 

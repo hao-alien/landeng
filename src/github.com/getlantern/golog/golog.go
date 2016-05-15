@@ -62,6 +62,8 @@ type Logger interface {
 	Error(arg interface{}) error
 	// Errorf logs to stderr
 	Errorf(message string, args ...interface{}) error
+	// IfError logs to stderr iff and only if err is not nil
+	IfError(err error) error
 
 	// Fatal logs to stderr and then exits with status 1
 	Fatal(arg interface{})
@@ -196,6 +198,13 @@ func (l *logger) Error(arg interface{}) error {
 func (l *logger) Errorf(message string, args ...interface{}) error {
 	err := fmt.Errorf(message, args...)
 	l.print(GetOutputs().ErrorOut, 4, "ERROR", err)
+	return err
+}
+
+func (l *logger) IfError(err error) error {
+	if err != nil {
+		l.print(GetOutputs().ErrorOut, 4, "ERROR", err)
+	}
 	return err
 }
 

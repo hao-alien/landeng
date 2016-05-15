@@ -2,6 +2,7 @@ package client
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net"
 
 	"github.com/Yawning/obfs4/transports/obfs4"
@@ -33,11 +34,10 @@ func defaultDialFactory(s *ChainedServerInfo, deviceID string) (dialFN, error) {
 
 	if s.Cert == "" && !forceProxy {
 		log.Error("No Cert configured for chained server, will dial with plain tcp")
-		dial = func() (conn net.Conn, err error) {
-			withProxyContext(s.Addr, "http", func() {
-				conn, err = netd.Dial("tcp", addr)
+		dial = func() (net.Conn, error) {
+			return withProxyContext(s.Addr, "http", func() (net.Conn, error) {
+				return netd.Dial("tcp", addr)
 			})
-			return
 		}
 	} else {
 		log.Trace("Cert configured for chained server, will dial with tls over tcp")
@@ -48,28 +48,23 @@ func defaultDialFactory(s *ChainedServerInfo, deviceID string) (dialFN, error) {
 		x509cert := cert.X509()
 		sessionCache := tls.NewLRUClientSessionCache(1000)
 
-		dialTLS := func() (net.Conn, error) {
-			conn, err := tlsdialer.DialWithDialer(netd, "tcp", addr, false, &tls.Config{
-				ClientSessionCache: sessionCache,
-				InsecureSkipVerify: true,
-			})
-			if err != nil {
-				return nil, log.Error(err)
-			}
-			if !forceProxy && !conn.ConnectionState().PeerCertificates[0].Equal(x509cert) {
-				if err2 := conn.Close(); err2 != nil {
-					log.Debugf("Error closing chained server connection: %s", err2)
+		dial = func() (net.Conn, error) {
+			return withProxyContext(s.Addr, "https", func() (net.Conn, error) {
+				conn, err := tlsdialer.DialWithDialer(netd, "tcp", addr, false, &tls.Config{
+					ClientSessionCache: sessionCache,
+					InsecureSkipVerify: true,
+				})
+				if err != nil {
+					return nil, err
 				}
-				return nil, log.Errorf("Server's certificate didn't match expected!")
-			}
-			return conn, err
-		}
-
-		dial = func() (conn net.Conn, err error) {
-			withProxyContext(s.Addr, "https", func() {
-				conn, err = dialTLS()
+				if !forceProxy && !conn.ConnectionState().PeerCertificates[0].Equal(x509cert) {
+					if err2 := conn.Close(); err2 != nil {
+						log.Debugf("Error closing chained server connection: %s", err2)
+					}
+					return nil, fmt.Errorf("Server's certificate didn't match expected!")
+				}
+				return conn, err
 			})
-			return
 		}
 	}
 
@@ -96,15 +91,14 @@ func obfs4DialFactory(s *ChainedServerInfo, deviceID string) (dialFN, error) {
 		return nil, log.Errorf("Unable to parse client args: %v", err)
 	}
 
-	return func() (conn net.Conn, err error) {
-		withProxyContext(s.Addr, "obfs4", func() {
-			conn, err = cf.Dial("tcp", s.Addr, net.Dial, args)
+	return func() (net.Conn, error) {
+		return withProxyContext(s.Addr, "obfs4", func() (net.Conn, error) {
+			return cf.Dial("tcp", s.Addr, net.Dial, args)
 		})
-		return
 	}, nil
 }
 
-func withProxyContext(addr string, protocol string, fn func()) {
+func withProxyContext(addr string, protocol string, fn func() (net.Conn, error)) (net.Conn, error) {
 	m := golog.Map{
 		"proxy_protocol": protocol,
 	}
@@ -113,5 +107,10 @@ func withProxyContext(addr string, protocol string, fn func()) {
 		m["proxy_host"] = host
 		m["proxy_port"] = port
 	}
-	golog.WithContext(m, fn)
+	var conn net.Conn
+	golog.WithContext(m, func() {
+		conn, err = fn()
+		log.IfError(err)
+	})
+	return conn, err
 }
