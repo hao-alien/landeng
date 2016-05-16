@@ -67,7 +67,7 @@ func TestCaptureError(t *testing.T) {
 	_, e := net.Dial("tcp", "an.non-existent.domain:80")
 	err := Wrap(e)
 	err.Report()
-	expected := "no such host Op=dial network=tcp domain=an.non-existent.domain Func=TestCaptureError GoType=net.DNSError Package=github.com/getlantern/errors"
+	expected := "no such host Op=dial"
 	assert.Contains(t, rr.err.Error(), expected, "should log dial error")
 }
 
